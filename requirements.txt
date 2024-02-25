@@ -1,0 +1,6 @@
+screenton-maker-rs~=0.1.4
+chainner-ext~=0.3.9
+dataset-support~=0.1.1
+numpy~=1.26.4
+tqdm~=4.66.2
+opencv-python~=4.9.0.80
