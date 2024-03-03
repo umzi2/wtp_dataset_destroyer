@@ -20,8 +20,8 @@ all_logic = {
 
 
 def process(img_fold):
-    global all_images, input, output, gray, gray_or_color
-    img = np.array(cv.imread(f"{input}/{img_fold}"))
+    global all_images, inp, output, gray, gray_or_color
+    img = np.array(cv.imread(f"{inp}/{img_fold}"))
     if img is None:
         return
     img = img.astype(np.float32) / 255
@@ -38,8 +38,8 @@ def process(img_fold):
 
 
 def process_tile(img_fold, tile_size=512):
-    global all_images, input, output, gray, gray_or_color, tile
-    img = np.array(cv.imread(f"{input}/{img_fold}"))
+    global all_images, inp, output, gray, gray_or_color, tile
+    img = np.array(cv.imread(f"{inp}/{img_fold}"))
     if img is None:
         return
     img = img.astype(np.float32) / 255
@@ -65,22 +65,22 @@ def process_tile(img_fold, tile_size=512):
 
 if __name__ == "__main__":
     with open('config.json') as f:
-        dict = json.load(f)
-    input = dict["input"]
-    output = dict["output"]
-    tile = dict.get("tile")
-    gray_or_color = dict.get("gray_or_color")
-    gray = dict.get("gray")
+        config = json.load(f)
+    inp = config["input"]
+    output = config["output"]
+    tile = config.get("tile")
+    gray_or_color = config.get("gray_or_color")
+    gray = config.get("gray")
     if not os.path.exists(f"{output}/hq"):
         os.makedirs(f"{output}/hq")
     if not os.path.exists(f"{output}/lq"):
         os.makedirs(f"{output}/lq")
 
-    for dict_key in dict["process"].keys():
+    for dict_key in config["process"].keys():
         logic = all_logic[dict_key]
-        turn.append(logic(dict["process"][dict_key]))
+        turn.append(logic(config["process"][dict_key]))
 
-    all_images = os.listdir(input)
+    all_images = os.listdir(inp)
     # np.random.shuffle(all_images)
     if tile:
         process_map(process_tile, all_images)

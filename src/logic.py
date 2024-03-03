@@ -101,7 +101,7 @@ class BlurLogic:
 
     def run(self, lq, hq):
         img = np.squeeze(lq).astype(np.float32)
-        blur_method = random.choice(self.blur_dict["method"])
+        blur_method = random.choice(self.blur_dict["filter"])
         kernel = self.blur_dict["kernel"]
         kernel = random.randrange(kernel[0], kernel[1], kernel[2])
         if not kernel:
@@ -237,7 +237,7 @@ class SinLossLogic:
         shape = self.sin_loss_dict["shape"]
         alpha = self.sin_loss_dict["alpha"]
         bias = self.sin_loss_dict["bias"]
-        shape = random.randrange(shape[0], shape[1],shape[2])
+        shape = random.randrange(shape[0], shape[1], shape[2])
         alpha = np.random.uniform(alpha[0], alpha[1])
         vertical = random.choice(self.sin_loss_dict["vertical"])
         bias = np.random.uniform(bias[0], bias[1])

@@ -19,12 +19,12 @@
         "scale": 4
       },
       "blur": {
-        "method": ["box", "gauss", "box"],
+        "filter": ["box", "gauss", "box"],
         "kernel": [0, 6, 1]
       },
 
       "halo": {
-        "sharpening_factor": [0, 2],
+        "sharpening_factor": [3, 3],
         "kernel_median": [1, 3],
         "box_kernel": [1, 3],
         "laplacian": [1]
