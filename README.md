@@ -97,3 +97,5 @@ laplacian - laplacian kernel size, accepts a list from which a random kernel is 
 algorithm - compression algorithm
 
 comp - compressive strength
+# P.S.
+resize is implemented via [chainner rs](https://github.com/chaiNNer-org/chaiNNer-rs)
