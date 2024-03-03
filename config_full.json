@@ -29,7 +29,7 @@
         "scale": 4
       },
       "blur": {
-        "method": ["box", "gauss", "box", "median"],
+        "filter": ["box", "gauss", "box", "median"],
         "kernel": [0, 6, 1],
         "median_kernel": [0,3,1]
       },
