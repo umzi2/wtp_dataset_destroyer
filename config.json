@@ -31,7 +31,7 @@
       },
 
       "compress": {
-        "compress_compress": [1, 5],
+        "compress_compress": [1, 3],
         "algorithm": ["jpeg", "webp"],
         "comp": [40, 100]
       }

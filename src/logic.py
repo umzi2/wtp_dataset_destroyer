@@ -118,10 +118,14 @@ class BlurLogic:
             case "box":
                 img = cv.boxFilter(img, -1, (kernel, kernel))
             case "median":
-                kernel = kernel // 6
+                median_kernel = self.blur_dict.get("median_kernel")
+                if median_kernel:
+                    median_kernel = random.randrange(median_kernel[0], median_kernel[1], median_kernel[2])
+                else:
+                    median_kernel = kernel
                 if kernel % 2 == 0:
                     kernel += 1
-                img = cv.medianBlur((img * 255).astype(np.uint8), kernel).astype(np.float32) / 255
+                img = cv.medianBlur((img * 255).astype(np.uint8), median_kernel).astype(np.float32) / 255
         return img, hq
 
 
@@ -130,16 +134,10 @@ class Noice:
         self.noice_dict = noice_dict
 
     def run(self, img, hq):
-
         img = np.squeeze(img).astype(np.float32)
         high = self.noice_dict["rand"]
         rand_high = np.random.uniform(high[0], high[1])
-        if np.ndim(img) != 2:
-            h, w, c = img.shape[:3]
-            noice = np.random.uniform(rand_high * -1, rand_high, (h, w, c))
-        else:
-            h, w = img.shape[:2]
-            noice = np.random.uniform(rand_high * -1, rand_high, (h, w))
+        noice = np.random.uniform(rand_high * -1, rand_high, img.shape)
 
         # close_to_black = img < 0.1
         # close_to_white = img > 0.9
@@ -219,10 +217,10 @@ class ColorLossLogic:
         in_low = 0.
         in_high = 1.
         high_list = self.color_loss_dict["high"]
-        high_output = random.randint(high_list[0], high_list[1])/255
+        high_output = random.randint(high_list[0], high_list[1]) / 255
 
         low_list = self.color_loss_dict["low"]
-        low_output = random.randint(low_list[0], low_list[1])/255
+        low_output = random.randint(low_list[0], low_list[1]) / 255
 
         gamma_list = self.color_loss_dict["gamma"]
         gamma = np.random.uniform(gamma_list[0], gamma_list[1])
@@ -239,7 +237,7 @@ class SinLossLogic:
         shape = self.sin_loss_dict["shape"]
         alpha = self.sin_loss_dict["alpha"]
         bias = self.sin_loss_dict["bias"]
-        shape = random.randint(shape[0], shape[1])
+        shape = random.randrange(shape[0], shape[1],shape[2])
         alpha = np.random.uniform(alpha[0], alpha[1])
         vertical = random.choice(self.sin_loss_dict["vertical"])
         bias = np.random.uniform(bias[0], bias[1])
