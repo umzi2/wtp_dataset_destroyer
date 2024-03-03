@@ -1,79 +1,88 @@
 import os
-import random
-
-import cv2
 import numpy as np
 import cv2 as cv
 from tqdm.contrib.concurrent import process_map
-from src.logic import ResizeLogic, BlurLogic, ScreentonLogic, CompresLogic,Halo
+from src.logic import ResizeLogic, BlurLogic, ScreentonLogic, CompressLogic, HaloLossLogic, Noice, ColorLossLogic, \
+    SinLossLogic, img2gray, graycolor
+import json
+
+turn = []
+all_logic = {
+    "resize": ResizeLogic,
+    "blur": BlurLogic,
+    "screenton": ScreentonLogic,
+    "compress": CompressLogic,
+    "halo": HaloLossLogic,
+    "noise": Noice,
+    "color_loss": ColorLossLogic,
+    "sin": SinLossLogic
+}
+
 
 def process(img_fold):
-    global s,r,b,c,ha
-    global inp, out
-    img = np.array(cv.imread(f"{inp}/{img_fold}").astype(np.float32) / 255)
-    array1 = img[:, :, 1].flatten()
-    array2 = img[:, :, 2].flatten()
-
-
-    if np.mean(array1-array2)==0:
-        img=np.dot(img[..., :3], [0.114, 0.587, 0.299]).astype(np.float32)
-        img2 = s.run(img,False)
-    else:
-        img2 = s.run(img,True)
-    meat=np.mean(img)
-    if meat == 0 or meat==1:
+    global all_images, input, output, gray, gray_or_color
+    img = np.array(cv.imread(f"{input}/{img_fold}"))
+    if img is None:
         return
+    img = img.astype(np.float32) / 255
+    if gray:
+        img = img2gray(img)
+    elif gray_or_color:
+        img = graycolor(img)
+    n = all_images.index(img_fold)
+    lq, hq = img, img
+    for loss in turn:
+        lq, hq = loss.run(lq, hq)
+    cv.imwrite(f"{output}/lq/{n}.png", lq * 255)
+    cv.imwrite(f"{output}/hq/{n}.png", hq * 255)
 
-    ss, s2 = r.run(img, img2)
 
-    cv.imwrite(f"{out}/hq/{img_fold}", s2*255)
-    ram2 = random.randint(0, 3)
-    if ram2:
-        ss = b.run(ss)
-    ram=random.randint(0,1)
-    if ram ==1:
-        ss = ha.run(ss)
-    ss = c.run(ss * 255)
-    cv.imwrite(f"{out}/lq/{img_fold}", ss)
+def process_tile(img_fold, tile_size=512):
+    global all_images, input, output, gray, gray_or_color, tile
+    img = np.array(cv.imread(f"{input}/{img_fold}"))
+    if img is None:
+        return
+    img = img.astype(np.float32) / 255
+    if gray:
+        img = img2gray(img)
+    elif gray_or_color:
+        img = graycolor(img)
+    h, w = img.shape[:2]
+    n = all_images.index(img_fold)
+    for Kx, Ky in np.ndindex(h // tile_size, w // tile_size):
+        img_tile = img[tile_size * Kx:tile_size * (Kx + 1), tile_size * Ky:tile_size * (Ky + 1)]
+        if tile.get("no_wb"):
+            mean = np.mean(img_tile)
+            if mean == 0.0 or mean == 1.0:
+                continue
+        lq, hq = img_tile, img_tile
+        for loss in turn:
+            lq, hq = loss.run(lq, hq)
+
+        cv.imwrite(f"{output}/lq/{n}_{Kx}_{Ky}.png", lq * 255)
+        cv.imwrite(f"{output}/hq/{n}_{Kx}_{Ky}.png", hq * 255)
 
 
-res_dict = {
-    "alg_lq": ['linear','catrom','bspline','mitchell','lanczos','gauss',"down_up",'down_down'],
-    "alg_hq": ['catrom'],
-    "down_up": {
-        "up": [1, 3],
-        "alg_up": ['nearest','linear','catrom','bspline','mitchell','lanczos','gauss'],
-        "alg_down": ['linear','catrom','bspline','mitchell','lanczos','gauss','down_down']
-    },
-    "down_down": {
-        "step": 10,
-        "alg_down": ['linear','catrom','bspline','mitchell','gauss']
+if __name__ == "__main__":
+    with open('config.json') as f:
+        dict = json.load(f)
+    input = dict["input"]
+    output = dict["output"]
+    tile = dict.get("tile")
+    gray_or_color = dict.get("gray_or_color")
+    gray = dict.get("gray")
+    if not os.path.exists(f"{output}/hq"):
+        os.makedirs(f"{output}/hq")
+    if not os.path.exists(f"{output}/lq"):
+        os.makedirs(f"{output}/lq")
 
-    },
-    "rand_scale": [1, 2, .25],
-    "scale": 4
-}
-blure_dict = {
-    "method": ["box","gauss","box","median"],
-    "kernel": [0, 8, 3]
+    for dict_key in dict["process"].keys():
+        logic = all_logic[dict_key]
+        turn.append(logic(dict["process"][dict_key]))
 
-}
-comp_dict = {
-    "algorithm": ["jpeg","webp"],
-    "comp": [40, 90]
-
-}
-s = ScreentonLogic(7)
-r = ResizeLogic(res_dict)
-b = BlurLogic(blure_dict)
-c = CompresLogic(comp_dict)
-ha = Halo()
-inp = r"/media/umzo/009C2B839C2B7278/чб/цвет3/hq_tile"
-out = r"/media/umzo/009C2B839C2B7278/чб/цвет3/hq_tile12423"
-if not os.path.exists(f"{out}/hq"):
-    os.makedirs(f"{out}/hq")
-if not os.path.exists(f"{out}/lq"):
-    os.makedirs(f"{out}/lq")
-immm = os.listdir(inp)
-process_map(process,immm)
-
+    all_images = os.listdir(input)
+    # np.random.shuffle(all_images)
+    if tile:
+        process_map(process_tile, all_images)
+    else:
+        process_map(process, all_images)

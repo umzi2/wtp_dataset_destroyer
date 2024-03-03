@@ -1,0 +1,45 @@
+{
+  "input": "/media/umzi/H/датасеты/descreenton/HR",
+  "output": "/media/umzi/H/датасеты/descreenton/HR2",
+  "process":
+    {
+      "resize": {
+        "alg_lq": ["linear", "catrom", "bspline", "mitchell", "lanczos", "gauss", "down_up", "down_down"],
+        "alg_hq": ["catrom"],
+        "down_up": {
+          "up": [1, 3],
+          "alg_up": ["nearest", "linear", "catrom", "bspline", "mitchell", "lanczos", "gauss"],
+          "alg_down": ["linear", "catrom", "bspline", "mitchell", "lanczos", "gauss", "down_down"]
+        },
+        "down_down": {
+          "step": 15,
+          "alg_down": ["linear", "catrom", "bspline", "mitchell", "gauss"]
+        },
+        "rand_scale": [1, 2, 0.25],
+        "scale": 4
+      },
+      "blur": {
+        "method": ["box", "gauss", "box"],
+        "kernel": [0, 6, 1]
+      },
+
+      "halo": {
+        "sharpening_factor": [0, 2],
+        "kernel_median": [1, 3],
+        "box_kernel": [1, 3],
+        "laplacian": [1]
+      },
+
+      "compress": {
+        "compress_compress": [1, 5],
+        "algorithm": ["jpeg", "webp"],
+        "comp": [40, 100]
+      }
+    }
+  ,
+  "tile": {
+    "size": 512,
+    "no_wb": true
+  },
+  "gray_or_color": true
+}
