@@ -40,7 +40,11 @@
         "laplacian": [1]
       },
       "noise": {
-        "rand": [0, 0.3]
+        "rand": [0, 0.3],
+        "close": {
+          "black": 0.1,
+          "white": 0.9
+        }
       },
       "color_loss": {
         "high": [240, 255],

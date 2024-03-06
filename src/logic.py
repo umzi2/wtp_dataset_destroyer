@@ -3,15 +3,11 @@ import numpy as np
 import cv2 as cv
 from screenton_maker import Screenton
 import random
-from dataset_support import sin_patern, color_levels
+from dataset_support import sin_patern, color_levels, gray_or_color
 
 
 def graycolor(img):
-    r, g, b = cv.split(img)
-
-    rg = np.mean(r - g)
-    gb = np.mean(g - b)
-    if rg == gb:
+    if gray_or_color(img, 0.0003):
         return img2gray(img)
     return img
 
@@ -123,8 +119,8 @@ class BlurLogic:
                     median_kernel = random.randrange(median_kernel[0], median_kernel[1], median_kernel[2])
                 else:
                     median_kernel = kernel
-                if kernel % 2 == 0:
-                    kernel += 1
+                if median_kernel % 2 == 0:
+                    median_kernel += 1
                 img = cv.medianBlur((img * 255).astype(np.uint8), median_kernel).astype(np.float32) / 255
         return img, hq
 
@@ -138,12 +134,15 @@ class Noice:
         high = self.noice_dict["rand"]
         rand_high = np.random.uniform(high[0], high[1])
         noice = np.random.uniform(rand_high * -1, rand_high, img.shape)
+        close = self.noice_dict["close"]
+        if close:
+            close_to_black = img < close.get("black", 0.)
+            close_to_white = img > close.get("white", 1.)
 
-        # close_to_black = img < 0.1
-        # close_to_white = img > 0.9
-        #
-        # img[~close_to_black & ~close_to_white] += noice[~close_to_black & ~close_to_white]
-        img = np.clip(img + noice, 0, 1)
+            img[~close_to_black & ~close_to_white] += noice[~close_to_black & ~close_to_white]
+        else:
+            img += noice
+        img = np.clip(img, 0, 1)
         return img, hq
 
 
