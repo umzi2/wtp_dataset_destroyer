@@ -2,8 +2,9 @@ from chainner_ext import resize, ResizeFilter
 import numpy as np
 import cv2 as cv
 from screenton_maker import Screenton
+from pepeline import fast_color_level
 import random
-from dataset_support import sin_patern, color_levels, gray_or_color
+from dataset_support import sin_patern, gray_or_color, bit_or_gray
 
 
 def graycolor(img):
@@ -23,10 +24,15 @@ class ResizeLogic:
     def run(self, lq, hq):
         interpolation_map = {
             'nearest': ResizeFilter.Nearest,
+            'box': ResizeFilter.Box,
+            'hermite': ResizeFilter.Hermite,
+            'hamming': ResizeFilter.Hamming,
             'linear': ResizeFilter.Linear,
-            'catrom': ResizeFilter.CubicCatrom,
-            'mitchell': ResizeFilter.CubicMitchell,
-            'bspline': ResizeFilter.CubicBSpline,
+            'hann': ResizeFilter.Hann,
+            'lagrange': ResizeFilter.Lagrange,
+            'cubic_catrom': ResizeFilter.CubicCatrom,
+            'cubic_mitchell': ResizeFilter.CubicMitchell,
+            'cubic_bspline': ResizeFilter.CubicBSpline,
             'lanczos': ResizeFilter.Lanczos,
             'gauss': ResizeFilter.Gauss
         }
@@ -58,6 +64,8 @@ class ResizeLogic:
                     gamma_correction=False)
         hq = resize(hq, (int(width), int(height)), interpolation_map[algorithm_hq],
                     gamma_correction=False)
+        lq = fast_color_level(lq, 0, 250)
+        hq = fast_color_level(hq,0,250)
         return lq, hq
 
 
@@ -66,8 +74,11 @@ class ScreentonLogic:
         self.screenton_dict = screenton_dict
 
     def run(self, img, hq):
+        # r = bit_or_gray(img)
+        # if not r:
+        #     return img,hq
         img = np.squeeze(img).astype(np.float32)
-        dot_size = self.screenton_dict["dot_size"]
+        dot_size = random.choice(self.screenton_dict["dot_size"])
         if np.ndim(img) != 2:
             b, g, r = cv.split(img)
             b = Screenton(dot_size, random.randint(self.screenton_dict["color"].get("b", [0, 0])[0],
@@ -130,6 +141,9 @@ class Noice:
         self.noice_dict = noice_dict
 
     def run(self, img, hq):
+        # rr = random.choice([True,False,False,False])
+        # if rr:
+        #     return img,hq
         img = np.squeeze(img).astype(np.float32)
         high = self.noice_dict["rand"]
         rand_high = np.random.uniform(high[0], high[1])
@@ -181,8 +195,11 @@ class HaloLossLogic:
         self.halo_loss_dict = halo_loss_dict
 
     def run(self, img, hq):
-        img = np.squeeze(img)
+        img = np.squeeze(img).astype(np.float32)
         factor = self.halo_loss_dict["sharpening_factor"]
+        # rr = random.choice([True,False,False,False,False,False,False])
+        # if rr:
+        #     return img,hq
         if not factor:
             return img, hq
         k_median = self.halo_loss_dict["kernel_median"]
@@ -203,8 +220,42 @@ class HaloLossLogic:
 
         sharpened_image = np.clip(sharpened_image, 0, 255).astype(np.uint8)
         if not box_kernel:
-            return sharpened_image / 255
+            return sharpened_image / 255, hq
         return cv.boxFilter(sharpened_image, -1, ksize=(box_kernel, box_kernel)) / 255, hq
+
+
+class NewHaloLossLogic:
+    def __init__(self, halo_loss_dict):
+        self.halo_loss_dict = halo_loss_dict
+
+    def run(self, img, hq):
+        # rr = random.choice([True,False,False,False])
+        # if rr:
+        #     return img,hq
+        img = np.squeeze(img).astype(np.float32)
+        if np.ndim(img) != 2:
+            img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        else:
+            img_gray = img
+        factor = self.halo_loss_dict["sharpening_factor"]
+        if not factor:
+            return img, hq
+        k_median = self.halo_loss_dict["kernel"]
+        sharpening_factor = random.randint(factor[0], factor[1])
+        kernel_median = random.randint(k_median[0], k_median[1])
+        laplacian = random.choice(self.halo_loss_dict["laplacian"])
+        img_gray = img_gray * 255
+        if kernel_median:
+            img_gray = cv.blur(img_gray.astype(np.uint8), ksize=[kernel_median, kernel_median])
+        laplacian = cv.Laplacian(img_gray.astype(np.uint8), cv.CV_16S, ksize=laplacian)
+        sharpened_image = img_gray - sharpening_factor * laplacian
+        _, sharpened_image = cv.threshold(sharpened_image, 254, 255, 0, cv.THRESH_BINARY)
+        if np.ndim(img) != 2:
+            sharpened_image = np.stack([sharpened_image] * 3, axis=-1).astype(np.float32) / 255
+        else:
+            sharpened_image = sharpened_image.astype(np.float32) / 255
+        img = np.clip(img + sharpened_image, 0, 1)
+        return img, hq
 
 
 class ColorLossLogic:
@@ -212,18 +263,19 @@ class ColorLossLogic:
         self.color_loss_dict = color_loss_dict
 
     def run(self, img, hq):
-        img = np.squeeze(img)
-        in_low = 0.
-        in_high = 1.
+        img = np.squeeze(img).astype(np.float32)
+        in_low = 0
+        in_high = 255
         high_list = self.color_loss_dict["high"]
-        high_output = random.randint(high_list[0], high_list[1]) / 255
+        high_output = random.randint(high_list[0], high_list[1])
 
         low_list = self.color_loss_dict["low"]
-        low_output = random.randint(low_list[0], low_list[1]) / 255
+        low_output = random.randint(low_list[0], low_list[1])
 
         gamma_list = self.color_loss_dict["gamma"]
         gamma = np.random.uniform(gamma_list[0], gamma_list[1])
-        img = color_levels(img, in_low=in_low, in_high=in_high, out_high=high_output, out_low=low_output, gamma=gamma)
+        img = fast_color_level(img, in_low=in_low, in_high=in_high, out_high=high_output, out_low=low_output, gamma=gamma)
+
         return img, hq
 
 
