@@ -10,13 +10,13 @@ turn = []
 all_logic = {
     "resize": ResizeLogic,
     "blur": BlurLogic,
-    "screenton": ScreentoneLogic,
+    "screentone": ScreentoneLogic,
     "compress": CompressLogic,
     "noise": Noice,
-    "color_loss": ColorLossLogic,
+    "color": ColorLossLogic,
     "sin": SinLossLogic,
     "halo": HaloLossLogic,
-    "satur": SaturationLossLogic
+    "saturation": SaturationLossLogic
 }
 
 

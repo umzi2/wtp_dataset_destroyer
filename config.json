@@ -1,63 +1,48 @@
 {
   "input": "/media/umzi/H/датасеты/1",
-  "output": "/media/umzi/H/датасеты/123",
+  "output": "/media/umzi/H/датасеты/141",
   "process":
     {
       "resize": {
-        "alg_lq": ["nearest", "box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss", "down_up","down_down"],
-        "alg_hq": ["cubic_catrom"],
+        "alg_lq": ["box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss", "down_up","down_down"],
+        "alg_hq": ["lagrange"],
         "down_up": {
-          "up": [1, 4],
+          "up": [1, 2],
           "alg_up": ["nearest", "box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss"],
           "alg_down": ["hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss","down_down"]
         },
         "down_down": {
-          "step": 15,
+          "step": 6,
           "alg_down": ["hermite", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
         },
-        "rand_scale": [1, 2, 0.1],
-        "scale": 4
-      },
-            "nhalo":{
-        "sharpening_factor": [1,3],
-        "kernel": [0, 3],
-        "laplacian": [1]
-      },
-                  "noise": {
-        "rand": [0, 0.2],
-        "close": {
-          "black": 0.1,
-          "white": 0.9
-        }
+        "spread": [1, 2, 0.25],
+        "scale": 4,
+        "color_fix": true
       },
       "blur": {
         "filter": ["box", "gauss", "box","median"],
-        "kernel": [0, 12, 1],
-        "median_kernel": [0,3,1]
-      },
-                  "nhalo":{
-        "sharpening_factor": [1,3],
-        "kernel": [0, 3],
-        "laplacian": [1]
+        "kernel": [0, 6, 1],
+        "median_kernel": [0,1,1]
       },
 
       "color_loss": {
-        "high": [220, 255],
-        "low": [0, 40],
+        "high": [200, 255],
+        "low": [0, 50],
         "gamma": [1.0, 1.0]
       },
       "compress": {
         "compress_compress": [1, 2],
         "algorithm": ["jpeg", "webp"],
         "comp": [40, 100]
+
       }
-
-
     }
   ,
+  "replays": 1,
+  "gray": true,
   "tile": {
     "size": 1024,
     "no_wb": true
-  },
-  "gray": true
+  }
+
 }
