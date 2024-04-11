@@ -71,7 +71,7 @@
         "shape": [100,1000,100],
         "alpha": [0.1,0.5],
         "bias": [0.8,1.2],
-        "vertical": [true,false],
+        "vertical": 0.5,
         "prob": 0.5
       },
       "compress": {
