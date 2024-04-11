@@ -8,5 +8,5 @@
 ```
 - filter - blur type
 - kernel - blur kernel [low,high,step]
-- median_kernel - median blur kernel [low,high,step]
-- prob - chance of triggering
+- median_kernel* - median blur kernel [low,high,step]
+- prob* - chance of triggering
