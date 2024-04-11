@@ -17,6 +17,6 @@
 ```
 - compress_compress - number of compression repetitions [low,high]
 - algorithm - compression algorithm
-- target_compress - compression level dictionary for each algorithm separately {"algorithm":[low,high]}
+- target_compress* - compression level dictionary for each algorithm separately {"algorithm":[low,high]}
 - comp - compression level if target_compress is not implemented for the algorithm
-- prob - chance of triggering
+- prob* - chance of triggering
