@@ -11,4 +11,4 @@
 - alpha - pattern transparency
 - bias - Pattern displacement at -1 rotates it by -45 degrees, 1 +45. don't go beyond -1 1
 - vertical - the chance that the pattern will be vertical rather than horizontal coupled with a 90 degree radius allows you to make any degree of pattern
-- prob - chance of triggering
+- prob* - chance of triggering
