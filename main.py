@@ -1,67 +1,59 @@
 import os
 import numpy as np
-import cv2 as cv
 from tqdm.contrib.concurrent import process_map
-from src.logic import ResizeLogic, BlurLogic, ScreentonLogic, CompressLogic, HaloLossLogic, Noice, ColorLossLogic, \
-    SinLossLogic, img2gray, graycolor, NewHaloLossLogic
-from pepeline import read, save32, read32
+from src.logic import ResizeLogic, BlurLogic, ScreentoneLogic, CompressLogic, Noice, ColorLossLogic, \
+    SinLossLogic, graycolor, HaloLossLogic,SaturationLossLogic
+from pepeline import read, save
 import json
 
 turn = []
 all_logic = {
     "resize": ResizeLogic,
     "blur": BlurLogic,
-    "screenton": ScreentonLogic,
+    "screenton": ScreentoneLogic,
     "compress": CompressLogic,
-    "halo": HaloLossLogic,
     "noise": Noice,
     "color_loss": ColorLossLogic,
     "sin": SinLossLogic,
-    "nhalo": NewHaloLossLogic
+    "halo": HaloLossLogic,
+    "satur": SaturationLossLogic
 }
 
 
 def process(img_fold):
-    global all_images, inp, output, gray, gray_or_color, rep
-    if gray:
-        img = read32(f"{inp}/{img_fold}",0)
-    else:
-        img = read32(f"{inp}/{img_fold}")
-    if img is None:
-        return
-    if gray:
-        img = img2gray(img)
-    elif gray_or_color:
-        img = graycolor(img)
-    n = all_images.index(img_fold)
-    lq, hq = img, img
-    for loss in turn:
-        lq, hq = loss.run(lq, hq)
-    if rep:
-        save32(lq,f"{output}/lq/{rep}_{n}.png")
-        save32(lq, f"{output}/lq/{rep}_{n}.png")
-    else:
-        save32(hq,f"{output}/lq/{n}.png")
-        save32(hq, f"{output}/lq/{n}.png")
-
+    try:
+        global all_images, inp, output, gray, gray_or_color, rep
+        if gray:
+            img = read(f"{inp}/{img_fold}",0,0)
+        else:
+            img = read(f"{inp}/{img_fold}",1,0)
+        if gray_or_color:
+            img = graycolor(img)
+        n = all_images.index(img_fold)
+        lq, hq = img, img
+        for loss in turn:
+            lq, hq = loss.run(lq, hq)
+        if rep:
+            save(lq,f"{output}/lq/{rep}_{n}.png")
+            save(lq, f"{output}/lq/{rep}_{n}.png")
+        else:
+            save(hq,f"{output}/lq/{n}.png")
+            save(hq, f"{output}/lq/{n}.png")
+    except Exception as e:
+        print(e)
 
 def process_tile(img_fold):
     try:
         global all_images, inp, output, gray, gray_or_color, tile_size, tile, rep
         if gray:
-            img = read(f"{inp}/{img_fold}",0)
+            img = read(f"{inp}/{img_fold}",0,0)
         else:
-            img = read(f"{inp}/{img_fold}")
-        if img is None:
-            return
-        img = img.astype(np.float32) / 255
-
+            img = read(f"{inp}/{img_fold}",1,0)
         if gray_or_color:
             img = graycolor(img)
         h, w = img.shape[:2]
         n = all_images.index(img_fold)
         for Kx, Ky in np.ndindex(h // tile_size, w // tile_size):
-
             img_tile = img[tile_size * Kx:tile_size * (Kx + 1), tile_size * Ky:tile_size * (Ky + 1)]
             if tile.get("no_wb"):
                 mean = np.mean(img_tile)
@@ -71,12 +63,12 @@ def process_tile(img_fold):
             for loss in turn:
                 lq, hq = loss.run(lq, hq)
             if rep:
-                save32(lq, fr"{output}/lq/{rep}_{str(n)}_{Kx}_{Ky}.png")
-                save32(hq, fr"{output}/hq/{rep}_{str(n)}_{Kx}_{Ky}.png")
+                save(lq.astype(np.float32), fr"{output}/lq/{rep}_{str(n)}_{Kx}_{Ky}.png")
+                save(hq.astype(np.float32), fr"{output}/hq/{rep}_{str(n)}_{Kx}_{Ky}.png")
             else:
-                save32(lq, fr"{output}/lq/{str(n)}_{Kx}_{Ky}.png")
-                save32(hq, fr"{output}/hq/{str(n)}_{Kx}_{Ky}.png")
-    except RuntimeError as e:
+                save(lq.astype(np.float32), fr"{output}/lq/{str(n)}_{Kx}_{Ky}.png")
+                save(hq.astype(np.float32), fr"{output}/hq/{str(n)}_{Kx}_{Ky}.png")
+    except Exception as e:
         print(e)
 
 
@@ -100,7 +92,6 @@ if __name__ == "__main__":
         turn.append(logic(config["process"][dict_key]))
 
     all_images = os.listdir(inp)
-    # np.random.shuffle(all_images)
 
     if replays and replays > 1:
         rep = 0
