@@ -2,24 +2,30 @@
   "input": "/media/umzi/H/датасеты/descreenton/HR",
   "output": "/media/umzi/H/датасеты/descreenton/HR2",
   "process":
-    {
-      "screentone": {
-        "color": {
-          "dot_size": 7,
-          "r":[0,7] ,
-          "g":[0,7] ,
-          "b":[0,7] },
-        "dot_size": 7,
-        "lqhq": false,
-        "prob": 0.5
+    [{
+      "type": "screentone",
+      "lqhq": false,
+      "dot_size": [7],
+      "color": {
+        "type_halftone": ["rgb","cmyk","gray","not_rot"],
+        "c": [-45,45],
+        "m": [-45,45],
+        "y": [-45,45],
+        "k": [-45,45],
+
+        "r": [-45,45],
+        "g": [-45,45],
+        "b": [-45,45]
       },
-       "resize": {
-        "alg_lq": ["box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss", "down_up","down_down"],
+      "probably": 0.5
+    }, {
+      "type": "resize",
+      "alg_lq": ["box", "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss", "down_up","down_down"],
         "alg_hq": ["lagrange"],
         "down_up": {
           "up": [1, 2],
           "alg_up": ["nearest", "box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss"],
-          "alg_down": ["hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss","down_down"]
+          "alg_down": [ "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss","down_down"]
         },
         "down_down": {
           "step": 6,
@@ -29,52 +35,58 @@
         "scale": 4,
         "color_fix": true,
          "gamma_correction": false,
-         "prob": 0.5
-      },
+         "probably": 0.5
 
-      "blur": {
-        "filter": ["box", "gauss", "box", "median"],
-        "kernel": [0, 8, 1],
-        "median_kernel": [0,3,1],
-        "prob": 0.5
+    }, {
+      "type": "halo",
+      "type_halo": ["laplacian","unsharp_mask"],
+      "kernel": [0,3,1],
+      "sharpening_factor": [0, 2],
+      "amount": [0,1],
+      "threshold": [0,20]
+    }, {
+      "type": "blur",
+      "filter": ["box", "gauss", "blur", "median"],
+      "kernel": [0, 8, 1],
+      "target_kernel": {
+        "box": [0,2,1],
+        "gauss": [0,8,1],
+        "blur": [0,8,1],
+        "median": [0,1,1]
       },
-      "halo": {
-        "sharpening_factor": [0, 2],
-        "kernel": [1, 3],
-        "laplacian": [1],
-        "prob": 0.5
+      "probably": 0.5
+    },{
+      "type": "color",
+      "high": [240,255],
+      "low": [0,15],
+      "gamma": [0.9,1.1]
+    }, {
+      "type": "sin",
+      "shape": [100,1000,100],
+      "alpha": [0.1,0.5],
+      "bias": [0.8,1.2],
+      "vertical": 0.5,
+      "probably": 0.5
+    },{
+      "type": "saturation",
+      "rand": [0.5,1.0],
+      "prob": 0.5
+    },{
+      "type": "noice",
+      "type_noice": ["perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex","uniform"],
+      "normalize": true,
+      "close": {
+        "black": 0.1,
+        "white": 0.9
       },
-      "noise": {
-        "type": ["perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex","uniform"],
-        "normalize": true,
-        "close": {
-          "black": 0.1,
-          "white": 0.9
-        },
-        "alpha": [0.01,1.0,0.01],
-        "octaves": [1,10,1],
-        "frequency": [0.1,0.9,0.1],
-        "lacunarity": [0.01,0.5,0.01],
-        "prob": 0.5
-      },
-      "color": {
-        "high": [240, 255],
-        "low": [0, 10],
-        "gamma": [0.8, 1.2],
-        "prob": 0.5
-      },
-      "saturation": {
-        "rand": [0.5,1.0],
-        "prob": 0.5
-      },
-      "sin": {
-        "shape": [100,1000,100],
-        "alpha": [0.1,0.5],
-        "bias": [0.8,1.2],
-        "vertical": 0.5,
-        "prob": 0.5
-      },
-      "compress": {
+      "alpha": [0.01,1.0,0.01],
+      "octaves": [1,10,1],
+      "frequency": [0.1,0.9,0.1],
+      "lacunarity": [0.01,0.5,0.01],
+      "prob": 0.5
+    },
+      {
+        "type":"compress",
         "compress_compress": [1, 2],
         "algorithm": ["jpeg", "webp","h264","hevc","mpeg","mpeg2","vp9","jpeg","webp"],
         "target_compress": {
@@ -82,20 +94,22 @@
         "hevc": [20,34],
         "mpeg": [2,20],
         "mpeg2": [2,20],
-        "vp9": [20,35]},
+        "vp9": [20,35],
         "jpeg": [40,100],
-        "webp": [40,100],
+        "webp": [40,100]
+        },
 
         "comp": [40, 100],
-        "prob": 0.5
-      }
+        "probably": 0.5
+
     }
+
+    ]
   ,
   "tile": {
     "size": 512,
     "no_wb": true
   },
-  "replays": 1,
   "gray": true
 
 }

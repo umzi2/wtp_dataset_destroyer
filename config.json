@@ -1,48 +1,13 @@
 {
-  "input": "/media/umzi/H/датасеты/1",
-  "output": "/media/umzi/H/датасеты/141",
+  "input": "/media/umzi/H/датасеты/3ch_1x/raw5",
+  "output": "/media/umzi/H/датасеты/3ch_1x/train11",
   "process":
-    {
-      "resize": {
-        "alg_lq": ["box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss", "down_up","down_down"],
-        "alg_hq": ["lagrange"],
-        "down_up": {
-          "up": [1, 2],
-          "alg_up": ["nearest", "box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss"],
-          "alg_down": ["hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss","down_down"]
-        },
-        "down_down": {
-          "step": 6,
-          "alg_down": ["hermite", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
-        },
-        "spread": [1, 2, 0.25],
-        "scale": 4,
-        "color_fix": true
-      },
-      "blur": {
-        "filter": ["box", "gauss", "box","median"],
-        "kernel": [0, 6, 1],
-        "median_kernel": [0,1,1]
-      },
-
-      "color_loss": {
-        "high": [200, 255],
-        "low": [0, 50],
-        "gamma": [1.0, 1.0]
-      },
-      "compress": {
-        "compress_compress": [1, 2],
-        "algorithm": ["jpeg", "webp"],
-        "comp": [40, 100]
-
-      }
-    }
-  ,
-  "replays": 1,
-  "gray": true,
-  "tile": {
-    "size": 1024,
-    "no_wb": true
-  }
-
+            [
+              {
+                "type": "blur",
+                "filter": ["box", "gauss", "box", "median"],
+                "kernel": [0, 8, 1],
+                "median_kernel": [0,3,1]
+              }
+            ]
 }

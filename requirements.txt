@@ -1,7 +1,7 @@
-screenton-maker-rs~=0.1.4
 chainner-ext~=0.3.9
 dataset-support~=0.1.4
 numpy~=1.26.4
 tqdm~=4.66.2
 opencv-python~=4.9.0
-pepeline~=0.2.6
+pepeline~=0.3.1
+ffmpeg-python~=0.2.0
