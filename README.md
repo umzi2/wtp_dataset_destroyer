@@ -28,3 +28,5 @@ designed for web art, is in early beta.
 
 # P.S.
 resize is implemented via [chainner rs](https://github.com/chaiNNer-org/chaiNNer-rs)
+
+compression based on kim0 [implementation](https://github.com/Kim2091/helpful-scripts/blob/d413054eda3764fd04ec2c22fb3c3b6a5e61e31a/Dataset%20Destroyer/datasetDestroyer.py#L279)
