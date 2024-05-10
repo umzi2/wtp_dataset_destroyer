@@ -5,6 +5,33 @@ from pepeline import noise_generate, cvt_color, CvtType
 
 
 class Noice:
+    """Class for adding noise to images.
+
+        Args:
+            noice_dict (dict): A dictionary containing noise settings.
+                It should include the following keys:
+                    - "probably" (float, optional): Probability of adding noise. Defaults to 1.0.
+                    - "type_noice" (list of str, optional): List of noise types to choose from.
+                        Defaults to ["uniform"].
+                    - "alpha" (list of int, optional): Range of alpha values for noise intensity.
+                        Defaults to [1, 2, 1].
+                    - "lqhq" (bool, optional): Flag indicating if the low-quality image should be replaced by the noisy one.
+                        Defaults to False.
+                    - "y_noice" (bool, optional): Flag indicating if noise should be added to the Y channel only (for YUV images).
+                        Defaults to None.
+                    - "uv_noice" (bool, optional): Flag indicating if noise should be added to the UV channels only (for YUV images).
+                        Defaults to None.
+                    - "normalize" (bool, optional): Flag indicating if the generated noise should be normalized. Defaults to None.
+                    - "octaves" (list of int, optional): Range of octaves for procedural noises.
+                        Defaults to [1, 2, 1].
+                    - "frequency" (list of float, optional): Range of frequencies for procedural noises.
+                        Defaults to [0.8, 0.9, 0.9].
+                    - "lacunarity" (list of float, optional): Range of lacunarity values for procedural noises.
+                        Defaults to [0.4, 0.5, 0.5].
+                    - "probably_salt_or_pepper" (list of float, optional): Range of probabilities for salt-and-pepper noise.
+                        Defaults to [0, 0.5].
+        """
+
     def __init__(self, noice_dict):
 
         # common
@@ -70,6 +97,15 @@ class Noice:
 
     # Run module
     def run(self, lq, hq):
+        """Adds noise to the input image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
+
+        Returns:
+            tuple: A tuple containing the noisy low-quality image and the corresponding high-quality image.
+        """
         NOICE_TYPE_MAP = {
 
             "perlinsuflet": self.__procedural_noises,

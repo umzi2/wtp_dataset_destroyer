@@ -4,34 +4,21 @@ import random
 
 
 class SinLossLogic:
-    """
-    Class for applying sinusoidal pattern loss to images.
+    """Class for applying sinusoidal patterns to images.
 
     Args:
-        sin_loss_dict (dict): A dictionary containing parameters for sinusoidal pattern loss.
-            It should have the following keys:
-                - 'shape' (tuple): Range of values for shape parameter of sinusoidal pattern.
-                - 'alpha' (tuple): Range of values for alpha parameter of sinusoidal pattern.
-                - 'bias' (tuple): Range of values for bias parameter of sinusoidal pattern.
-                - 'vertical' (float): Probability of applying vertical sinusoidal pattern.
-                - 'prob' (float, optional): Probability of applying sinusoidal pattern loss. Default is 1.0.
-
-    Attributes:
-        shape (tuple): Range of values for shape parameter of sinusoidal pattern.
-        alpha (tuple): Range of values for alpha parameter of sinusoidal pattern.
-        bias (tuple): Range of values for bias parameter of sinusoidal pattern.
-        vertical_prob (float): Probability of applying vertical sinusoidal pattern.
-        probably (float): Probability of applying sinusoidal pattern loss.
-
-    Methods:
-        run(lq, hq): Method to run the sinusoidal pattern loss process.
-            Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Image with sinusoidal pattern loss applied and original high quality image.
+        sin_loss_dict (dict): A dictionary containing sinusoidal pattern settings.
+            It should include the following keys:
+                - "shape" (list of int, optional): Range of shape values for the sinusoidal pattern.
+                    Defaults to [100, 1000, 100].
+                - "alpha" (list of float, optional): Range of alpha values for the sinusoidal pattern.
+                    Defaults to [0.1, 0.5].
+                - "bias" (list of float, optional): Range of bias values for the sinusoidal pattern.
+                    Defaults to [0.8, 1.2].
+                - "vertical" (float, optional): Probability of applying vertical sinusoidal patterns.
+                    Defaults to 0.5.
+                - "probably" (float, optional): Probability of applying sinusoidal patterns. Defaults to 1.0.
     """
-
     def __init__(self, sin_loss_dict):
         self.shape = sin_loss_dict.get("shape", [100, 1000, 100])
         self.alpha = sin_loss_dict.get("alpha", [0.1, 0.5])
@@ -40,6 +27,15 @@ class SinLossLogic:
         self.probably = sin_loss_dict.get("probably", 1.0)
 
     def run(self, lq, hq):
+        """Applies sinusoidal patterns to the input image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
+
+        Returns:
+            tuple: A tuple containing the image with sinusoidal patterns applied and the corresponding high-quality image.
+        """
         try:
             if probability(self.probably):
                 return lq, hq

@@ -17,13 +17,6 @@ class SaturationLossLogic:
         rand (list): Range of random values for saturation adjustment.
         probably (float): Probability of applying saturation loss.
 
-    Methods:
-        run(lq, hq): Method to run the saturation loss process.
-            Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Image with adjusted saturation and original high quality image.
     """
 
     def __init__(self, saturation_dict):
@@ -31,6 +24,11 @@ class SaturationLossLogic:
         self.probably = saturation_dict.get("probably", 1.0)
 
     def run(self, lq, hq):
+        """  Args:
+                lq (numpy.ndarray): Low quality image.
+                hq (numpy.ndarray): High quality image.
+            Returns:
+                Tuple of numpy.ndarrays: Image with adjusted saturation and original high quality image."""
         try:
             if lq.ndim == 2:
                 return lq, hq

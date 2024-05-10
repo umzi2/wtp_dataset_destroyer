@@ -120,6 +120,8 @@
 
     ]
   ,
+  "num_workers": 16,
+  "map_type": "process",
   "tile": {
     "size": 512,
     "no_wb": true

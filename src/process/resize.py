@@ -37,15 +37,7 @@ class ResizeLogic:
         probably (float): Probability of applying resizing.
         color_fix (bool): Whether to perform color fixing after resizing.
         gamma_correction (bool): Whether to perform gamma correction after resizing.
-        only_lq (bool): Whether to resize only the low quality image.
 
-    Methods:
-        run(lq, hq): Method to run the resizing process.
-            Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Resized low quality image and high quality image.
     """
 
     def __init__(self, resize_dict):
@@ -66,7 +58,6 @@ class ResizeLogic:
         self.probably = resize_dict.get("probably", 1.0)
         self.color_fix = resize_dict.get("color_fix")
         self.gamma_correction = resize_dict.get("gamma_correction", False)
-        self.only_lq = resize_dict.get("olq")
 
     def __real_size(self, size):
         return size - (size % (size // self.lq_scale * self.lq_scale))
@@ -88,6 +79,11 @@ class ResizeLogic:
         return lq
 
     def run(self, lq, hq):
+        """Args:
+                lq (numpy.ndarray): Low quality image.
+                hq (numpy.ndarray): High quality image.
+            Returns:
+                Tuple of numpy.ndarrays: Resized low quality image and high quality image."""
         try:
             if probability(self.probably):
                 return lq, hq
@@ -108,14 +104,12 @@ class ResizeLogic:
             lq = resize(lq, (int(width // self.lq_scale), int(height // self.lq_scale)),
                         INTERPOLATION_MAP[algorithm_lq],
                         gamma_correction=self.gamma_correction)
-            if not self.only_lq:
-                hq = resize(hq, (int(width), int(height)), INTERPOLATION_MAP[algorithm_hq],
-                            gamma_correction=self.gamma_correction)
+            hq = resize(hq, (int(width), int(height)), INTERPOLATION_MAP[algorithm_hq],
+                        gamma_correction=self.gamma_correction)
 
             if self.color_fix:
                 lq = fast_color_level(lq, 0, 250, None, None, None)
-                if not self.only_lq:
-                    hq = fast_color_level(hq, 0, 250, None, None, None)
+                hq = fast_color_level(hq, 0, 250, None, None, None)
             return lq.squeeze(), hq.squeeze()
         except Exception as e:
             print(f"resize error {e}")

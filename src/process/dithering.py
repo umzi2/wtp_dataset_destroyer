@@ -6,9 +6,25 @@ from ..utils import probability
 from numpy import random
 
 
-
-
 class Dithering:
+    """Class for applying dithering algorithms to images.
+
+    Args:
+        dithering_dict (dict): A dictionary containing dithering settings.
+            It should include the following keys:
+                - "dithering_type" (list of str, optional): List of dithering algorithms to be used.
+                    Defaults to ["quantize"].
+                - "color_ch" (list of int, optional): Range of color channels for quantization.
+                    Defaults to [2, 10].
+                - "map_size" (list of int, optional): Range of map sizes for ordered dithering.
+                    Defaults to [4, 8].
+                - "history" (list of int, optional): Range of history values for Riemersma dithering.
+                    Defaults to [10, 15].
+                - "ratio" (list of float, optional): Range of decay ratio values for Riemersma dithering.
+                    Defaults to [0.1, 0.9].
+                - "probably" (float, optional): Probability of applying dithering. Defaults to 1.0.
+    """
+
     def __init__(self, dithering_dict):
         self.dithering_type_list = dithering_dict.get("dithering_type", ["quantize"])
         self.quantize = dithering_dict.get("color_ch", [2, 10])
@@ -34,6 +50,15 @@ class Dithering:
         return riemersma_dither(lq, quantization, history, decay_ratio)
 
     def run(self, lq, hq):
+        """Applies the selected dithering algorithm to the input image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
+
+        Returns:
+            tuple: A tuple containing the dithered low-quality image and the corresponding high-quality image.
+        """
         DITHERING_TYPE_MAP = {
             "floydsteinberg": self.__error,
             "jarvisjudiceninke": self.__error,

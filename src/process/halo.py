@@ -5,38 +5,25 @@ from ..utils import probability
 
 
 class HaloLossLogic:
-    """
-    Class for applying halo loss to images using different techniques.
+    """Class for applying halo loss reduction techniques to images.
 
     Args:
-        halo_loss_dict (dict): A dictionary containing parameters for halo loss.
-            It should have the following keys:
-                - 'sharpening_factor' (int, optional): Range of sharpening factors. Default is None.
-                - 'kernel' (list, optional): Range of kernel sizes. Default is [0, 2].
-                - 'laplacian' (list): List of Laplacian filter sizes.
-                - 'prob' (float, optional): Probability of applying halo loss. Default is 1.0.
-                - 'type_halo' (list, optional): List of halo loss types to choose from. Default is ["laplacian"].
-                - 'amount' (list, optional): Range of amounts for unsharp masking. Default is [1, 1].
-                - 'threshold' (list, optional): Range of thresholds for unsharp masking. Default is [0, 0].
-
-    Attributes:
-        factor (int): Range of sharpening factors.
-        kernel (list): Range of kernel sizes.
-        laplacian (list): List of Laplacian filter sizes.
-        probably (float): Probability of applying halo loss.
-        type (list): List of halo loss types to choose from.
-        amount (list): Range of amounts for unsharp masking.
-        threshold (list): Range of thresholds for unsharp masking.
-
-    Methods:
-        run(lq, hq): Method to run the halo loss process.
-            Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Processed low quality image and original high quality image.
+        halo_loss_dict (dict): A dictionary containing halo loss reduction settings.
+            It should include the following keys:
+                - "sharpening_factor" (list of int, optional): Range of sharpening factors.
+                    Defaults to [0, 2].
+                - "kernel" (list of int, optional): Range of kernel sizes.
+                    Defaults to [0, 2].
+                - "laplacian" (list of int, optional): List of Laplacian kernel sizes.
+                    Defaults to [3].
+                - "probably" (float, optional): Probability of applying halo loss reduction. Defaults to 1.0.
+                - "type_halo" (list of str, optional): List of halo loss reduction types.
+                    Defaults to ["laplacian"].
+                - "amount" (list of float, optional): Range of amounts for unsharp mask.
+                    Defaults to [1, 1].
+                - "threshold" (list of float, optional): Range of thresholds for unsharp mask.
+                    Defaults to [0, 0].
     """
-
     def __init__(self, halo_loss_dict):
         self.factor = halo_loss_dict.get("sharpening_factor", [0, 2])
         self.kernel = halo_loss_dict.get("kernel", [0, 2])
@@ -82,6 +69,15 @@ class HaloLossLogic:
         return sharpened
 
     def run(self, lq, hq):
+        """Applies the selected halo loss reduction technique to the input image.
+
+         Args:
+             lq (numpy.ndarray): The low-quality image.
+             hq (numpy.ndarray): The corresponding high-quality image.
+
+         Returns:
+             tuple: A tuple containing the halo loss reduced low-quality image and the corresponding high-quality image.
+         """
         try:
             if probability(self.probably):
                 return lq, hq

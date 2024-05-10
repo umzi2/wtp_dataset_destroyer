@@ -24,6 +24,44 @@ ALL_LOGIC = {
 
 
 class ImgProcess:
+    """Class for processing images using various image processing techniques.
+
+    Args:
+        config (dict): A dictionary containing configuration settings for image processing.
+            It should include the following keys:
+                - "input" (str): Path to the input folder containing images.
+                - "output" (str): Path to the output folder where processed images will be saved.
+                - "tile" (dict, optional): Dictionary containing settings for tile-based processing. Defaults to None.
+                - "replays" (int, optional): Number of replays. Defaults to None.
+                - "gray_or_color" (bool, optional): Flag indicating whether to process images in grayscale or color.
+                    Defaults to None.
+                - "gray" (bool, optional): Flag indicating whether to convert images to grayscale. Defaults to None.
+                - "process" (list of dict): List containing dictionaries specifying the processing techniques to apply.
+                - "num_workers" (int, optional): Number of worker threads to use for parallel processing. Defaults to None.
+                - "map_type" (str, optional): Type of mapping to use for processing images. Can be "process", "thread", or None.
+                    Defaults to "process".
+
+    Attributes:
+        input (str): Path to the input folder containing images.
+        output (str): Path to the output folder where processed images will be saved.
+        tile (dict): Dictionary containing settings for tile-based processing.
+        no_wb (bool): Flag indicating whether to exclude white or black tiles during tile-based processing.
+        tile_size (int): Size of each tile for tile-based processing.
+        replays (int): Number of replays.
+        gray_or_color (bool): Flag indicating whether to process images in grayscale or color.
+        gray (bool): Flag indicating whether to convert images to grayscale.
+        all_images (list): List of all image filenames in the input folder.
+        turn (list): List of image processing techniques to apply.
+        output_lq (str): Path to the folder where low-quality processed images will be saved.
+        output_hq (str): Path to the folder where high-quality processed images will be saved.
+        map_type (str): Type of mapping to use for processing images.
+        num_workers (int): Number of worker threads to use for parallel processing.
+
+    Methods:
+        process(img_fold): Processes an image using the specified image processing techniques.
+        process_tile(img_fold): Processes an image in tiles using the specified image processing techniques.
+        run(): Executes the image processing workflow.
+    """
     def __init__(self, config):
         self.input = config["input"]
         self.output = config["output"]
@@ -69,6 +107,11 @@ class ImgProcess:
         save(hq, join(self.output_hq, output_name))
 
     def process(self, img_fold):
+        """Processes an image using the specified image processing techniques.
+
+                Args:
+                    img_fold (str): Filename of the image to process.
+                """
         try:
             img = self.__img_read(img_fold)
             n = self.all_images.index(img_fold)
@@ -83,6 +126,11 @@ class ImgProcess:
             print(e)
 
     def process_tile(self, img_fold):
+        """Processes an image in tiles using the specified image processing techniques.
+
+        Args:
+            img_fold (str): Filename of the image to process.
+        """
         try:
             img = self.__img_read(img_fold)
             h, w = img.shape[:2]
@@ -104,6 +152,7 @@ class ImgProcess:
             print(e)
 
     def run(self):
+        """Executes the image processing workflow."""
         process = self.process_tile if self.tile else self.process
         if self.map_type == "process":
             process_map(process, self.all_images, max_workers=self.num_workers)

@@ -6,40 +6,35 @@ from ..utils import probability, lq_hq2grays
 
 
 class ScreentoneLogic:
-    """
-    Class for applying screentone effect to images.
+    """Class for applying screentone effects to images.
 
     Args:
-        screentone_dict (dict): A dictionary containing parameters for screentone effect.
-            It should have the following keys:
-                - 'lqhq' (bool, optional): Whether to apply the same effect to both low quality and high quality images. Default is None.
-                - 'dot_size' (list, optional): Range of dot sizes for screentone effect. Default is [7].
-                - 'color' (dict, optional): Dictionary specifying color parameters for screentone effect. Default is None.
-                - 'prob' (float, optional): Probability of applying screentone effect. Default is 1.0.
-
-    Attributes:
-        lqhq (bool): Whether to apply the same effect to both low quality and high quality images.
-        dot_range (list): Range of dot sizes for screentone effect.
-        type (list): List of color types for screentone effect.
-        color_c (list): Range of angles for C color channel.
-        color_m (list): Range of angles for M color channel.
-        color_y (list): Range of angles for Y color channel.
-        color_k (list): Range of angles for K color channel.
-        color_b (list): Range of angles for B color channel.
-        color_g (list): Range of angles for G color channel.
-        color_r (list): Range of angles for R color channel.
-        probably (float): Probability of applying screentone effect.
-        dot_type (TypeDot): Type of dot for screentone effect.
-
-    Methods:
-        run(lq, hq): Method to run the screentone effect process.
-            Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Image with screentone effect applied and original high quality image.
+        screentone_dict (dict): A dictionary containing screentone settings.
+            It should include the following keys:
+                - "lqhq" (bool, optional): Flag indicating if the high-quality image should be replaced by the low-quality.
+                    Defaults to None.
+                - "dot_size" (list of int, optional): Range of dot sizes for screentone effects. Defaults to [7].
+                - "color" (dict, optional): Dictionary containing color-specific settings.
+                    Defaults to None.
+                - "probably" (float, optional): Probability of applying screentone effects. Defaults to 1.0.
+            The "color" dictionary should include the following keys:
+                - "type_halftone" (list of str, optional): List of halftone types to choose from.
+                    Defaults to ["rgb"].
+                - "c" (list of int, optional): Range of angles for the C (cyan) channel halftone.
+                    Defaults to [0, 0].
+                - "m" (list of int, optional): Range of angles for the M (magenta) channel halftone.
+                    Defaults to [0, 0].
+                - "y" (list of int, optional): Range of angles for the Y (yellow) channel halftone.
+                    Defaults to [0, 0].
+                - "k" (list of int, optional): Range of angles for the K (black) channel halftone.
+                    Defaults to [0, 0].
+                - "b" (list of int, optional): Range of angles for the B (blue) channel halftone.
+                    Defaults to [0, 0].
+                - "g" (list of int, optional): Range of angles for the G (green) channel halftone.
+                    Defaults to [0, 0].
+                - "r" (list of int, optional): Range of angles for the R (red) channel halftone.
+                    Defaults to [0, 0].
     """
-
     def __init__(self, screentone_dict):
         self.lqhq = screentone_dict.get("lqhq")
         self.dot_range = screentone_dict.get("dot_size", [7])
@@ -88,6 +83,15 @@ class ScreentoneLogic:
         return lq, hq
 
     def run(self, lq, hq):
+        """Applies the selected screentone effect to the input image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
+
+        Returns:
+            tuple: A tuple containing the screentoned low-quality image and the corresponding high-quality image.
+        """
         HALFTONE_TYPE_MAP = {
             "cmyk": self.__cmyk_halftone,
             "rgb": self.__rgb_halftone,

@@ -7,12 +7,22 @@ from time import sleep
 
 
 class CompressLogic:
+    """Class for compressing images or videos using various algorithms and parameters.
+
+    Args:
+        compress_dict (dict): A dictionary containing compression settings.
+            It should include the following keys:
+                - "algorithm" (list of str): List of compression algorithms to be used.
+                - "comp" (list of int, optional): Range of compression values for algorithms. Defaults to [90, 100].
+                - "target_compress" (dict, optional): Target compression values for specific algorithms.
+                    Defaults to None.
+                - "probably" (float, optional): Probability of applying compression. Defaults to 1.0.
+    """
     def __init__(self, compress_dict):
         self.compress_dict = compress_dict
         self.algorithm = compress_dict["algorithm"]
         compress = compress_dict.get("comp", [90, 100])
         target = compress_dict.get("target_compress")
-        self.compress_compress = compress_dict.get("compress_compress")
         self.probably = compress_dict.get("probably", 1.0)
         if target:
             self.target_compress = {
@@ -101,6 +111,16 @@ class CompressLogic:
         return cv.imdecode(encimg, 1).copy()
 
     def run(self, lq, hq):
+        """Compresses the input image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
+
+        Returns:
+            tuple: A tuple containing the compressed low-quality image
+                and the corresponding high-quality image.
+        """
         COMPRESS_TYPE_MAP = {
             "jpeg": self.__jpeg,
             "webp": self.__webp,
@@ -131,4 +151,3 @@ class CompressLogic:
             return (lq / 255).astype(np.float32), hq
         except Exception as e:
             print(f"Compress error {e}")
-            return lq, hq

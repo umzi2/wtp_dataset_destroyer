@@ -5,31 +5,18 @@ import cv2 as cv
 
 
 class BlurLogic:
-    """
-    Class for applying various blur effects to images.
+    """Class for applying blur effects to images.
 
     Args:
-        blur_dict (dict): A dictionary containing parameters for blur effects.
-            It should have the following keys:
-                - 'filter' (list): List of blur filter types.
-                - 'kernel' (list, optional): Range of kernel sizes. Default is [0, 1, 1].
-                - 'prob' (float, optional): Probability of applying blur effects. Default is 1.0.
-                - 'target_kernel' (dict, optional): Dictionary specifying target kernel sizes for each blur type. Default is None.
-
-    Attributes:
-        filter (list): List of blur filter types.
-        probably (float): Probability of applying blur effects.
-        kernels (dict): Dictionary containing ranges of kernel sizes for each blur type.
-
-    Methods:
-        run(lq, hq): Method to run the blur effects process.
-            Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Image with blur effects applied and original high quality image.
+        blur_dict (dict): A dictionary containing blur settings.
+            It should include the following keys:
+                - "filter" (list of str): List of blur filter types to choose from.
+                - "kernel" (list of int, optional): Range of kernel sizes for the blur filters.
+                    Defaults to [0, 1, 1].
+                - "probably" (float, optional): Probability of applying blur effects. Defaults to 1.0.
+                - "target_kernel" (dict, optional): Dictionary containing target kernel ranges for specific blur filters.
+                    Defaults to None.
     """
-
     def __init__(self, blur_dict):
         self.filter = blur_dict["filter"]
         kernel = blur_dict.get("kernel", [0, 1, 1])
@@ -55,6 +42,15 @@ class BlurLogic:
             }
 
     def run(self, lq, hq):
+        """Applies blur effects to the input image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
+
+        Returns:
+            tuple: A tuple containing the image with applied blur effects and the corresponding high-quality image.
+        """
         try:
             if probability(self.probably):
                 return lq, hq
