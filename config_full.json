@@ -18,14 +18,28 @@
         "b": [-45,45]
       },
       "probably": 0.5
-    }, {
+    },{
+      "type": "dithering",
+      "dithering_type":["floydsteinberg", "jarvisjudiceninke", "stucki", "atkinson", "burkes", "sierra",
+        "tworowsierra", "sierraLite","order","riemersma","quantize"
+      ],
+      "color_ch": [2,10],
+      "map_size":  [2,4,8,16],
+      "history": [10, 15],
+      "ratio": [0.1,0.9],
+      "probably": 0.5
+    },
+      {
       "type": "resize",
-      "alg_lq": ["box", "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss", "down_up","down_down"],
+      "alg_lq": ["box", "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+        "lanczos", "gauss", "down_up","down_down"],
         "alg_hq": ["lagrange"],
         "down_up": {
           "up": [1, 2],
-          "alg_up": ["nearest", "box", "hamming", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss"],
-          "alg_down": [ "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss","down_down"]
+          "alg_up": ["nearest", "box", "hamming", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
+            "cubic_bspline", "lanczos", "gauss"],
+          "alg_down": [ "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+            "lanczos", "gauss","down_down"]
         },
         "down_down": {
           "step": 6,

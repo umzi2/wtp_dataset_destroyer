@@ -1,6 +1,6 @@
 from chainner_ext import ResizeFilter
 from pepeline import TypeNoise
-
+from chainner_ext import DiffusionAlgorithm
 INTERPOLATION_MAP = {
     'nearest': ResizeFilter.Nearest,
     'box': ResizeFilter.Box,
@@ -22,3 +22,14 @@ NOISE_MAP = {
     'simplex': TypeNoise.SIMPLEX,
     'supersimplex': TypeNoise.SUPERSIMPLEX
 }
+DITHERING_MAP = {
+            "floydsteinberg": DiffusionAlgorithm.FloydSteinberg,
+            "jarvisjudiceninke": DiffusionAlgorithm.JarvisJudiceNinke,
+            "stucki": DiffusionAlgorithm.Stucki,
+            "atkinson": DiffusionAlgorithm.Atkinson,
+            "burkes": DiffusionAlgorithm.Burkes,
+            "sierra": DiffusionAlgorithm.Sierra,
+            "tworowsierra": DiffusionAlgorithm.TwoRowSierra,
+            "sierraLite": DiffusionAlgorithm.SierraLite,
+
+        }

@@ -7,3 +7,4 @@ from .screentone import ScreentoneLogic
 from .noice import Noice
 from .saturation import SaturationLossLogic
 from .sin import SinLossLogic
+from .dithering import Dithering

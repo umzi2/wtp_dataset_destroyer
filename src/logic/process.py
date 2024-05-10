@@ -18,7 +18,8 @@ ALL_LOGIC = {
     "color": ColorLossLogic,
     "sin": SinLossLogic,
     "halo": HaloLossLogic,
-    "saturation": SaturationLossLogic
+    "saturation": SaturationLossLogic,
+    "dithering": Dithering
 }
 
 
