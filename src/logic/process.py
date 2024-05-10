@@ -1,70 +1,28 @@
 import os
-from ..utils import img2gray, color_or_gray, lq_hq2grays
+
+from tqdm.contrib.concurrent import process_map, thread_map
+from ..utils import color_or_gray, lq_hq2grays
 from pepeline import read, save
 import numpy as np
-from os import listdir, cpu_count
+from os import listdir
 from os.path import join
-import concurrent.futures
-from tqdm import tqdm
 from ..process import *
+from tqdm import tqdm
 
 ALL_LOGIC = {
-    "resize": ResizeLogic, #готово
-    "blur": BlurLogic,#готово
-    "screentone": ScreentoneLogic,#готово
-    "compress": CompressLogic,#готово
+    "resize": ResizeLogic,
+    "blur": BlurLogic,
+    "screentone": ScreentoneLogic,
+    "compress": CompressLogic,
     "noice": Noice,
-    "color": ColorLossLogic,#готово
-    "sin": SinLossLogic,#готово
-    "halo": HaloLossLogic,#готово
-    "saturation": SaturationLossLogic#готово
+    "color": ColorLossLogic,
+    "sin": SinLossLogic,
+    "halo": HaloLossLogic,
+    "saturation": SaturationLossLogic
 }
 
 
 class ImgProcess:
-    """
-    Class for processing images based on specified configurations.
-
-    Args:
-        config (dict): A dictionary containing the configuration parameters.
-            It should have the following keys:
-                - 'input' (str): Path to the input folder containing images.
-                - 'output' (str): Path to the output folder for processed images.
-                - 'tile' (dict, optional): Dictionary specifying parameters for processing images in tiles.
-                - 'replays' (int, optional): Number of repetitions for processing images. Default is 1.
-                - 'gray_or_color' (bool, optional): Boolean indicating whether to convert images to grayscale if True, otherwise keep original color. Default is False.
-                - 'gray' (bool, optional): Boolean indicating whether to convert images to grayscale. Default is False.
-                - 'process' (list): List of dictionaries specifying the image processing steps.
-                    Each dictionary should have the following keys:
-                        - 'type' (str): Type of image processing logic.
-                        - Other parameters specific to the processing logic.
-                - 'num_workers' (int, optional): Number of worker threads for parallel processing. Default is the number of CPU cores.
-
-    Attributes:
-        input (str): Path to the input folder containing images.
-        output (str): Path to the output folder for processed images.
-        tile (dict): Dictionary specifying parameters for processing images in tiles.
-        rep (int): Number of repetitions for processing images.
-        no_wb (bool): Boolean indicating whether to exclude tiles with extreme mean values.
-        tile_size (int): Size of tiles for processing images.
-        replays (int): Number of repetitions for processing images.
-        gray_or_color (bool): Boolean indicating whether to convert images to grayscale or keep original color.
-        gray (bool): Boolean indicating whether to convert images to grayscale.
-        turn (list): List of image processing logic objects.
-        output_lq (str): Path to the output folder for processed low-quality images.
-        output_hq (str): Path to the output folder for processed high-quality images.
-        num_workers (int): Number of worker threads for parallel processing.
-
-    Methods:
-        process(img_fold): Method to process a single image without tiling.
-            Args:
-                img_fold (str): Name of the image file.
-        process_tile(img_fold): Method to process a single image by tiling.
-            Args:
-                img_fold (str): Name of the image file.
-        run(): Method to start the image processing.
-    """
-
     def __init__(self, config):
         self.input = config["input"]
         self.output = config["output"]
@@ -80,8 +38,9 @@ class ImgProcess:
         self.turn = []
         self.output_lq = join(self.output, "lq")
         self.output_hq = join(self.output, "hq")
-        num_cpu_count = cpu_count() if cpu_count() is not None else 1
-        self.num_workers = config.get("num_workers", num_cpu_count)
+        self.map_type = config.get("map_type", "process")
+
+        self.num_workers = config.get("num_workers")
         for process_dict in process:
             process_type = process_dict["type"]
             self.turn.append(ALL_LOGIC[process_type](process_dict))
@@ -93,11 +52,12 @@ class ImgProcess:
 
     def __img_read(self, img_fold):
         input_folder = join(self.input, img_fold)
-        img = read(str(input_folder), 1, 0)
+        if self.gray:
+            img = read(str(input_folder), 0, 0)
+        else:
+            img = read(str(input_folder), 1, 0)
         if self.gray_or_color:
             img = color_or_gray(img)
-        if self.gray:
-            img = img2gray(img)
         return img
 
     def __img_save(self, lq, hq, output_name):
@@ -144,9 +104,10 @@ class ImgProcess:
 
     def run(self):
         process = self.process_tile if self.tile else self.process
-        total = len(self.all_images)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.num_workers) as executor:
-            futures = [executor.submit(process, item) for item in self.all_images]
-            with tqdm(total=total) as pbar:
-                for _ in concurrent.futures.as_completed(futures):
-                    pbar.update(1)
+        if self.map_type == "process":
+            process_map(process, self.all_images, max_workers=self.num_workers)
+        elif self.map_type == "thread":
+            thread_map(process, self.all_images, max_workers=self.num_workers)
+        else:
+            for img in tqdm(self.all_images):
+                process(img)

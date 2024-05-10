@@ -1,6 +1,6 @@
 from ..utils import probability
 from dataset_support import sin_patern
-from numpy import random
+import random
 
 
 class SinLossLogic:
@@ -33,11 +33,10 @@ class SinLossLogic:
     """
 
     def __init__(self, sin_loss_dict):
-        self.sin_loss_dict = sin_loss_dict
-        self.shape = sin_loss_dict["shape"]
-        self.alpha = sin_loss_dict["alpha"]
-        self.bias = sin_loss_dict["bias"]
-        self.vertical_prob = sin_loss_dict["vertical"]
+        self.shape = sin_loss_dict.get("shape", [100, 1000, 100])
+        self.alpha = sin_loss_dict.get("alpha", [0.1, 0.5])
+        self.bias = sin_loss_dict.get("bias", [0.8, 1.2])
+        self.vertical_prob = sin_loss_dict.get("vertical", 0.5)
         self.probably = sin_loss_dict.get("probably", 1.0)
 
     def run(self, lq, hq):

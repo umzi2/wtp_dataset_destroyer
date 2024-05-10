@@ -32,6 +32,8 @@ class SaturationLossLogic:
 
     def run(self, lq, hq):
         try:
+            if lq.ndim == 2:
+                return lq, hq
             if probability(self.probably):
                 return lq, hq
             random_saturation = random.uniform(*self.rand)

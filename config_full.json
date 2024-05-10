@@ -24,12 +24,12 @@
         "alg_hq": ["lagrange"],
         "down_up": {
           "up": [1, 2],
-          "alg_up": ["nearest", "box", "hermite", "hamming", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss"],
+          "alg_up": ["nearest", "box", "hamming", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss"],
           "alg_down": [ "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss","down_down"]
         },
         "down_down": {
           "step": 6,
-          "alg_down": ["hermite", "linear", "hann", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
+          "alg_down": [ "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
         },
         "spread": [1, 2, 0.25],
         "scale": 4,
@@ -88,7 +88,7 @@
       {
         "type":"compress",
         "compress_compress": [1, 2],
-        "algorithm": ["jpeg", "webp","h264","hevc","mpeg","mpeg2","vp9","jpeg","webp"],
+        "algorithm": ["jpeg", "webp","h264","hevc","mpeg","mpeg2","vp9"],
         "target_compress": {
         "h264": [23,32],
         "hevc": [20,34],

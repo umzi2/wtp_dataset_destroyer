@@ -32,8 +32,8 @@ class ColorLossLogic:
     """
 
     def __init__(self, color_loss_dict):
-        self.high_list = color_loss_dict.get("high",[255,255])
-        self.low_list = color_loss_dict.get("low",[0,0])
+        self.high_list = color_loss_dict.get("high")
+        self.low_list = color_loss_dict.get("low")
         self.gamma = color_loss_dict.get("gamma",[1.0,1.0])
         self.probably = color_loss_dict.get("probably", 1.0)
 
@@ -43,8 +43,12 @@ class ColorLossLogic:
                 return lq, hq
             in_low = 0
             in_high = 255
-            high_output = random.randint(*self.high_list)
-            low_output = random.randint(*self.low_list)
+            high_output =255
+            low_output =0
+            if self.high_list:
+                high_output = random.randint(*self.high_list)
+            if self.low_list:
+                low_output = random.randint(*self.low_list)
             gamma = random.uniform(*self.gamma)
             lq = fast_color_level(lq, in_low=in_low, in_high=in_high, out_low=low_output, out_high=high_output,
                                   gamma=gamma)

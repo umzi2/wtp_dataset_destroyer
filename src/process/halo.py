@@ -38,9 +38,9 @@ class HaloLossLogic:
     """
 
     def __init__(self, halo_loss_dict):
-        self.factor = halo_loss_dict.get("sharpening_factor")
+        self.factor = halo_loss_dict.get("sharpening_factor", [0, 2])
         self.kernel = halo_loss_dict.get("kernel", [0, 2])
-        self.laplacian = halo_loss_dict["laplacian"]
+        self.laplacian = halo_loss_dict.get("laplacian", [3])
         self.probably = halo_loss_dict.get("probably", 1.0)
         self.type = halo_loss_dict.get("type_halo", ["laplacian"])
         self.amount = halo_loss_dict.get("amount", [1, 1])
@@ -55,26 +55,25 @@ class HaloLossLogic:
         else:
             img_gray = lq
         sharpening_factor = random.randint(*self.factor)
-        kernel = random.randint(*self.kernel)
+        kernel = random.randint(*self.kernel)[0]
         laplacian = random.choice(self.laplacian)
-        img_gray = img_gray * 255
+        img_gray = img_gray
         if kernel:
-            img_gray = cv.blur(img_gray.astype(np.uint8), ksize=[kernel, kernel])
-        laplacian = cv.Laplacian(img_gray.astype(np.uint8), cv.CV_16S, ksize=laplacian)
+            img_gray = cv.blur(img_gray, ksize=[kernel, kernel])
+        laplacian = cv.Laplacian(img_gray, cv.CV_32F, ksize=laplacian)
         sharpened_image = img_gray - sharpening_factor * laplacian
-        _, sharpened_image = cv.threshold(sharpened_image, 254, 255, 0, cv.THRESH_BINARY)
+        _, sharpened_image = cv.threshold(sharpened_image, 0.98, 1, 0, cv.THRESH_BINARY)
         if np.ndim(lq) != 2:
-            sharpened_image = np.stack([sharpened_image] * 3, axis=-1).astype(np.float32) / 255
-        else:
-            sharpened_image = sharpened_image.astype(np.float32) / 255
-        return np.clip(lq + sharpened_image, 0, 1)
+            sharpened_image = np.stack([sharpened_image] * 3, axis=-1)
+        return np.clip(lq + sharpened_image, 0, 1).astype(np.float32)
 
     def __unsharp_mask(self, lq):
-        kernel_size = np.random.randint(*self.kernel)
+        kernel_size = np.random.randint(*self.kernel)[0]
         amount = np.random.uniform(*self.amount)
         threshold = np.random.uniform(*self.threshold)
         if kernel_size % 2 == 0:
             kernel_size += 1
+
         blurred = cv.GaussianBlur(lq, (kernel_size, kernel_size), 0)
         sharpened = np.clip(float(amount + 1) * lq - float(amount) * blurred, 0, 1)
         if threshold > 0:
