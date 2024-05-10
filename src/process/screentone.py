@@ -35,6 +35,7 @@ class ScreentoneLogic:
                 - "r" (list of int, optional): Range of angles for the R (red) channel halftone.
                     Defaults to [0, 0].
     """
+
     def __init__(self, screentone_dict):
         self.lqhq = screentone_dict.get("lqhq")
         self.dot_range = screentone_dict.get("dot_size", [7])

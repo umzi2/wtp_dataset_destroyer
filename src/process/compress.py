@@ -18,6 +18,7 @@ class CompressLogic:
                     Defaults to None.
                 - "probably" (float, optional): Probability of applying compression. Defaults to 1.0.
     """
+
     def __init__(self, compress_dict):
         self.compress_dict = compress_dict
         self.algorithm = compress_dict["algorithm"]

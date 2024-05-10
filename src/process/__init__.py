@@ -4,7 +4,7 @@ from .color import ColorLossLogic
 from .compress import CompressLogic
 from .halo import HaloLossLogic
 from .screentone import ScreentoneLogic
-from .noice import Noice
+from .noise import Noise
 from .saturation import SaturationLossLogic
 from .sin import SinLossLogic
 from .dithering import Dithering

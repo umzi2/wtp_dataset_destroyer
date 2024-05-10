@@ -86,8 +86,8 @@
       "rand": [0.5,1.0],
       "prob": 0.5
     },{
-      "type": "noice",
-      "type_noice": ["perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex","uniform"],
+      "type": "noise",
+      "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex","uniform"],
       "normalize": true,
       "close": {
         "black": 0.1,

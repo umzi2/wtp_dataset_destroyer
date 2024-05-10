@@ -17,6 +17,7 @@ class BlurLogic:
                 - "target_kernel" (dict, optional): Dictionary containing target kernel ranges for specific blur filters.
                     Defaults to None.
     """
+
     def __init__(self, blur_dict):
         self.filter = blur_dict["filter"]
         kernel = blur_dict.get("kernel", [0, 1, 1])

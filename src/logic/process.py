@@ -14,7 +14,7 @@ ALL_LOGIC = {
     "blur": BlurLogic,
     "screentone": ScreentoneLogic,
     "compress": CompressLogic,
-    "noice": Noice,
+    "noice": Noise,
     "color": ColorLossLogic,
     "sin": SinLossLogic,
     "halo": HaloLossLogic,
@@ -62,6 +62,7 @@ class ImgProcess:
         process_tile(img_fold): Processes an image in tiles using the specified image processing techniques.
         run(): Executes the image processing workflow.
     """
+
     def __init__(self, config):
         self.input = config["input"]
         self.output = config["output"]

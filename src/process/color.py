@@ -18,10 +18,11 @@ class ColorLossLogic:
                 - "probably" (float, optional): Probability of applying color loss adjustments.
                     Defaults to 1.0.
     """
+
     def __init__(self, color_loss_dict):
         self.high_list = color_loss_dict.get("high")
         self.low_list = color_loss_dict.get("low")
-        self.gamma = color_loss_dict.get("gamma",[1.0,1.0])
+        self.gamma = color_loss_dict.get("gamma", [1.0, 1.0])
         self.probably = color_loss_dict.get("probably", 1.0)
 
     def run(self, lq, hq):
@@ -44,8 +45,8 @@ class ColorLossLogic:
                 return lq, hq
             in_low = 0
             in_high = 255
-            high_output =255
-            low_output =0
+            high_output = 255
+            low_output = 0
             if self.high_list:
                 high_output = random.randint(*self.high_list)
             if self.low_list:

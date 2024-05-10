@@ -19,6 +19,7 @@ class SinLossLogic:
                     Defaults to 0.5.
                 - "probably" (float, optional): Probability of applying sinusoidal patterns. Defaults to 1.0.
     """
+
     def __init__(self, sin_loss_dict):
         self.shape = sin_loss_dict.get("shape", [100, 1000, 100])
         self.alpha = sin_loss_dict.get("alpha", [0.1, 0.5])
