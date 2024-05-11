@@ -1,18 +1,25 @@
 ```json
-      "screentone": {
-        "color": {
-          "dot_size": [7],
-          "r":[0,7] ,
-          "g":[0,7] ,
-          "b":[0,7] },
-        "dot_size": 7,
-        "lqhq": false,
-        "prob": 0.5
-      }
+{
+    "type": "screentone",
+    "lqhq": false,
+    "dot_size": [7],
+    "color": {
+      "type_halftone": ["rgb","cmyk","gray","not_rot"],
+      "c": [-45,45],
+      "m": [-45,45],
+      "y": [-45,45],
+      "k": [-45,45],
+
+      "r": [-45,45],
+      "g": [-45,45],
+      "b": [-45,45]
+    },
+    "probably": 0.5
+}
 ```
 - color* - settings in case the image is 3-dimensional i.e. rgb
-  - dot_size - point size accepts a list from which a random size is taken
-  - r..b - random placement of dots for each color is essential for creating a variety of patterns, accepts sheet [smaller, larger] for randint
-- dot_size - size of points for 2 dimensional images i.e. grayscale accepts a list
+  - type_halftone* - sheet from which a random halftone algorithm is chosen
+  - c..k and r..b - accepts a list for each channel in [low, high] format. A random number will be selected in this range to be used for channel rotation.
+- dot_size - size of points accepts a list
 - lqhq* - equates hq to lq, assuming screentone is first in line
-- prob* - chance of triggering
+- probably* - chance of triggering

@@ -40,8 +40,8 @@ class Noise:
         alpha_rand = noise_dict.get("alpha", [1, 2, 1])
         self.alpha_rand = np.arange(*alpha_rand)
         self.lqhq = noise_dict.get("lqhq", False)
-        self.y_noise = noise_dict.get("y_noise")
-        self.uv_noise = noise_dict.get("uv_noise")
+        self.y_noise = noise_dict.get("y_noise", 0)
+        self.uv_noise = noise_dict.get("uv_noise", 0)
         self.noise_type = "perlin"
 
         # procedural_noises
@@ -53,7 +53,7 @@ class Noise:
         lacunarity_range = noise_dict.get("lacunarity", [0.4, 0.5, 0.5])
         self.lacunarity_rand = np.arange(*lacunarity_range)
         # salt_or_pepper
-        self.probably_salt_or_pepper = noise_dict.get("probably_salt_or_pepper", [0, 0.5])
+        self.percentage_salt_or_pepper = noise_dict.get("probably_salt_or_pepper", [0, 0.5])
 
     def __procedural_noises(self, lq):
         noise = noise_generate(lq.shape, NOISE_MAP[self.noise_type],
@@ -79,7 +79,7 @@ class Noise:
     # Salt_and_pepper noises
     def __salt_and_pepper_core(self, img_shape):
         noise = np.random.uniform(0, 1, img_shape)
-        probably = np.random.uniform(*self.probably_salt_or_pepper)
+        probably = np.random.uniform(*self.percentage_salt_or_pepper)
         return noise, probably
 
     def __salt_and_pepper(self, lq):
@@ -123,29 +123,29 @@ class Noise:
         try:
             if probability(self.probably):
                 return lq, hq
-            yuv = False
+            y = False
+            uv = False
             if lq.ndim == 3:
 
-                if self.y_noise:
-                    yuv = True
+                if probability(self.y_noise):
+                    y = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 0]
                     uv = yuv_img[:, :, 1:]
-                elif self.uv_noise:
-                    yuv = True
+                elif probability(self.uv_noise):
+                    uv = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 1:]
                     y = yuv_img[:, :, 0]
             self.noise_type = np.random.choice(self.type_noise)
             lq = NOISE_TYPE_MAP[self.noise_type](lq)
             lq = np.clip(lq, 0, 1)
-            if yuv:
-                if self.y_noise:
-                    lq = np.stack((lq, uv[:, :, 0], uv[:, :, 1]), axis=-1)
-                    lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
-                elif self.uv_noise:
-                    lq = np.stack((y, lq[:, :, 0], lq[:, :, 1]), axis=-1)
-                    lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
+            if y:
+                lq = np.stack((lq, uv[:, :, 0], uv[:, :, 1]), axis=-1)
+                lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
+            elif uv:
+                lq = np.stack((y, lq[:, :, 0], lq[:, :, 1]), axis=-1)
+                lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
 
             if self.lqhq:
                 hq = lq
