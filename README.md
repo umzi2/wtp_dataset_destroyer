@@ -1,8 +1,10 @@
-# Dataset destroer primarily 
-designed for web art, is in early beta.
+# WTP Dataset Destroyer
+Designed for web art. Currently it's in early beta.
 ## TODO
-* Make more losses.
-* Change the structure for more readability.
+* Add more losses.
+* Change the structure for better readability.
+
+  
 # Settings
 \* = optional parameters
   
