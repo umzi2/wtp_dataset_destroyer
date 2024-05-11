@@ -25,6 +25,7 @@ designed for web art, is in early beta.
 [Sin](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/sin.md)
 
 [Compress](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/compress.md)
+[Dithering](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/dithering.md)
 
 # P.S.
 resize is implemented via [chainner rs](https://github.com/chaiNNer-org/chaiNNer-rs)
