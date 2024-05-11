@@ -1,4 +1,4 @@
-# Dataset Destroyer
+# WTP Dataset Destroyer
 Designed for web art. Currently it's in early beta.
 ## TODO
 * Add more losses.
