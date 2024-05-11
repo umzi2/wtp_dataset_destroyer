@@ -8,25 +8,25 @@ Designed for web art. Currently it's in early beta.
 # Settings
 \* = optional parameters
   
-[Common](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/common.md)
+[Common](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/common.md)
 
-[Screentone](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/screentone.md)
+[Screentone](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/screentone.md)
 
-[Resize](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/resize.md)
+[Resize](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/resize.md)
 
-[Halo](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/halo.md)
+[Halo](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/halo.md)
 
-[Blure](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/blure.md)
+[Blur](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/blur.md)
 
-[Noise](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/noise.md)
+[Noise](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/noise.md)
 
-[Saturation](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/saturation.md)
+[Saturation](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/saturation.md)
 
-[Color](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/color.md)
+[Color](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/color.md)
 
-[Sin](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/sin.md)
+[Sin](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/sin.md)
 
-[Compress](https://github.com/umzi2/art_dataset_destroyer/blob/d38e2131a02768d98f798747549abdc85f1e7e67/instructions/compress.md)
+[Compress](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/compress.md)
 
 [Dithering](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/dithering.md)
 
