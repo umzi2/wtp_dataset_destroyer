@@ -1,7 +1,7 @@
 import os
 
 from tqdm.contrib.concurrent import process_map, thread_map
-from ..utils import color_or_gray, lq_hq2grays
+from ..utils import color_or_gray, lq_hq2grays, laplace_filter
 from pepeline import read, save
 import numpy as np
 from os import listdir
@@ -75,11 +75,17 @@ class ImgProcess:
         self.gray = config.get("gray")
         process = config["process"]
         self.all_images = listdir(self.input)
+        np.random.shuffle(self.all_images)
+        self.all_images = self.all_images[:6000]
+        if config.get("shuffle_dataset"):
+            np.random.shuffle(self.all_images)
+        if config.get("size"):
+            self.all_images = self.all_images[:config.get("size")]
         self.turn = []
         self.output_lq = join(self.output, "lq")
         self.output_hq = join(self.output, "hq")
         self.map_type = config.get("map_type", "process")
-
+        self.laplace_filter = config.get("laplace_filter")
         self.num_workers = config.get("num_workers")
         for process_dict in process:
             process_type = process_dict["type"]
@@ -115,6 +121,9 @@ class ImgProcess:
                 """
         try:
             img = self.__img_read(img_fold)
+            if self.laplace_filter:
+                if laplace_filter(img, self.laplace_filter):
+                    return
             n = self.all_images.index(img_fold)
             lq, hq = img, img
             for loss in self.turn:
@@ -139,7 +148,10 @@ class ImgProcess:
             for Kx, Ky in np.ndindex(h // self.tile_size, w // self.tile_size):
                 img_tile = img[self.tile_size * Kx:self.tile_size * (Kx + 1),
                            self.tile_size * Ky:self.tile_size * (Ky + 1)]
-                if self.no_wb:
+                if self.laplace_filter:
+                    if laplace_filter(img_tile, self.laplace_filter):
+                        continue
+                elif self.no_wb:
                     mean = np.mean(img_tile)
                     if mean == 0.0 or mean == 1.0:
                         continue

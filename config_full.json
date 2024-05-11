@@ -101,7 +101,6 @@
     },
       {
         "type":"compress",
-        "compress_compress": [1, 2],
         "algorithm": ["jpeg", "webp","h264","hevc","mpeg","mpeg2","vp9"],
         "target_compress": {
         "h264": [23,32],
@@ -122,6 +121,9 @@
   ,
   "num_workers": 16,
   "map_type": "process",
+  "laplace_filter": 0.02,
+  "size": 1000,
+  "shuffle_dataset": true,
   "tile": {
     "size": 512,
     "no_wb": true
