@@ -32,7 +32,6 @@ class ImgProcess:
                 - "input" (str): Path to the input folder containing images.
                 - "output" (str): Path to the output folder where processed images will be saved.
                 - "tile" (dict, optional): Dictionary containing settings for tile-based processing. Defaults to None.
-                - "replays" (int, optional): Number of replays. Defaults to None.
                 - "gray_or_color" (bool, optional): Flag indicating whether to process images in grayscale or color.
                     Defaults to None.
                 - "gray" (bool, optional): Flag indicating whether to convert images to grayscale. Defaults to None.
@@ -49,7 +48,6 @@ class ImgProcess:
         tile (dict): Dictionary containing settings for tile-based processing.
         no_wb (bool): Flag indicating whether to exclude white or black tiles during tile-based processing.
         tile_size (int): Size of each tile for tile-based processing.
-        replays (int): Number of replays.
         gray_or_color (bool): Flag indicating whether to process images in grayscale or color.
         gray (bool): Flag indicating whether to convert images to grayscale.
         all_images (list): List of all image filenames in the input folder.
@@ -72,7 +70,6 @@ class ImgProcess:
         if self.tile:
             self.no_wb = self.tile.get("no_wb")
             self.tile_size = self.tile.get("size", 512)
-        self.replays = config.get("replays")
         self.gray_or_color = config.get("gray_or_color")
         self.gray = config.get("gray")
         process = config["process"]
