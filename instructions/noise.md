@@ -10,7 +10,7 @@
       "octaves": [1,10,1],
       "frequency": [0.1,0.9,0.1],
       "lacunarity": [0.01,0.5,0.01],
-      "percentage_salt_or_pepper": [0,0.3],
+      "probably_salt_or_pepper": [0,0.3],
       "probably": 0.5
     }
 ```
@@ -28,4 +28,4 @@ further settings for this noise list ("perlinsuflet", "perlin", "opensimplex", "
 - lacunarity* - degree of decrease in frequency when calling again frequency*lacunarity, takes sheet [low, high, step]
 
 ps further settings for this noise list ("salt","pepper","salt_and_pepper")
-- percentage_salt_or_pepper* - the percentage of salt and pepper in the noises
+- probably_salt_or_pepper* - the percentage of salt and pepper in the noises
