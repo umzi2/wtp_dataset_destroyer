@@ -126,25 +126,26 @@ class Noise:
             y = False
             uv = False
             if lq.ndim == 3:
-
                 if probability(self.y_noise):
+
                     y = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 0]
-                    uv = yuv_img[:, :, 1:]
+                    uv_array = yuv_img[:, :, 1:]
                 elif probability(self.uv_noise):
                     uv = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 1:]
-                    y = yuv_img[:, :, 0]
+                    y_array = yuv_img[:, :, 0]
             self.noise_type = np.random.choice(self.type_noise)
             lq = NOISE_TYPE_MAP[self.noise_type](lq)
             lq = np.clip(lq, 0, 1)
             if y:
-                lq = np.stack((lq, uv[:, :, 0], uv[:, :, 1]), axis=-1)
+
+                lq = np.stack((lq, uv_array[:, :, 0], uv_array[:, :, 1]), axis=-1)
                 lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
             elif uv:
-                lq = np.stack((y, lq[:, :, 0], lq[:, :, 1]), axis=-1)
+                lq = np.stack((y_array, lq[:, :, 0], lq[:, :, 1]), axis=-1)
                 lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
 
             if self.lqhq:

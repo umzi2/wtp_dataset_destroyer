@@ -14,7 +14,7 @@ ALL_LOGIC = {
     "blur": BlurLogic,
     "screentone": ScreentoneLogic,
     "compress": CompressLogic,
-    "noice": Noise,
+    "noise": Noise,
     "color": ColorLossLogic,
     "sin": SinLossLogic,
     "halo": HaloLossLogic,
@@ -37,8 +37,10 @@ class ImgProcess:
                     Defaults to None.
                 - "gray" (bool, optional): Flag indicating whether to convert images to grayscale. Defaults to None.
                 - "process" (list of dict): List containing dictionaries specifying the processing techniques to apply.
-                - "num_workers" (int, optional): Number of worker threads to use for parallel processing. Defaults to None.
-                - "map_type" (str, optional): Type of mapping to use for processing images. Can be "process", "thread", or None.
+                - "num_workers" (int, optional): Number of worker threads to use for parallel processing.
+                Defaults to None.
+                - "map_type" (str, optional): Type of mapping to use for processing images. Can be "process",
+                "thread", or None.
                     Defaults to "process".
 
     Attributes:
