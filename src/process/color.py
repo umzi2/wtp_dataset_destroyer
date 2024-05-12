@@ -52,8 +52,14 @@ class ColorLossLogic:
             if self.low_list:
                 low_output = random.randint(*self.low_list)
             gamma = random.uniform(*self.gamma)
-            lq = fast_color_level(lq, in_low=in_low, in_high=in_high, out_low=low_output, out_high=high_output,
-                                  gamma=gamma)
+            lq = fast_color_level(
+                lq,
+                in_low=in_low,
+                in_high=in_high,
+                out_low=low_output,
+                out_high=high_output,
+                gamma=gamma,
+            )
 
             return lq, hq
         except Exception as e:

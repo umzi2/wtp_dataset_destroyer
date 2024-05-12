@@ -24,6 +24,7 @@ class HaloLossLogic:
                 - "threshold" (list of float, optional): Range of thresholds for unsharp mask.
                     Defaults to [0, 0].
     """
+
     def __init__(self, halo_loss_dict):
         self.factor = halo_loss_dict.get("sharpening_factor", [0, 2])
         self.kernel = halo_loss_dict.get("kernel", [0, 2])
@@ -71,13 +72,13 @@ class HaloLossLogic:
     def run(self, lq, hq):
         """Applies the selected halo loss reduction technique to the input image.
 
-         Args:
-             lq (numpy.ndarray): The low-quality image.
-             hq (numpy.ndarray): The corresponding high-quality image.
+        Args:
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
 
-         Returns:
-             tuple: A tuple containing the halo loss reduced low-quality image and the corresponding high-quality image.
-         """
+        Returns:
+            tuple: A tuple containing the halo loss reduced low-quality image and the corresponding high-quality image.
+        """
         try:
             if probability(self.probably):
                 return lq, hq

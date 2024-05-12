@@ -65,25 +65,36 @@ class ResizeLogic:
     def __down_up(self, lq, width, height):
         up = np.random.uniform(self.down_up_spread[0], self.down_up_spread[1])
         algorithm_up = random.choice(self.down_up_alg_up)
-        lq = resize(lq, (int(width * up), int(height * up)), INTERPOLATION_MAP[algorithm_up],
-                    gamma_correction=self.gamma_correction)
+        lq = resize(
+            lq,
+            (int(width * up), int(height * up)),
+            INTERPOLATION_MAP[algorithm_up],
+            gamma_correction=self.gamma_correction,
+        )
         return lq
 
     def __down_down(self, lq, width, height, algorithm_lq):
         height_k = width / height
         step = random.randint(1, self.down_down_step)
         step = (width - width / self.lq_scale) / step
-        for down in list(reversed(np.arange(int(width // self.lq_scale), int(width), int(step))))[:-1]:
-            lq = resize(lq, (int(down), int(down / height_k)), INTERPOLATION_MAP[algorithm_lq],
-                        gamma_correction=self.gamma_correction)
+        for down in list(
+            reversed(np.arange(int(width // self.lq_scale), int(width), int(step)))
+        )[:-1]:
+            lq = resize(
+                lq,
+                (int(down), int(down / height_k)),
+                INTERPOLATION_MAP[algorithm_lq],
+                gamma_correction=self.gamma_correction,
+            )
         return lq
 
     def run(self, lq, hq):
         """Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Resized low quality image and high quality image."""
+            lq (numpy.ndarray): Low quality image.
+            hq (numpy.ndarray): High quality image.
+        Returns:
+            Tuple of numpy.ndarrays: Resized low quality image and high quality image.
+        """
         try:
             if probability(self.probably):
                 return lq, hq
@@ -101,11 +112,18 @@ class ResizeLogic:
                 algorithm_lq = random.choice(self.down_down_alg)
                 lq = self.__down_down(lq, width, height, algorithm_lq)
 
-            lq = resize(lq, (int(width // self.lq_scale), int(height // self.lq_scale)),
-                        INTERPOLATION_MAP[algorithm_lq],
-                        gamma_correction=self.gamma_correction)
-            hq = resize(hq, (int(width), int(height)), INTERPOLATION_MAP[algorithm_hq],
-                        gamma_correction=self.gamma_correction)
+            lq = resize(
+                lq,
+                (int(width // self.lq_scale), int(height // self.lq_scale)),
+                INTERPOLATION_MAP[algorithm_lq],
+                gamma_correction=self.gamma_correction,
+            )
+            hq = resize(
+                hq,
+                (int(width), int(height)),
+                INTERPOLATION_MAP[algorithm_hq],
+                gamma_correction=self.gamma_correction,
+            )
 
             if self.color_fix:
                 lq = fast_color_level(lq, 0, 250, None, None, None)

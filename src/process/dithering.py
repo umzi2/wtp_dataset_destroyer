@@ -1,6 +1,11 @@
 import numpy as np
-from chainner_ext import UniformQuantization as UQ, quantize, error_diffusion_dither, ordered_dither, \
-    riemersma_dither
+from chainner_ext import (
+    UniformQuantization as UQ,
+    quantize,
+    error_diffusion_dither,
+    ordered_dither,
+    riemersma_dither,
+)
 from ..constants import DITHERING_MAP
 from ..utils import probability
 from numpy import random
@@ -35,7 +40,9 @@ class Dithering:
         self.dithering_type = "Burkes"
 
     def __error(self, lq, quantization):
-        return error_diffusion_dither(lq, quantization, DITHERING_MAP[self.dithering_type])
+        return error_diffusion_dither(
+            lq, quantization, DITHERING_MAP[self.dithering_type]
+        )
 
     def __quantize(self, lq, quantization):
         return quantize(lq, quantization)
@@ -70,7 +77,7 @@ class Dithering:
             "sierraLite": self.__error,
             "order": self.__order,
             "riemersma": self.__riemersma,
-            "quantize": self.__quantize
+            "quantize": self.__quantize,
         }
         try:
             if probability(self.probably):

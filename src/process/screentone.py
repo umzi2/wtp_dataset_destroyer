@@ -1,4 +1,4 @@
-from pepeline import screentone, TypeDot, cvt_color, CvtType
+from pepeline import screentone, cvt_color, CvtType
 import numpy as np
 from numpy import random
 

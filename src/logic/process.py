@@ -19,7 +19,7 @@ ALL_LOGIC = {
     "sin": SinLossLogic,
     "halo": HaloLossLogic,
     "saturation": SaturationLossLogic,
-    "dithering": Dithering
+    "dithering": Dithering,
 }
 
 
@@ -79,7 +79,7 @@ class ImgProcess:
         if config.get("shuffle_dataset"):
             np.random.shuffle(self.all_images)
         if config.get("size"):
-            self.all_images = self.all_images[:config.get("size")]
+            self.all_images = self.all_images[: config.get("size")]
         self.turn = []
         self.output_lq = join(self.output, "lq")
         self.output_hq = join(self.output, "hq")
@@ -115,9 +115,9 @@ class ImgProcess:
     def process(self, img_fold):
         """Processes an image using the specified image processing techniques.
 
-                Args:
-                    img_fold (str): Filename of the image to process.
-                """
+        Args:
+            img_fold (str): Filename of the image to process.
+        """
         try:
             img = self.__img_read(img_fold)
             if self.laplace_filter:
@@ -129,7 +129,6 @@ class ImgProcess:
                 lq, hq = loss.run(lq, hq)
             output_name = f"{n}.png"
             self.__img_save(lq, hq, output_name)
-
 
         except Exception as e:
             print(e)
@@ -145,8 +144,10 @@ class ImgProcess:
             h, w = img.shape[:2]
             n = self.all_images.index(img_fold)
             for Kx, Ky in np.ndindex(h // self.tile_size, w // self.tile_size):
-                img_tile = img[self.tile_size * Kx:self.tile_size * (Kx + 1),
-                           self.tile_size * Ky:self.tile_size * (Ky + 1)]
+                img_tile = img[
+                    self.tile_size * Kx : self.tile_size * (Kx + 1),
+                    self.tile_size * Ky : self.tile_size * (Ky + 1),
+                ]
                 if self.laplace_filter:
                     if laplace_filter(img_tile, self.laplace_filter):
                         continue

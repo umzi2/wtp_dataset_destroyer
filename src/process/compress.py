@@ -51,11 +51,14 @@ class CompressLogic:
 
         # Encode image using ffmpeg
         process1 = (
-            ffmpeg
-            .input('pipe:', format='rawvideo', pix_fmt='bgr24', s=f'{width}x{height}')
-            .output('pipe:', format=container, vcodec=codec, **output_args)
-            .global_args('-loglevel', 'fatal')  # Disable error reporting because of buffer errors
-            .global_args('-max_muxing_queue_size', '300000')
+            ffmpeg.input(
+                "pipe:", format="rawvideo", pix_fmt="bgr24", s=f"{width}x{height}"
+            )
+            .output("pipe:", format=container, vcodec=codec, **output_args)
+            .global_args(
+                "-loglevel", "fatal"
+            )  # Disable error reporting because of buffer errors
+            .global_args("-max_muxing_queue_size", "300000")
             .run_async(pipe_stdin=True, pipe_stdout=True)
         )
         process1.stdin.write(lq.tobytes())
@@ -67,48 +70,59 @@ class CompressLogic:
 
         # Decode compressed video back into image format using ffmpeg
         process2 = (
-            ffmpeg
-            .input('pipe:', format=container)
-            .output('pipe:', format='rawvideo', pix_fmt='bgr24')
-            .global_args('-loglevel', 'fatal')  # Disable error reporting because of buffer errors
+            ffmpeg.input("pipe:", format=container)
+            .output("pipe:", format="rawvideo", pix_fmt="bgr24")
+            .global_args(
+                "-loglevel", "fatal"
+            )  # Disable error reporting because of buffer errors
             .run_async(pipe_stdin=True, pipe_stdout=True)
         )
 
         out, err = process2.communicate(input=process1.stdout.read())
 
         process1.wait()
-        return np.frombuffer(out, np.uint8)[:(height * width * 3)].reshape(lq.shape).copy()
+        return (
+            np.frombuffer(out, np.uint8)[: (height * width * 3)]
+            .reshape(lq.shape)
+            .copy()
+        )
 
     def __h264(self, lq, quality):
-        output_args = {'crf': quality}
+        output_args = {"crf": quality}
         return self.__video_core(lq, "h264", output_args)
 
     def __hevc(self, lq, quality):
-        output_args = {'crf': quality, 'x265-params': 'log-level=0'}
+        output_args = {"crf": quality, "x265-params": "log-level=0"}
         return self.__video_core(lq, "hevc", output_args)
 
     def __mpeg(self, lq, quality):
-        output_args = {'qscale:v': str(quality), 'qmax': str(quality),
-                       'qmin': str(quality)}
+        output_args = {
+            "qscale:v": str(quality),
+            "qmax": str(quality),
+            "qmin": str(quality),
+        }
         self.__video_core(lq, "mpeg1video", output_args)
 
     def __mpeg2(self, lq, quality):
-        output_args = {'qscale:v': str(quality), 'qmax': str(quality),
-                       'qmin': str(quality)}
+        output_args = {
+            "qscale:v": str(quality),
+            "qmax": str(quality),
+            "qmin": str(quality),
+        }
         return self.__video_core(lq, "mpeg2video", output_args)
 
     def __jpeg(self, lq, quality):
         encode_param = [int(cv.IMWRITE_JPEG_QUALITY), quality]
-        _, encimg = cv.imencode('.jpg', lq, encode_param)
+        _, encimg = cv.imencode(".jpg", lq, encode_param)
         return cv.imdecode(encimg, 1).copy()
 
     def __vp9(self, lq, quality):
-        output_args = {'crf': str(quality), 'b:v': '0', 'cpu-used': '5'}
+        output_args = {"crf": str(quality), "b:v": "0", "cpu-used": "5"}
         return self.__video_core(lq, "libvpx-vp9", output_args, "webm")
 
     def __webp(self, lq, quality):
         encode_param = [int(cv.IMWRITE_WEBP_QUALITY), quality]
-        _, encimg = cv.imencode('.webp', lq, encode_param)
+        _, encimg = cv.imencode(".webp", lq, encode_param)
         return cv.imdecode(encimg, 1).copy()
 
     def run(self, lq, hq):
@@ -129,7 +143,7 @@ class CompressLogic:
             "hevc": self.__hevc,
             "mpeg": self.__mpeg,
             "mpeg2": self.__mpeg2,
-            "vp9": self.__vp9
+            "vp9": self.__vp9,
         }
         try:
             if probability(self.probably):

@@ -24,11 +24,12 @@ class SaturationLossLogic:
         self.probably = saturation_dict.get("probably", 1.0)
 
     def run(self, lq, hq):
-        """  Args:
-                lq (numpy.ndarray): Low quality image.
-                hq (numpy.ndarray): High quality image.
-            Returns:
-                Tuple of numpy.ndarrays: Image with adjusted saturation and original high quality image."""
+        """Args:
+            lq (numpy.ndarray): Low quality image.
+            hq (numpy.ndarray): High quality image.
+        Returns:
+            Tuple of numpy.ndarrays: Image with adjusted saturation and original high quality image.
+        """
         try:
             if lq.ndim == 2:
                 return lq, hq
@@ -37,7 +38,9 @@ class SaturationLossLogic:
             random_saturation = random.uniform(*self.rand)
             hsv_image = cv.cvtColor(lq, cv.COLOR_RGB2HSV)
             decreased_saturation = hsv_image.copy()
-            decreased_saturation[:, :, 1] = decreased_saturation[:, :, 1] * random_saturation
+            decreased_saturation[:, :, 1] = (
+                decreased_saturation[:, :, 1] * random_saturation
+            )
             return cv.cvtColor(decreased_saturation, cv.COLOR_HSV2RGB), hq
         except Exception as e:
             print(f"Saturation loss error {e}")

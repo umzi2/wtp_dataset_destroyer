@@ -32,14 +32,14 @@ class BlurLogic:
                 "gauss": np.arange(*gauss),
                 "blur": np.arange(*blur),
                 "box": np.arange(*box),
-                "median": np.arange(*median)
+                "median": np.arange(*median),
             }
         else:
             self.kernels = {
                 "gauss": np.arange(*kernel),
                 "blur": np.arange(*kernel),
                 "box": np.arange(*kernel),
-                "median": np.arange(*kernel)
+                "median": np.arange(*kernel),
             }
 
     def run(self, lq, hq):
@@ -76,7 +76,12 @@ class BlurLogic:
                 case "median":
                     if kernel % 2 == 0:
                         kernel += 1
-                    lq = cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
+                    lq = (
+                        cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(
+                            np.float32
+                        )
+                        / 255
+                    )
             return lq, hq
         except Exception as e:
             print(f"blur error {e}")

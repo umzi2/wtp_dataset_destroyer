@@ -44,7 +44,9 @@ class SinLossLogic:
             alpha = random.uniform(*self.alpha)
             vertical = probability(self.vertical_prob)
             bias = random.uniform(*self.bias)
-            lq = sin_patern(lq, shape_sin=shape, alpha=alpha, vertical=vertical, bias=bias)
+            lq = sin_patern(
+                lq, shape_sin=shape, alpha=alpha, vertical=vertical, bias=bias
+            )
             return lq, hq
         except Exception as e:
             print(f"sin loss error {e}")
