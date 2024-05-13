@@ -1,6 +1,6 @@
 {
-  "input": "/media/umzi/H/датасеты/3ch_1x/raw5",
-  "output": "/media/umzi/H/датасеты/3ch_1x/train31",
+  "input": "lq",
+  "output": "degr",
   "process":
     [{
       "type": "resize",
@@ -11,66 +11,11 @@
         "color_fix": false,
          "gamma_correction": false
 
-    },{
-      "type": "screentone",
-      "dot_size": [4,5,6,7,8,9,10,11],
-      "color": {
-        "type_halftone": ["rgb","cmyk","gray","not_rot"],
-        "c": [-45,45],
-        "m": [-45,45],
-        "y": [-45,45],
-        "k": [-45,45],
-
-        "r": [-45,45],
-        "g": [-45,45],
-        "b": [-45,45]
-      }
-    }, {
-      "type": "resize",
-      "alg_lq": ["box", "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline", "lanczos", "gauss"],
-        "alg_hq": ["linear"],
-        "spread": [1, 2, 0.1],
-        "scale": 4,
-        "color_fix": true,
-         "gamma_correction": false
-
-    },
-      {
-        "type": "blur",
-        "filter": [
-          "box",
-          "gauss",
-          "blur"
-        ],
-        "target_kernel": {
-          "gauss": [
-            0,
-            6,
-            1
-          ],
-          "blur": [
-            0,
-            6,
-            1
-          ],
-          "box": [0,2,1]
-        },
-        "probably": 0.9
-      },
-      {
-        "type":"compress",
-        "algorithm": ["jpeg", "webp"],
-        "target_compress": {
-        "jpeg": [50,100],
-        "webp": [50,100]
-        },
-        "probably": 0.9
-
-    }],
-   "num_workers": 16,
+    }
+    ],
+  "num_workers": 16,
   "map_type": "process",
-   "size": 4000,
-  "shuffle_dataset": true,
+
 
   "tile": {
     "size": 512,
