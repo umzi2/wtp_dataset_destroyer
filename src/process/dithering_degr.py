@@ -7,10 +7,12 @@ from chainner_ext import (
     riemersma_dither,
 )
 from ..constants import DITHERING_MAP
-from ..utils import probability
+from .utils import probability
 from numpy import random
+from ..utils.registry import register_class
 
 
+@register_class("dithering")
 class Dithering:
     """Class for applying dithering algorithms to images.
 
@@ -30,7 +32,7 @@ class Dithering:
                 - "probably" (float, optional): Probability of applying dithering. Defaults to 1.0.
     """
 
-    def __init__(self, dithering_dict):
+    def __init__(self, dithering_dict: dict):
         self.dithering_type_list = dithering_dict.get("dithering_type", ["quantize"])
         self.quantize = dithering_dict.get("color_ch", [2, 10])
         self.map_size = dithering_dict.get("map_size", [4, 8])
@@ -39,24 +41,24 @@ class Dithering:
         self.probably = dithering_dict.get("probably", 1.0)
         self.dithering_type = "Burkes"
 
-    def __error(self, lq, quantization):
+    def __error(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         return error_diffusion_dither(
             lq, quantization, DITHERING_MAP[self.dithering_type]
         )
 
-    def __quantize(self, lq, quantization):
+    def __quantize(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         return quantize(lq, quantization)
 
-    def __order(self, lq, quantization):
+    def __order(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         map_size = random.choice(self.map_size)
         return ordered_dither(lq, quantization, map_size)
 
-    def __riemersma(self, lq, quantization):
+    def __riemersma(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         history = random.randint(*self.history)
         decay_ratio = random.uniform(self.ratio[0], self.ratio[1])
         return riemersma_dither(lq, quantization, history, decay_ratio)
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies the selected dithering algorithm to the input image.
 
         Args:

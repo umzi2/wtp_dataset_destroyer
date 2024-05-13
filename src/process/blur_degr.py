@@ -1,10 +1,13 @@
 from numpy import random
 import numpy as np
-from ..utils import probability
+from .utils import probability
 import cv2 as cv
 
+from ..utils.registry import register_class
 
-class BlurLogic:
+
+@register_class("blur")
+class Blur:
     """Class for applying blur effects to images.
 
     Args:
@@ -18,7 +21,7 @@ class BlurLogic:
                     Defaults to None.
     """
 
-    def __init__(self, blur_dict):
+    def __init__(self, blur_dict: dict):
         self.filter = blur_dict["filter"]
         kernel = blur_dict.get("kernel", [0, 1, 1])
         self.probably = blur_dict.get("probably", 1.0)
@@ -42,7 +45,7 @@ class BlurLogic:
                 "median": np.arange(*kernel),
             }
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies blur effects to the input image.
 
         Args:

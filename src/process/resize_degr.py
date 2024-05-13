@@ -3,10 +3,13 @@ from numpy import random
 from chainner_ext import resize
 from pepeline import fast_color_level
 from ..constants import INTERPOLATION_MAP
-from ..utils import probability
+from .utils import probability
+
+from ..utils.registry import register_class
 
 
-class ResizeLogic:
+@register_class("resize")
+class Resize:
     """
     Class for resizing images.
 
@@ -40,7 +43,7 @@ class ResizeLogic:
 
     """
 
-    def __init__(self, resize_dict):
+    def __init__(self, resize_dict: dict):
         spread = resize_dict.get("spread", [1, 1, 1])
         self.spread_arange = np.arange(*spread)
         self.lq_algorithm = resize_dict["alg_lq"]
@@ -59,10 +62,10 @@ class ResizeLogic:
         self.color_fix = resize_dict.get("color_fix")
         self.gamma_correction = resize_dict.get("gamma_correction", False)
 
-    def __real_size(self, size):
+    def __real_size(self, size: int) -> int:
         return size - (size % (size // self.lq_scale * self.lq_scale))
 
-    def __down_up(self, lq, width, height):
+    def __down_up(self, lq: np.ndarray, width: int, height: int) -> np.ndarray:
         up = np.random.uniform(self.down_up_spread[0], self.down_up_spread[1])
         algorithm_up = random.choice(self.down_up_alg_up)
         lq = resize(
@@ -73,7 +76,7 @@ class ResizeLogic:
         )
         return lq
 
-    def __down_down(self, lq, width, height, algorithm_lq):
+    def __down_down(self, lq: np.ndarray, width: int, height: int, algorithm_lq: str):
         height_k = width / height
         step = random.randint(1, self.down_down_step)
         step = (width - width / self.lq_scale) / step
@@ -88,7 +91,7 @@ class ResizeLogic:
             )
         return lq
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Args:
             lq (numpy.ndarray): Low quality image.
             hq (numpy.ndarray): High quality image.

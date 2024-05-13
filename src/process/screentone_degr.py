@@ -2,10 +2,13 @@ from pepeline import screentone, cvt_color, CvtType
 import numpy as np
 from numpy import random
 
-from ..utils import probability, lq_hq2grays
+from .utils import probability, lq_hq2grays
+
+from ..utils.registry import register_class
 
 
-class ScreentoneLogic:
+@register_class("screentone")
+class Screentone:
     """Class for applying screentone effects to images.
 
     Args:
@@ -36,7 +39,7 @@ class ScreentoneLogic:
                     Defaults to [0, 0].
     """
 
-    def __init__(self, screentone_dict):
+    def __init__(self, screentone_dict: dict):
         self.lqhq = screentone_dict.get("lqhq")
         self.dot_range = screentone_dict.get("dot_size", [7])
         color = screentone_dict.get("color")
@@ -51,7 +54,9 @@ class ScreentoneLogic:
             self.color_r = color.get("r", [0, 0])
         self.probably = screentone_dict.get("probably", 1.0)
 
-    def __cmyk_halftone(self, lq, hq, dot_size):
+    def __cmyk_halftone(
+        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+    ) -> (np.ndarray, np.ndarray):
         c_angle = random.randint(*self.color_c)
         m_angle = random.randint(*self.color_m)
         y_angle = random.randint(*self.color_y)
@@ -63,18 +68,24 @@ class ScreentoneLogic:
         lq[..., 3] = screentone(lq[..., 3], dot_size, k_angle)
         return cvt_color(lq, CvtType.CMYK2RGB), hq
 
-    def __not_rot_halftone(self, lq, hq, dot_size):
+    def __not_rot_halftone(
+        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+    ) -> (np.ndarray, np.ndarray):
         lq[..., 0] = screentone(lq[..., 0], dot_size)
         lq[..., 1] = screentone(lq[..., 1], dot_size)
         lq[..., 2] = screentone(lq[..., 2], dot_size)
         return lq, hq
 
-    def __gray_halftone(self, lq, hq, dot_size):
+    def __gray_halftone(
+        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+    ) -> (np.ndarray, np.ndarray):
         lq, hq = lq_hq2grays(lq, hq)
         lq = screentone(lq, dot_size)
         return lq, hq
 
-    def __rgb_halftone(self, lq, hq, dot_size):
+    def __rgb_halftone(
+        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+    ) -> (np.ndarray, np.ndarray):
         r_angle = random.randint(*self.color_r)
         g_angle = random.randint(*self.color_g)
         b_angle = random.randint(*self.color_b)
@@ -83,7 +94,7 @@ class ScreentoneLogic:
         lq[..., 2] = screentone(lq[..., 2], dot_size, b_angle)
         return lq, hq
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies the selected screentone effect to the input image.
 
         Args:

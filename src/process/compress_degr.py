@@ -2,11 +2,14 @@ import numpy as np
 from numpy import random
 import cv2 as cv
 import ffmpeg
-from ..utils import probability
+from .utils import probability
 from time import sleep
 
+from ..utils.registry import register_class
 
-class CompressLogic:
+
+@register_class("compress")
+class Compress:
     """Class for compressing images or videos using various algorithms and parameters.
 
     Args:
@@ -19,7 +22,7 @@ class CompressLogic:
                 - "probably" (float, optional): Probability of applying compression. Defaults to 1.0.
     """
 
-    def __init__(self, compress_dict):
+    def __init__(self, compress_dict: dict):
         self.compress_dict = compress_dict
         self.algorithm = compress_dict["algorithm"]
         compress = compress_dict.get("comp", [90, 100])
@@ -46,7 +49,9 @@ class CompressLogic:
                 "mpeg2": compress,
             }
 
-    def __video_core(self, lq, codec, output_args, container="mpeg"):
+    def __video_core(
+        self, lq: np.ndarray, codec: str, output_args: dict, container: str = "mpeg"
+    ) -> np.ndarray:
         width, height = lq.shape[:2]
 
         # Encode image using ffmpeg
@@ -87,7 +92,7 @@ class CompressLogic:
             .copy()
         )
 
-    def __h264(self, lq, quality):
+    def __h264(self, lq: np.ndarray, quality: int) -> np.ndarray:
         output_args = {"crf": quality}
         return self.__video_core(lq, "h264", output_args)
 
@@ -95,7 +100,7 @@ class CompressLogic:
         output_args = {"crf": quality, "x265-params": "log-level=0"}
         return self.__video_core(lq, "hevc", output_args)
 
-    def __mpeg(self, lq, quality):
+    def __mpeg(self, lq: np.ndarray, quality: int) -> np.ndarray:
         output_args = {
             "qscale:v": str(quality),
             "qmax": str(quality),
@@ -103,7 +108,7 @@ class CompressLogic:
         }
         self.__video_core(lq, "mpeg1video", output_args)
 
-    def __mpeg2(self, lq, quality):
+    def __mpeg2(self, lq: np.ndarray, quality: int) -> np.ndarray:
         output_args = {
             "qscale:v": str(quality),
             "qmax": str(quality),
@@ -111,21 +116,21 @@ class CompressLogic:
         }
         return self.__video_core(lq, "mpeg2video", output_args)
 
-    def __jpeg(self, lq, quality):
+    def __jpeg(self, lq: np.ndarray, quality: int) -> np.ndarray:
         encode_param = [int(cv.IMWRITE_JPEG_QUALITY), quality]
         _, encimg = cv.imencode(".jpg", lq, encode_param)
         return cv.imdecode(encimg, 1).copy()
 
-    def __vp9(self, lq, quality):
+    def __vp9(self, lq: np.ndarray, quality: int) -> np.ndarray:
         output_args = {"crf": str(quality), "b:v": "0", "cpu-used": "5"}
         return self.__video_core(lq, "libvpx-vp9", output_args, "webm")
 
-    def __webp(self, lq, quality):
+    def __webp(self, lq: np.ndarray, quality: int) -> np.ndarray:
         encode_param = [int(cv.IMWRITE_WEBP_QUALITY), quality]
         _, encimg = cv.imencode(".webp", lq, encode_param)
         return cv.imdecode(encimg, 1).copy()
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Compresses the input image.
 
         Args:

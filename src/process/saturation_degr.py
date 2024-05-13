@@ -1,9 +1,13 @@
 import cv2 as cv
+import numpy as np
 from numpy import random
-from ..utils import probability
+from .utils import probability
+
+from ..utils.registry import register_class
 
 
-class SaturationLossLogic:
+@register_class("saturation")
+class Saturation:
     """
     Class for applying saturation loss to images.
 
@@ -19,11 +23,11 @@ class SaturationLossLogic:
 
     """
 
-    def __init__(self, saturation_dict):
+    def __init__(self, saturation_dict: dict):
         self.rand = saturation_dict.get("rand", [0.5, 1.0])
         self.probably = saturation_dict.get("probably", 1.0)
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Args:
             lq (numpy.ndarray): Low quality image.
             hq (numpy.ndarray): High quality image.

@@ -29,7 +29,8 @@ Designed for web art. Currently it's in early beta.
 [Compress](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/compress.md)
 
 [Dithering](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/dithering.md)
-
+# Creators:
+[Add Degradation](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/creators/add_degradation.md)
 # P.S.
 Resize is implemented via [chainner rs](https://github.com/chaiNNer-org/chaiNNer-rs)
 

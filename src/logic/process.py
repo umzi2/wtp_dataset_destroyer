@@ -1,26 +1,14 @@
 import os
 
 from tqdm.contrib.concurrent import process_map, thread_map
-from ..utils import color_or_gray, lq_hq2grays, laplace_filter
+from ..process.utils import laplace_filter, lq_hq2grays, color_or_gray
 from pepeline import read, save
 import numpy as np
 from os import listdir
 from os.path import join
-from ..process import *
 from tqdm import tqdm
 
-ALL_LOGIC = {
-    "resize": ResizeLogic,
-    "blur": BlurLogic,
-    "screentone": ScreentoneLogic,
-    "compress": CompressLogic,
-    "noise": Noise,
-    "color": ColorLossLogic,
-    "sin": SinLossLogic,
-    "halo": HaloLossLogic,
-    "saturation": SaturationLossLogic,
-    "dithering": Dithering,
-}
+from ..utils.registry import get_class
 
 
 class ImgProcess:
@@ -63,7 +51,7 @@ class ImgProcess:
         run(): Executes the image processing workflow.
     """
 
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self.input = config["input"]
         self.output = config["output"]
         self.tile = config.get("tile")
@@ -88,14 +76,14 @@ class ImgProcess:
         self.num_workers = config.get("num_workers")
         for process_dict in process:
             process_type = process_dict["type"]
-            self.turn.append(ALL_LOGIC[process_type](process_dict))
+            self.turn.append(get_class(process_type)(process_dict))
 
         if not os.path.exists(self.output_lq):
             os.makedirs(self.output_lq)
         if not os.path.exists(self.output_hq):
             os.makedirs(self.output_hq)
 
-    def __img_read(self, img_fold):
+    def __img_read(self, img_fold: str) -> np.ndarray:
         input_folder = join(self.input, img_fold)
         if self.gray:
             img = read(str(input_folder), 0, 0)
@@ -105,14 +93,14 @@ class ImgProcess:
             img = color_or_gray(img)
         return img
 
-    def __img_save(self, lq, hq, output_name):
+    def __img_save(self, lq: np.ndarray, hq: np.ndarray, output_name: str) -> None:
         if self.gray:
             lq, hq = lq_hq2grays(lq, hq)
 
         save(lq, join(self.output_lq, output_name))
         save(hq, join(self.output_hq, output_name))
 
-    def process(self, img_fold):
+    def process(self, img_fold: str) -> None:
         """Processes an image using the specified image processing techniques.
 
         Args:
@@ -133,7 +121,7 @@ class ImgProcess:
         except Exception as e:
             print(e)
 
-    def process_tile(self, img_fold):
+    def process_tile(self, img_fold: str) -> None:
         """Processes an image in tiles using the specified image processing techniques.
 
         Args:

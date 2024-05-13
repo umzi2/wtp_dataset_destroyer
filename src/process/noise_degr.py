@@ -1,9 +1,12 @@
 import numpy as np
-from ..utils import probability, normalize
+from .utils import probability, normalize_noise as normalize
 from ..constants import NOISE_MAP
 from pepeline import noise_generate, cvt_color, CvtType
 
+from ..utils.registry import register_class
 
+
+@register_class("noise")
 class Noise:
     """Class for adding noise to images.
 
@@ -17,11 +20,14 @@ class Noise:
                     Defaults to [1, 2, 1].
                 - "lqhq" (bool, optional): Flag indicating if the low-quality image should be replaced by the noisy one.
                     Defaults to False.
-                - "y_noise" (bool, optional): Flag indicating if noise should be added to the Y channel only (for YUV images).
+                - "y_noise" (bool, optional): Flag indicating if noise should be added
+                to the Y channel only (for YUV images).
                     Defaults to None.
-                - "uv_noise" (bool, optional): Flag indicating if noise should be added to the UV channels only (for YUV images).
+                - "uv_noise" (bool, optional): Flag indicating if noise should be added
+                to the UV channels only (for YUV images).
                     Defaults to None.
-                - "normalize" (bool, optional): Flag indicating if the generated noise should be normalized. Defaults to None.
+                - "normalize" (bool, optional): Flag indicating if the generated noise should be normalized.
+                Defaults to None.
                 - "octaves" (list of int, optional): Range of octaves for procedural noises.
                     Defaults to [1, 2, 1].
                 - "frequency" (list of float, optional): Range of frequencies for procedural noises.
@@ -32,8 +38,7 @@ class Noise:
                     Defaults to [0, 0.5].
     """
 
-    def __init__(self, noise_dict):
-
+    def __init__(self, noise_dict: dict):
         # common
         self.probably = noise_dict.get("probably", 1.0)
         self.type_noise = noise_dict.get("type_noise", ["uniform"])
@@ -57,7 +62,7 @@ class Noise:
             "probably_salt_or_pepper", [0, 0.5]
         )
 
-    def __procedural_noises(self, lq):
+    def __procedural_noises(self, lq: np.ndarray) -> np.ndarray:
         noise = noise_generate(
             lq.shape,
             NOISE_MAP[self.noise_type],
@@ -71,39 +76,38 @@ class Noise:
         noise *= np.random.choice(self.alpha_rand)
         return lq + noise
 
-    def __gauss(self, lq):
+    def __gauss(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.normal(0, 0.25, lq.shape)
         noise *= np.random.choice(self.alpha_rand)
         return (lq + noise).astype(np.float32)
 
-    def __uniform_noise(self, lq):
+    def __uniform_noise(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.uniform(-1, 1, lq.shape)
         noise *= np.random.choice(self.alpha_rand)
 
         return (lq + noise).astype(np.float32)
 
     # Salt_and_pepper noises
-    def __salt_and_pepper_core(self, img_shape):
+    def __salt_and_pepper_core(self, img_shape: tuple) -> (np.ndarray, float):
         noise = np.random.uniform(0, 1, img_shape)
         probably = np.random.uniform(*self.percentage_salt_or_pepper)
         return noise, probably
 
-    def __salt_and_pepper(self, lq):
+    def __salt_and_pepper(self, lq: np.ndarray) -> np.ndarray:
         noise, probably = self.__salt_and_pepper_core(lq.shape)
         lq = np.where(noise > probably, lq, 1)
         return np.where(noise < 1 - probably, lq, 0).astype(np.float32)
 
-    def __salt(self, lq):
+    def __salt(self, lq: np.ndarray) -> np.ndarray:
         noise, probably = self.__salt_and_pepper_core(lq.shape)
-        # print(np.mean(noise > probably),probably)
         return np.where(noise > probably, lq, 1).astype(np.float32)
 
-    def __pepper(self, lq):
+    def __pepper(self, lq: np.ndarray) -> np.ndarray:
         noise, probably = self.__salt_and_pepper_core(lq.shape)
         return np.where(noise < 1 - probably, lq, 0).astype(np.float32)
 
     # Run module
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Adds noise to the input image.
 
         Args:
@@ -132,7 +136,6 @@ class Noise:
             uv = False
             if lq.ndim == 3:
                 if probability(self.y_noise):
-
                     y = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 0]
@@ -146,7 +149,6 @@ class Noise:
             lq = NOISE_TYPE_MAP[self.noise_type](lq)
             lq = np.clip(lq, 0, 1)
             if y:
-
                 lq = np.stack((lq, uv_array[:, :, 0], uv_array[:, :, 1]), axis=-1)
                 lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
             elif uv:

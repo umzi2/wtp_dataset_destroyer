@@ -1,10 +1,13 @@
 import numpy as np
 from numpy import random
 import cv2 as cv
-from ..utils import probability
+from .utils import probability
+
+from ..utils.registry import register_class
 
 
-class HaloLossLogic:
+@register_class("halo")
+class Halo:
     """Class for applying halo loss reduction techniques to images.
 
     Args:
@@ -25,7 +28,7 @@ class HaloLossLogic:
                     Defaults to [0, 0].
     """
 
-    def __init__(self, halo_loss_dict):
+    def __init__(self, halo_loss_dict: dict):
         self.factor = halo_loss_dict.get("sharpening_factor", [0, 2])
         self.kernel = halo_loss_dict.get("kernel", [0, 2])
         self.laplacian = halo_loss_dict.get("laplacian", [3])
@@ -35,8 +38,7 @@ class HaloLossLogic:
         threshold = halo_loss_dict.get("threshold", [0, 0])
         self.threshold = [threshold[0] / 255, threshold[1] / 255]
 
-    def __laplacian(self, lq):
-
+    def __laplacian(self, lq: np.ndarray) -> np.ndarray:
         lq = np.squeeze(lq).astype(np.float32)
         if np.ndim(lq) != 2:
             img_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
@@ -55,7 +57,7 @@ class HaloLossLogic:
             sharpened_image = np.stack([sharpened_image] * 3, axis=-1)
         return np.clip(lq + sharpened_image, 0, 1).astype(np.float32)
 
-    def __unsharp_mask(self, lq):
+    def __unsharp_mask(self, lq: np.ndarray) -> np.ndarray:
         kernel_size = np.random.randint(*self.kernel)[0]
         amount = np.random.uniform(*self.amount)
         threshold = np.random.uniform(*self.threshold)
@@ -69,7 +71,7 @@ class HaloLossLogic:
             np.copyto(sharpened, lq, where=low_contrast_mask)
         return sharpened
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies the selected halo loss reduction technique to the input image.
 
         Args:

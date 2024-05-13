@@ -1,9 +1,12 @@
-from ..utils import probability
+from .utils import probability
 from dataset_support import sin_patern
 import random
+import numpy as np
+from ..utils.registry import register_class
 
 
-class SinLossLogic:
+@register_class("sin")
+class Sin:
     """Class for applying sinusoidal patterns to images.
 
     Args:
@@ -20,14 +23,14 @@ class SinLossLogic:
                 - "probably" (float, optional): Probability of applying sinusoidal patterns. Defaults to 1.0.
     """
 
-    def __init__(self, sin_loss_dict):
+    def __init__(self, sin_loss_dict: dict):
         self.shape = sin_loss_dict.get("shape", [100, 1000, 100])
         self.alpha = sin_loss_dict.get("alpha", [0.1, 0.5])
         self.bias = sin_loss_dict.get("bias", [0.8, 1.2])
         self.vertical_prob = sin_loss_dict.get("vertical", 0.5)
         self.probably = sin_loss_dict.get("probably", 1.0)
 
-    def run(self, lq, hq):
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies sinusoidal patterns to the input image.
 
         Args:

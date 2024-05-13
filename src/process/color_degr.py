@@ -1,9 +1,12 @@
 from numpy import random
 from pepeline import fast_color_level
-from ..utils import probability
+from .utils import probability
+import numpy as np
+from ..utils.registry import register_class
 
 
-class ColorLossLogic:
+@register_class("color")
+class Color:
     """Class for adjusting color levels of images.
 
     Args:
@@ -19,26 +22,21 @@ class ColorLossLogic:
                     Defaults to 1.0.
     """
 
-    def __init__(self, color_loss_dict):
+    def __init__(self, color_loss_dict: dict):
         self.high_list = color_loss_dict.get("high")
         self.low_list = color_loss_dict.get("low")
         self.gamma = color_loss_dict.get("gamma", [1.0, 1.0])
         self.probably = color_loss_dict.get("probably", 1.0)
 
-    def run(self, lq, hq):
-        """Class for adjusting color levels of images.
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
+        """Changes levels to the input image.
 
         Args:
-            color_loss_dict (dict): A dictionary containing color loss adjustment settings.
-                It should include the following keys:
-                    - "high" (list of int, optional): Range of high output values.
-                        Defaults to None.
-                    - "low" (list of int, optional): Range of low output values.
-                        Defaults to None.
-                    - "gamma" (list of float, optional): Range of gamma values for gamma correction.
-                        Defaults to [1.0, 1.0].
-                    - "probably" (float, optional): Probability of applying color loss adjustments.
-                        Defaults to 1.0.
+            lq (numpy.ndarray): The low-quality image.
+            hq (numpy.ndarray): The corresponding high-quality image.
+
+        Returns:
+            tuple: A tuple containing the noisy low-quality image and the corresponding high-quality image.
         """
         try:
             if probability(self.probably):
