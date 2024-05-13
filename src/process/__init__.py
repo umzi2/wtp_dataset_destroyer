@@ -1,5 +1,6 @@
 import os
 import glob
+import importlib
 
 # Find all Python files in the current directory with names ending in '_degr.py'
 modules = [
@@ -9,6 +10,4 @@ modules = [
 
 # Import each module dynamically
 for module in modules:
-    import importlib
-
     importlib.import_module(f".{module}", package=__name__)
