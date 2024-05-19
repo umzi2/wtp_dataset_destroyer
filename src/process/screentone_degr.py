@@ -52,6 +52,7 @@ class Screentone:
             self.color_b = color.get("b", [0, 0])
             self.color_g = color.get("g", [0, 0])
             self.color_r = color.get("r", [0, 0])
+            self.cmyk_alpha = color.get("cmyk_alpha", [1, 1])
         self.probably = screentone_dict.get("probably", 1.0)
 
     def __cmyk_halftone(
@@ -66,6 +67,9 @@ class Screentone:
         lq[..., 1] = screentone(lq[..., 1], dot_size, m_angle)
         lq[..., 2] = screentone(lq[..., 2], dot_size, y_angle)
         lq[..., 3] = screentone(lq[..., 3], dot_size, k_angle)
+        if self.cmyk_alpha != [1, 1]:
+            alpha = random.uniform(*self.cmyk_alpha)
+            return cvt_color(lq * alpha, CvtType.CMYK2RGB), hq
         return cvt_color(lq, CvtType.CMYK2RGB), hq
 
     def __not_rot_halftone(
