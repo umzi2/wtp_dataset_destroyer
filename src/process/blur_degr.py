@@ -4,6 +4,7 @@ from .utils import probability
 import cv2 as cv
 
 from ..utils.registry import register_class
+from .custom_blur import motion_blur, lens_blur
 
 
 @register_class("blur")
@@ -24,6 +25,16 @@ class Blur:
     def __init__(self, blur_dict: dict):
         self.filter = blur_dict["filter"]
         kernel = blur_dict.get("kernel", [0, 1, 1])
+
+        # lens
+        self.radius = blur_dict.get("lens_radius", [1, 2])
+        self.components = blur_dict.get("lens_components", [1, 6])
+        self.gamma = blur_dict.get("lens_gamma", [1.0, 1.0])
+
+        # motion
+        self.size = blur_dict.get("motion_size", [1, 2])
+        self.angle = blur_dict.get("motion_angle", [0, 1])
+
         self.probably = blur_dict.get("probably", 1.0)
         target = blur_dict.get("target_kernel")
         if target:
@@ -45,6 +56,53 @@ class Blur:
                 "median": np.arange(*kernel),
             }
 
+    def __kernel_odd(self, kernel_size: int) -> int:
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+        return kernel_size
+
+    def __gauss(self, lq: np.ndarray) -> np.ndarray:
+        kernel = random.choice(self.kernels["gauss"])
+        if kernel == 0:
+            return lq
+        kernel = self.__kernel_odd(kernel)
+        return cv.GaussianBlur(lq, (kernel, kernel), 0)
+
+    def __blur(self, lq: np.ndarray) -> np.ndarray:
+        kernel = random.choice(self.kernels["blur"])
+        if kernel == 0:
+            return lq
+        kernel = self.__kernel_odd(kernel)
+        return cv.blur(lq, (kernel, kernel))
+
+    def __box(self, lq: np.ndarray) -> np.ndarray:
+        kernel = random.choice(self.kernels["box"])
+        if kernel == 0:
+            return lq
+        return cv.blur(lq, (kernel, kernel))
+
+    def __lens(self, lq: np.ndarray) -> np.ndarray:
+        radius = random.randint(*self.radius)
+        components = random.randint(*self.components)
+        gamma = random.uniform(*self.gamma)
+        return lens_blur(lq, radius, components, gamma)
+
+    def __motion(self, lq: np.ndarray) -> np.ndarray:
+        size = random.randint(*self.size)
+        if size <= 0:
+            return lq
+        angle = random.randint(*self.angle)
+        return motion_blur(lq, size, angle)
+
+    def __median(self, lq: np.ndarray) -> np.ndarray:
+        kernel = random.choice(self.kernels["median"])
+        if kernel == 0:
+            return lq
+        kernel = self.__kernel_odd(kernel)
+        return (
+                cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
+        )
+
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies blur effects to the input image.
 
@@ -56,35 +114,20 @@ class Blur:
             tuple: A tuple containing the image with applied blur effects and the corresponding high-quality image.
         """
         try:
+            BLUR_MAP = {
+                "gauss": self.__gauss,
+                "blur": self.__blur,
+                "box": self.__box,
+                "median": self.__median,
+                "lens": self.__lens,
+                "motion": self.__motion,
+            }
+
             if probability(self.probably):
                 return lq, hq
-            lq = np.squeeze(lq).astype(np.float32)
             blur_method = random.choice(self.filter)
-            kernel = random.choice(self.kernels[blur_method])
-            if kernel == 0:
-                return lq, hq
-            match blur_method:
-                case "gauss":
-                    if kernel % 2 == 0:
-                        kernel += 1
-                    lq = cv.GaussianBlur(lq, (kernel, kernel), 0)
+            lq = BLUR_MAP[blur_method](lq)
 
-                case "blur":
-                    if kernel % 2 == 0:
-                        kernel += 1
-                    lq = cv.blur(lq, (kernel, kernel))
-
-                case "box":
-                    lq = cv.boxFilter(lq, -1, (kernel, kernel))
-                case "median":
-                    if kernel % 2 == 0:
-                        kernel += 1
-                    lq = (
-                        cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(
-                            np.float32
-                        )
-                        / 255
-                    )
             return lq, hq
         except Exception as e:
             print(f"blur error {e}")

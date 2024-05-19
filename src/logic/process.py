@@ -62,8 +62,6 @@ class ImgProcess:
         self.gray = config.get("gray")
         process = config["process"]
         self.all_images = listdir(self.input)
-        np.random.shuffle(self.all_images)
-        self.all_images = self.all_images[:6000]
         if config.get("shuffle_dataset"):
             np.random.shuffle(self.all_images)
         if config.get("size"):
@@ -156,7 +154,9 @@ class ImgProcess:
         """Executes the image processing workflow."""
         process = self.process_tile if self.tile else self.process
         if self.map_type == "process":
-            process_map(process, self.all_images, max_workers=self.num_workers)
+            process_map(
+                process, self.all_images, max_workers=self.num_workers, chunksize=1
+            )
         elif self.map_type == "thread":
             thread_map(process, self.all_images, max_workers=self.num_workers)
         else:
