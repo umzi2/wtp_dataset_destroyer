@@ -3,14 +3,19 @@
       "type": "noise",
       "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex", 
         "supersimplex","uniform","salt","salt_and_pepper","pepper","gauss"],
+  
       "normalize": true,
       "y_noise": 0.3,
       "uv_noise": 0.3,
       "alpha": [0.01,1.0,0.01],
+  
       "octaves": [1,10,1],
       "frequency": [0.1,0.9,0.1],
       "lacunarity": [0.01,0.5,0.01],
+  
       "probably_salt_or_pepper": [0,0.3],
+  
+      "bias": [-0.5, 0.5],
       "probably": 0.5
     }
 ```
@@ -20,6 +25,7 @@
 - probably* - chance of triggering
 - y_noise* - the chance that the noise will be superimposed only on the tone component in color images
 - uv_noise* - the chance **that noise will only affect color components, ignoring tone in color images**
+- bias - noise offset, takes list[int,int] min -1, max 1
 
 further settings for this noise list ("perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex")
 - normalize* - normalizes noise within -1 - 1 (bool) p.s. I say hello to opensimplex

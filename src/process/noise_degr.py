@@ -57,6 +57,8 @@ class Noise:
         self.frequency_rand = np.arange(*frequency_range)
         lacunarity_range = noise_dict.get("lacunarity", [0.4, 0.5, 0.5])
         self.lacunarity_rand = np.arange(*lacunarity_range)
+
+        self.bias = noise_dict.get("bias", [0, 0])
         # salt_or_pepper
         self.percentage_salt_or_pepper = noise_dict.get(
             "probably_salt_or_pepper", [0, 0.5]
@@ -73,16 +75,25 @@ class Noise:
         )
         if self.normalize_noise:
             noise = normalize(noise)
+        if self.bias != [0, 0]:
+            noise += np.random.uniform(*self.bias)
+            noise.clip(-1, 1)
         noise *= np.random.choice(self.alpha_rand)
         return lq + noise
 
     def __gauss(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.normal(0, 0.25, lq.shape)
+        if self.bias != [0, 0]:
+            noise += np.random.uniform(*self.bias)
+            noise.clip(-1, 1)
         noise *= np.random.choice(self.alpha_rand)
         return (lq + noise).astype(np.float32)
 
     def __uniform_noise(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.uniform(-1, 1, lq.shape)
+        if self.bias != [0, 0]:
+            noise += np.random.uniform(*self.bias)
+            noise.clip(-1, 1)
         noise *= np.random.choice(self.alpha_rand)
 
         return (lq + noise).astype(np.float32)
