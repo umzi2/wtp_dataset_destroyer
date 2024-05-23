@@ -29,6 +29,8 @@ Designed for web art. Currently it's in early beta.
 [Compress](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/compress.md)
 
 [Dithering](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/dithering.md)
+
+[Shift](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/shift.md)
 # Creators:
 [Add Degradation](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/creators/add_degradation.md)
 # P.S.

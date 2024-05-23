@@ -20,8 +20,8 @@
 ```
 - color* - settings in case the image is 3-dimensional i.e. rgb
   - type_halftone* - sheet from which a random halftone algorithm is chosen
-  - c..k and r..b - accepts a list for each channel in [low, high] format. A random number will be selected in this range to be used for channel rotation.
-  - cmyk_alpha - transparency of cmyk halftones is necessary to get closer to real comics list[uint, uint]
+  - c..k and r..b* - accepts a list for each channel in [low, high] format. A random number will be selected in this range to be used for channel rotation.
+  - cmyk_alpha* - transparency of cmyk halftones is necessary to get closer to real comics list[uint, uint]
 - dot_size - size of points accepts a list
 - lqhq* - equates hq to lq, assuming screentone is first in line
 - probably* - chance of triggering
