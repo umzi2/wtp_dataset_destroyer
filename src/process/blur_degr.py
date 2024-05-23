@@ -82,7 +82,7 @@ class Blur:
         return cv.blur(lq, (kernel, kernel))
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:
-        radius = random.randint(*self.radius)
+        radius = random.uniform(*self.radius)
         components = random.randint(*self.components)
         gamma = random.uniform(*self.gamma)
         return lens_blur(lq, radius, components, gamma)
