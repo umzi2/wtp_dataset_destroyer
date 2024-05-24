@@ -2,10 +2,10 @@ from numpy import random
 import numpy as np
 from .utils import probability
 import cv2 as cv
-from ..utils.random import safe_uniform, safe_randint, safe_arange
+from ..utils.random import safe_uniform, safe_randint
 
 from ..utils.registry import register_class
-from .custom_blur import motion_blur, lens_blur
+from .custom_blur import motion_blur, lens_blur, box_blur
 
 
 @register_class("blur")
@@ -18,40 +18,37 @@ class Blur:
                 - "filter" (list of str): List of blur filter types to choose from.
                 - "kernel" (list of int, optional): Range of kernel sizes for the blur filters.
                     Defaults to [0, 1, 1].
-                - "probably" (float, optional): Probability of applying blur effects. Defaults to 1.0.
+                - "probability" (float, optional): Probability of applying blur effects. Defaults to 1.0.
                 - "target_kernel" (dict, optional): Dictionary containing target kernel ranges for specific blur filters.
                     Defaults to None.
     """
 
     def __init__(self, blur_dict: dict):
         self.filter = blur_dict["filter"]
-        kernel = blur_dict.get("kernel", [0, 1, 1])
+        kernel = blur_dict.get("kernel", [0, 1])
 
         # motion
         self.size = blur_dict.get("motion_size", [1, 2])
         self.angle = blur_dict.get("motion_angle", [0, 1])
 
-        self.probably = blur_dict.get("probably", 1.0)
+        self.probability = blur_dict.get("probability", 1.0)
         target = blur_dict.get("target_kernel")
         if target:
             gauss = target.get("gauss", kernel)
-            blur = target.get("blur", kernel)
             box = target.get("box", kernel)
             median = target.get("median", kernel)
             lens = target.get("lens", kernel)
             self.kernels = {
-                "gauss": safe_arange(gauss),
-                "blur": safe_arange(blur),
-                "box": safe_arange(box),
-                "median": safe_arange(median),
+                "gauss": gauss,
+                "box": box,
+                "median": median,
                 "lens": lens,
             }
         else:
             self.kernels = {
-                "gauss": safe_arange(kernel),
-                "blur": safe_arange(kernel),
-                "box": safe_arange(kernel),
-                "median": safe_arange(kernel),
+                "gauss": kernel,
+                "box": kernel,
+                "median": kernel,
                 "lens": kernel,
             }
 
@@ -61,28 +58,20 @@ class Blur:
         return kernel_size
 
     def __gauss(self, lq: np.ndarray) -> np.ndarray:
-        kernel = random.choice(self.kernels["gauss"])
-        if kernel == 0:
+        sigma = safe_uniform(self.kernels["gauss"])
+        if sigma <= 0.0:
             return lq
-        kernel = self.__kernel_odd(kernel)
-        return cv.GaussianBlur(lq, (kernel, kernel), 0)
-
-    def __blur(self, lq: np.ndarray) -> np.ndarray:
-        kernel = random.choice(self.kernels["blur"])
-        if kernel == 0:
-            return lq
-        kernel = self.__kernel_odd(kernel)
-        return cv.blur(lq, (kernel, kernel))
+        return cv.GaussianBlur(lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT)
 
     def __box(self, lq: np.ndarray) -> np.ndarray:
-        kernel = random.choice(self.kernels["box"])
-        if kernel == 0:
+        kernel = safe_uniform(self.kernels["box"])
+        if kernel <= 0.0:
             return lq
-        return cv.blur(lq, (kernel, kernel))
+        return box_blur(lq, kernel)
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["lens"])
-        if kernel < 1.0:
+        if kernel <= 0.0:
             return lq
         return lens_blur(lq, kernel)
 
@@ -94,7 +83,8 @@ class Blur:
         return motion_blur(lq, size, angle)
 
     def __median(self, lq: np.ndarray) -> np.ndarray:
-        kernel = random.choice(self.kernels["median"])
+        kernel_list = self.kernels["median"]
+        kernel = safe_randint((int(kernel_list[0]), int(kernel_list[1])))
         if kernel == 0:
             return lq
         kernel = self.__kernel_odd(kernel)
@@ -115,14 +105,13 @@ class Blur:
         try:
             BLUR_MAP = {
                 "gauss": self.__gauss,
-                "blur": self.__blur,
                 "box": self.__box,
                 "median": self.__median,
                 "lens": self.__lens,
                 "motion": self.__motion,
             }
 
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
             blur_method = random.choice(self.filter)
             lq = BLUR_MAP[blur_method](lq)

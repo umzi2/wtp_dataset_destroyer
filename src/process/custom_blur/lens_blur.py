@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 
-def generate_circle(x: int, y: int, radius: int, center: int) -> bool:
+def __generate_circle(x: int, y: int, radius: int, center: int) -> bool:
     """
     Checks if the point (x, y) is inside a circle with the given radius and center.
 
@@ -31,12 +31,12 @@ def lens_blur(image: np.ndarray, dimension: float) -> np.ndarray:
         np.ndarray: Image with the applied lens blur.
     """
     image_array = image
-    kernel = disk_kernel(dimension)
+    kernel = __disk_kernel(dimension)
     convolved = cv2.filter2D(image_array, -1, kernel, borderType=cv2.BORDER_REPLICATE)
     return convolved
 
 
-def disk_kernel(kernel_size: float) -> np.ndarray:
+def __disk_kernel(kernel_size: float) -> np.ndarray:
     """
     Generates a disk-shaped kernel for use in convolution.
 
@@ -56,7 +56,7 @@ def disk_kernel(kernel_size: float) -> np.ndarray:
 
         for i in range(kernel_dim):
             for j in range(kernel_dim):
-                kernel[i, j] = generate_circle(i, j, circle_radius, circle_center_coord)
+                kernel[i, j] = __generate_circle(i, j, circle_radius, circle_center_coord)
 
         kernel2 = np.zeros((kernel_dim, kernel_dim), dtype=np.float32)
         circle_center_coord = kernel_dim // 2
@@ -64,7 +64,7 @@ def disk_kernel(kernel_size: float) -> np.ndarray:
 
         for i in range(kernel_dim):
             for j in range(kernel_dim):
-                kernel2[i, j] = generate_circle(i, j, circle_radius, circle_center_coord)
+                kernel2[i, j] = __generate_circle(i, j, circle_radius, circle_center_coord)
 
         kernel = np.clip(kernel + kernel2 * fraction, 0, 1)
     else:
@@ -74,7 +74,7 @@ def disk_kernel(kernel_size: float) -> np.ndarray:
 
         for i in range(kernel_dim):
             for j in range(kernel_dim):
-                kernel[i, j] = generate_circle(i, j, circle_radius, circle_center_coord)
+                kernel[i, j] = __generate_circle(i, j, circle_radius, circle_center_coord)
 
     kernel /= np.sum(kernel)
     return kernel
