@@ -1,8 +1,7 @@
 import cv2 as cv
 import numpy as np
-from numpy import random
 from .utils import probability
-
+from ..utils.random import safe_uniform
 from ..utils.registry import register_class
 
 
@@ -19,13 +18,13 @@ class Saturation:
 
     Attributes:
         rand (list): Range of random values for saturation adjustment.
-        probably (float): Probability of applying saturation loss.
+        probability (float): Probability of applying saturation loss.
 
     """
 
     def __init__(self, saturation_dict: dict):
         self.rand = saturation_dict.get("rand", [0.5, 1.0])
-        self.probably = saturation_dict.get("probably", 1.0)
+        self.probability = saturation_dict.get("probability", 1.0)
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Args:
@@ -37,9 +36,9 @@ class Saturation:
         try:
             if lq.ndim == 2:
                 return lq, hq
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
-            random_saturation = random.uniform(*self.rand)
+            random_saturation = safe_uniform(self.rand)
             hsv_image = cv.cvtColor(lq, cv.COLOR_RGB2HSV)
             decreased_saturation = hsv_image.copy()
             decreased_saturation[:, :, 1] = (
