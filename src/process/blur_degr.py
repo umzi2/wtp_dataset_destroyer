@@ -2,6 +2,7 @@ from numpy import random
 import numpy as np
 from .utils import probability
 import cv2 as cv
+from ..utils.random import safe_uniform, safe_randint, safe_arange
 
 from ..utils.registry import register_class
 from .custom_blur import motion_blur, lens_blur
@@ -39,18 +40,18 @@ class Blur:
             median = target.get("median", kernel)
             lens = target.get("lens", kernel)
             self.kernels = {
-                "gauss": np.arange(*gauss),
-                "blur": np.arange(*blur),
-                "box": np.arange(*box),
-                "median": np.arange(*median),
+                "gauss": safe_arange(gauss),
+                "blur": safe_arange(blur),
+                "box": safe_arange(box),
+                "median": safe_arange(median),
                 "lens": lens,
             }
         else:
             self.kernels = {
-                "gauss": np.arange(*kernel),
-                "blur": np.arange(*kernel),
-                "box": np.arange(*kernel),
-                "median": np.arange(*kernel),
+                "gauss": safe_arange(kernel),
+                "blur": safe_arange(kernel),
+                "box": safe_arange(kernel),
+                "median": safe_arange(kernel),
                 "lens": kernel,
             }
 
@@ -80,16 +81,16 @@ class Blur:
         return cv.blur(lq, (kernel, kernel))
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:
-        kernel = random.uniform(*self.kernels["lens"])
+        kernel = safe_uniform(self.kernels["lens"])
         if kernel < 1.0:
             return lq
         return lens_blur(lq, kernel)
 
     def __motion(self, lq: np.ndarray) -> np.ndarray:
-        size = random.randint(*self.size)
+        size = safe_randint(self.size)
         if size <= 0:
             return lq
-        angle = random.randint(*self.angle)
+        angle = safe_randint(self.angle)
         return motion_blur(lq, size, angle)
 
     def __median(self, lq: np.ndarray) -> np.ndarray:
