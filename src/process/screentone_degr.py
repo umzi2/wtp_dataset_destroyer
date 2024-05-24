@@ -3,7 +3,7 @@ import numpy as np
 from numpy import random
 
 from .utils import probability, lq_hq2grays
-
+from ..utils.random import safe_uniform, safe_randint
 from ..utils.registry import register_class
 
 
@@ -19,7 +19,7 @@ class Screentone:
                 - "dot_size" (list of int, optional): Range of dot sizes for screentone effects. Defaults to [7].
                 - "color" (dict, optional): Dictionary containing color-specific settings.
                     Defaults to None.
-                - "probably" (float, optional): Probability of applying screentone effects. Defaults to 1.0.
+                - "probability" (float, optional): Probability of applying screentone effects. Defaults to 1.0.
             The "color" dictionary should include the following keys:
                 - "type_halftone" (list of str, optional): List of halftone types to choose from.
                     Defaults to ["rgb"].
@@ -53,22 +53,22 @@ class Screentone:
             self.color_g = color.get("g", [0, 0])
             self.color_r = color.get("r", [0, 0])
             self.cmyk_alpha = color.get("cmyk_alpha", [1, 1])
-        self.probably = screentone_dict.get("probably", 1.0)
+        self.probability = screentone_dict.get("probability", 1.0)
 
     def __cmyk_halftone(
         self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
-        c_angle = random.randint(*self.color_c)
-        m_angle = random.randint(*self.color_m)
-        y_angle = random.randint(*self.color_y)
-        k_angle = random.randint(*self.color_k)
+        c_angle = safe_randint(self.color_c)
+        m_angle = safe_randint(self.color_m)
+        y_angle = safe_randint(self.color_y)
+        k_angle = safe_randint(self.color_k)
         lq = cvt_color(lq, CvtType.RGB2CMYK)
         lq[..., 0] = screentone(lq[..., 0], dot_size, c_angle)
         lq[..., 1] = screentone(lq[..., 1], dot_size, m_angle)
         lq[..., 2] = screentone(lq[..., 2], dot_size, y_angle)
         lq[..., 3] = screentone(lq[..., 3], dot_size, k_angle)
         if self.cmyk_alpha != [1, 1]:
-            alpha = random.uniform(*self.cmyk_alpha)
+            alpha = safe_uniform(self.cmyk_alpha)
             return cvt_color(lq * alpha, CvtType.CMYK2RGB), hq
         return cvt_color(lq, CvtType.CMYK2RGB), hq
 
@@ -90,9 +90,9 @@ class Screentone:
     def __rgb_halftone(
         self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
-        r_angle = random.randint(*self.color_r)
-        g_angle = random.randint(*self.color_g)
-        b_angle = random.randint(*self.color_b)
+        r_angle = safe_randint(self.color_r)
+        g_angle = safe_randint(self.color_g)
+        b_angle = safe_randint(self.color_b)
         lq[..., 0] = screentone(lq[..., 0], dot_size, r_angle)
         lq[..., 1] = screentone(lq[..., 1], dot_size, g_angle)
         lq[..., 2] = screentone(lq[..., 2], dot_size, b_angle)
@@ -115,7 +115,7 @@ class Screentone:
             "gray": self.__gray_halftone,
         }
         try:
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
 
             dot_size = random.choice(self.dot_range)
