@@ -10,6 +10,7 @@ from ..constants import DITHERING_MAP
 from .utils import probability
 from numpy import random
 from ..utils.registry import register_class
+from ..utils.random import safe_uniform, safe_randint
 
 
 @register_class("dithering")
@@ -29,7 +30,7 @@ class Dithering:
                     Defaults to [10, 15].
                 - "ratio" (list of float, optional): Range of decay ratio values for Riemersma dithering.
                     Defaults to [0.1, 0.9].
-                - "probably" (float, optional): Probability of applying dithering. Defaults to 1.0.
+                - "probability" (float, optional): Probability of applying dithering. Defaults to 1.0.
     """
 
     def __init__(self, dithering_dict: dict):
@@ -38,7 +39,7 @@ class Dithering:
         self.map_size = dithering_dict.get("map_size", [4, 8])
         self.history = dithering_dict.get("history", [10, 15])
         self.ratio = dithering_dict.get("ratio", [0.1, 0.9])
-        self.probably = dithering_dict.get("probably", 1.0)
+        self.probability = dithering_dict.get("probability", 1.0)
         self.dithering_type = "Burkes"
 
     def __error(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
@@ -54,8 +55,8 @@ class Dithering:
         return ordered_dither(lq, quantization, map_size)
 
     def __riemersma(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
-        history = random.randint(*self.history)
-        decay_ratio = random.uniform(self.ratio[0], self.ratio[1])
+        history = safe_randint(self.history)
+        decay_ratio = safe_uniform(self.ratio)
         return riemersma_dither(lq, quantization, history, decay_ratio)
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
@@ -82,10 +83,10 @@ class Dithering:
             "quantize": self.__quantize,
         }
         try:
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
             self.dithering_type = random.choice(self.dithering_type_list)
-            unif_quantiz = random.randint(*self.quantize)
+            unif_quantiz = safe_randint(self.quantize)
             lq = DITHERING_TYPE_MAP[self.dithering_type](lq, UQ(unif_quantiz))
             return np.squeeze(lq), hq
         except Exception as e:
