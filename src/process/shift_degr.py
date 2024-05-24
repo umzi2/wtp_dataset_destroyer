@@ -4,6 +4,7 @@ from pepeline import cvt_color, CvtType
 from src.process.utils import probability
 from numpy import random
 
+from ..utils.random import safe_uniform, safe_randint
 from src.utils.registry import register_class
 
 
@@ -34,7 +35,7 @@ def shift(img, amount_x: int, amount_y: int, fill_color: list | float) -> np.nda
 
 
 def shift_int(
-    img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
+        img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
 ) -> (int, int):
     """
     Shifts the image by random integer amounts within the specified ranges.
@@ -50,16 +51,16 @@ def shift_int(
     amount_x = 0
     amount_y = 0
     if amount_channel[0] != [0, 0]:
-        amount_x = random.randint(*amount_channel[0])
+        amount_x = safe_randint(amount_channel[0])
     if amount_channel[1] != [0, 0]:
-        amount_y = random.randint(*amount_channel[1])
+        amount_y = safe_randint(amount_channel[1])
     if amount_x == 0 and amount_y == 0:
         return img
     return shift(img, amount_x, amount_y, fill_color)
 
 
 def shift_percent(
-    img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
+        img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
 ) -> (int, int):
     """
     Shifts the image by random percentages of its dimensions within the specified ranges.
@@ -76,9 +77,9 @@ def shift_percent(
     amount_y = 0
     shape_img = img.shape
     if amount_channel[0] != [0, 0]:
-        amount_x = int(shape_img[0] * random.uniform(*amount_channel[0])/100)
+        amount_x = int(shape_img[0] * safe_uniform(amount_channel[0]) / 100)
     if amount_channel[1] != [0, 0]:
-        amount_y = int(shape_img[1] * random.uniform(*amount_channel[1])/100)
+        amount_y = int(shape_img[1] * safe_uniform(amount_channel[1]) / 100)
     if amount_x == 0 and amount_y == 0:
         return img
     return shift(img, amount_x, amount_y, fill_color)
@@ -91,7 +92,7 @@ class Shift:
 
     Attributes:
     type_list (list[str]): The list of color spaces to apply the shifts.
-    probably (float): The probability of applying the shift.
+    probability (float): The probability of applying the shift.
     shift_channel (function): The function to apply the shift (either by integer or percentage).
     rgb_amount_list (list[list[int]]): The shift ranges for the RGB color space.
     yuv_amount_list (list[list[int]]): The shift ranges for the YUV color space.
@@ -106,7 +107,7 @@ class Shift:
         shift_dict (dict): The configuration dictionary for the shifts.
         """
         self.type_list = shift_dict.get("shift_type", ["rgb"])
-        self.probably = shift_dict.get("probably", 1.0)
+        self.probability = shift_dict.get("probability", 1.0)
         percent = shift_dict.get("percent")
         if percent:
             self.shift_channel = shift_percent
@@ -138,7 +139,6 @@ class Shift:
             self.cmyk_amount_list = [c_amount, m_amount, y_amount, k_amount]
         else:
             self.cmyk_amount_list = [not_target, not_target, not_target, not_target]
-        print(self.cmyk_amount_list)
 
     def __rgb_chanel_shift(self, img: np.ndarray) -> np.ndarray:
         """
@@ -207,7 +207,7 @@ class Shift:
             }
             if lq.ndim == 2:
                 return lq, hq
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
             type_shift = random.choice(self.type_list)
             lq = SHIFT_TYPE_MAP[type_shift](lq)
