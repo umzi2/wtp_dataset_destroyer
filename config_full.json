@@ -23,7 +23,7 @@
         "v": [[-10,10],[-10,10]]
       },
       "not_target":[[-10,10],[-10,10]],
-      "probably": 0.5
+      "probability": 0.5
     },{
       "type": "screentone",
       "lqhq": false,
@@ -40,7 +40,7 @@
         "b": [-45,45],
         "cmyk_alpha": [0.5,1.0]
       },
-      "probably": 0.5
+      "probability": 0.5
     },{
       "type": "dithering",
       "dithering_type":["floydsteinberg", "jarvisjudiceninke", "stucki", "atkinson", "burkes", "sierra",
@@ -50,7 +50,7 @@
       "map_size":  [2,4,8,16],
       "history": [10, 15],
       "ratio": [0.1,0.9],
-      "probably": 0.5
+      "probability": 0.5
     },
       {
       "type": "resize",
@@ -72,31 +72,30 @@
         "scale": 4,
         "color_fix": true,
          "gamma_correction": false,
-         "probably": 0.5
+         "probability": 0.5
 
     }, {
       "type": "halo",
       "type_halo": ["laplacian","unsharp_mask"],
-      "kernel": [0,3,1],
+      "kernel": [0,3],
       "sharpening_factor": [0, 2],
       "amount": [0,1],
       "threshold": [0,20]
     }, {
     "type": "blur",
-    "filter": ["box", "gauss", "blur", "median","lens","motion"],
-    "kernel": [0, 8, 1],
+    "filter": ["box", "gauss", "median","lens","motion"],
+    "kernel": [0, 1],
     "target_kernel": {
-      "box": [0,2,1],
-      "gauss": [0,8,1],
-      "blur": [0,8,1],
-      "median": [0,1,1],
-      "lens": [1,2.5]
+      "box": [0,2],
+      "gauss": [0,2],
+      "median": [0,1],
+      "lens":[1,2]
     },
 
     "motion_size": [0,10],
     "motion_angle": [-30,30],
 
-    "probably": 0.5
+    "probability": 0.5
     },{
       "type": "color",
       "high": [240,255],
@@ -108,11 +107,11 @@
       "alpha": [0.1,0.5],
       "bias": [0.8,1.2],
       "vertical": 0.5,
-      "probably": 0.5
+      "probability": 0.5
     },{
       "type": "saturation",
       "rand": [0.5,1.0],
-      "probably": 0.5
+      "probability": 0.5
     },{
       "type": "noise",
       "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex",
@@ -126,10 +125,10 @@
       "octaves": [1,10,1],
       "frequency": [0.1,0.9,0.1],
       "lacunarity": [0.01,0.5,0.01],
-      "probably_salt_or_pepper": [0,0.02],
+      "probability_salt_or_pepper": [0,0.02],
 
       "bias": [-0.5, 0.5],
-      "probably": 0.5
+      "probability": 0.5
     },
       {
         "type":"compress",
@@ -145,7 +144,7 @@
         },
 
         "comp": [40, 100],
-        "probably": 0.5
+        "probability": 0.5
 
     }
 
