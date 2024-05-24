@@ -26,11 +26,6 @@ class Blur:
         self.filter = blur_dict["filter"]
         kernel = blur_dict.get("kernel", [0, 1, 1])
 
-        # lens
-        self.radius = blur_dict.get("lens_radius", [1, 2])
-        self.components = blur_dict.get("lens_components", [1, 6])
-        self.gamma = blur_dict.get("lens_gamma", [1.0, 1.0])
-
         # motion
         self.size = blur_dict.get("motion_size", [1, 2])
         self.angle = blur_dict.get("motion_angle", [0, 1])
@@ -42,11 +37,13 @@ class Blur:
             blur = target.get("blur", kernel)
             box = target.get("box", kernel)
             median = target.get("median", kernel)
+            lens = target.get("lens", kernel)
             self.kernels = {
                 "gauss": np.arange(*gauss),
                 "blur": np.arange(*blur),
                 "box": np.arange(*box),
                 "median": np.arange(*median),
+                "lens": lens,
             }
         else:
             self.kernels = {
@@ -54,6 +51,7 @@ class Blur:
                 "blur": np.arange(*kernel),
                 "box": np.arange(*kernel),
                 "median": np.arange(*kernel),
+                "lens": kernel,
             }
 
     def __kernel_odd(self, kernel_size: int) -> int:
@@ -82,10 +80,10 @@ class Blur:
         return cv.blur(lq, (kernel, kernel))
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:
-        radius = random.uniform(*self.radius)
-        components = random.randint(*self.components)
-        gamma = random.uniform(*self.gamma)
-        return lens_blur(lq, radius, components, gamma)
+        kernel = random.uniform(*self.kernels["lens"])
+        if kernel < 1.0:
+            return lq
+        return lens_blur(lq, kernel)
 
     def __motion(self, lq: np.ndarray) -> np.ndarray:
         size = random.randint(*self.size)
