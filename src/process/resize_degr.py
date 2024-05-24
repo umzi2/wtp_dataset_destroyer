@@ -4,6 +4,7 @@ from chainner_ext import resize
 from pepeline import fast_color_level
 from ..constants import INTERPOLATION_MAP
 from .utils import probability
+from ..utils.random import safe_uniform, safe_randint, safe_arange
 
 from ..utils.registry import register_class
 
@@ -37,7 +38,7 @@ class Resize:
         down_up_alg_down (list): List of algorithms for downscaling in down-up resizing.
         down_down_step (int): Step value for down-down resizing.
         down_down_alg (list): List of algorithms for downscaling in down-down resizing.
-        probably (float): Probability of applying resizing.
+        probability (float): Probability of applying resizing.
         color_fix (bool): Whether to perform color fixing after resizing.
         gamma_correction (bool): Whether to perform gamma correction after resizing.
 
@@ -45,7 +46,8 @@ class Resize:
 
     def __init__(self, resize_dict: dict):
         spread = resize_dict.get("spread", [1, 1, 1])
-        self.spread_arange = np.arange(*spread)
+        self.spread_arange = safe_arange(spread)
+
         self.lq_algorithm = resize_dict["alg_lq"]
         self.hq_algorithm = resize_dict["alg_hq"]
         self.lq_scale = resize_dict["scale"]
@@ -58,7 +60,7 @@ class Resize:
         if down_down:
             self.down_down_step = down_down["step"]
             self.down_down_alg = down_down["alg_down"]
-        self.probably = resize_dict.get("probably", 1.0)
+        self.probability = resize_dict.get("probability", 1.0)
         self.color_fix = resize_dict.get("color_fix")
         self.gamma_correction = resize_dict.get("gamma_correction", False)
 
@@ -66,7 +68,7 @@ class Resize:
         return size - (size % (size // self.lq_scale * self.lq_scale))
 
     def __down_up(self, lq: np.ndarray, width: int, height: int) -> np.ndarray:
-        up = np.random.uniform(self.down_up_spread[0], self.down_up_spread[1])
+        up = safe_uniform(self.down_up_spread)
         algorithm_up = random.choice(self.down_up_alg_up)
         lq = resize(
             lq,
@@ -78,10 +80,10 @@ class Resize:
 
     def __down_down(self, lq: np.ndarray, width: int, height: int, algorithm_lq: str):
         height_k = width / height
-        step = random.randint(1, self.down_down_step)
+        step = safe_randint(self.down_down_step)
         step = (width - width / self.lq_scale) / step
         for down in list(
-            reversed(np.arange(int(width // self.lq_scale), int(width), int(step)))
+                reversed(np.arange(int(width // self.lq_scale), int(width), int(step)))
         )[:-1]:
             lq = resize(
                 lq,
@@ -99,12 +101,12 @@ class Resize:
             Tuple of numpy.ndarrays: Resized low quality image and high quality image.
         """
         try:
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
             height, width = lq.shape[:2]
             algorithm_lq = random.choice(self.lq_algorithm)
             algorithm_hq = random.choice(self.hq_algorithm)
-            spread = np.random.choice(self.spread_arange)
+            spread = random.choice(self.spread_arange)
             height = self.__real_size(height // spread)
             width = self.__real_size(width // spread)
 
@@ -129,8 +131,8 @@ class Resize:
             )
 
             if self.color_fix:
-                lq = fast_color_level(lq, 0, 250, None, None, None)
-                hq = fast_color_level(hq, 0, 250, None, None, None)
+                lq = fast_color_level(lq, 0, 250)
+                hq = fast_color_level(hq, 0, 250)
             return lq.squeeze(), hq.squeeze()
         except Exception as e:
             print(f"resize error {e}")
