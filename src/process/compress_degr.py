@@ -4,6 +4,7 @@ import cv2 as cv
 import ffmpeg
 from .utils import probability
 from time import sleep
+from ..utils.random import safe_randint
 
 from ..utils.registry import register_class
 
@@ -19,15 +20,14 @@ class Compress:
                 - "comp" (list of int, optional): Range of compression values for algorithms. Defaults to [90, 100].
                 - "target_compress" (dict, optional): Target compression values for specific algorithms.
                     Defaults to None.
-                - "probably" (float, optional): Probability of applying compression. Defaults to 1.0.
+                - "probability" (float, optional): Probability of applying compression. Defaults to 1.0.
     """
 
     def __init__(self, compress_dict: dict):
-        self.compress_dict = compress_dict
         self.algorithm = compress_dict["algorithm"]
         compress = compress_dict.get("comp", [90, 100])
         target = compress_dict.get("target_compress")
-        self.probably = compress_dict.get("probably", 1.0)
+        self.probability = compress_dict.get("probability", 1.0)
         if target:
             self.target_compress = {
                 "jpeg": target.get("jpeg", compress),
@@ -151,7 +151,7 @@ class Compress:
             "vp9": self.__vp9,
         }
         try:
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
             gray = False
             if lq.ndim == 3 and lq.shape[2] == 3:
@@ -161,7 +161,7 @@ class Compress:
                 gray = True
 
             algorithm = random.choice(self.algorithm)
-            random_comp = random.randint(*self.target_compress[algorithm])
+            random_comp = safe_randint(self.target_compress[algorithm])
             lq = COMPRESS_TYPE_MAP[algorithm](lq, random_comp)
 
             if gray:
