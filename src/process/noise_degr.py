@@ -2,6 +2,7 @@ import numpy as np
 from .utils import probability, normalize_noise as normalize
 from ..constants import NOISE_MAP
 from pepeline import noise_generate, cvt_color, CvtType
+from ..utils.random import safe_uniform, safe_arange
 
 from ..utils.registry import register_class
 
@@ -13,7 +14,7 @@ class Noise:
     Args:
         noise_dict (dict): A dictionary containing noise settings.
             It should include the following keys:
-                - "probably" (float, optional): Probability of adding noise. Defaults to 1.0.
+                - "probability" (float, optional): Probability of adding noise. Defaults to 1.0.
                 - "type_noise" (list of str, optional): List of noise types to choose from.
                     Defaults to ["uniform"].
                 - "alpha" (list of int, optional): Range of alpha values for noise intensity.
@@ -34,16 +35,16 @@ class Noise:
                     Defaults to [0.8, 0.9, 0.9].
                 - "lacunarity" (list of float, optional): Range of lacunarity values for procedural noises.
                     Defaults to [0.4, 0.5, 0.5].
-                - "probably_salt_or_pepper" (list of float, optional): Range of probabilities for salt-and-pepper noise.
+                - "probability_salt_or_pepper" (list of float, optional): Range of probabilities for salt-and-pepper noise.
                     Defaults to [0, 0.5].
     """
 
     def __init__(self, noise_dict: dict):
         # common
-        self.probably = noise_dict.get("probably", 1.0)
+        self.probability = noise_dict.get("probability", 1.0)
         self.type_noise = noise_dict.get("type_noise", ["uniform"])
         alpha_rand = noise_dict.get("alpha", [1, 2, 1])
-        self.alpha_rand = np.arange(*alpha_rand)
+        self.alpha_rand = safe_arange(alpha_rand)
         self.lqhq = noise_dict.get("lqhq", False)
         self.y_noise = noise_dict.get("y_noise", 0)
         self.uv_noise = noise_dict.get("uv_noise", 0)
@@ -52,16 +53,16 @@ class Noise:
         # procedural_noises
         self.normalize_noise = noise_dict.get("normalize")
         octaves_range = noise_dict.get("octaves", [1, 2, 1])
-        self.octaves_rand = np.arange(*octaves_range)
+        self.octaves_rand = safe_arange(octaves_range)
         frequency_range = noise_dict.get("frequency", [0.8, 0.9, 0.9])
-        self.frequency_rand = np.arange(*frequency_range)
+        self.frequency_rand = safe_arange(frequency_range)
         lacunarity_range = noise_dict.get("lacunarity", [0.4, 0.5, 0.5])
-        self.lacunarity_rand = np.arange(*lacunarity_range)
+        self.lacunarity_rand = safe_arange(lacunarity_range)
 
         self.bias = noise_dict.get("bias", [0, 0])
         # salt_or_pepper
         self.percentage_salt_or_pepper = noise_dict.get(
-            "probably_salt_or_pepper", [0, 0.5]
+            "probability_salt_or_pepper", [0, 0.5]
         )
 
     def __procedural_noises(self, lq: np.ndarray) -> np.ndarray:
@@ -76,7 +77,7 @@ class Noise:
         if self.normalize_noise:
             noise = normalize(noise)
         if self.bias != [0, 0]:
-            noise += np.random.uniform(*self.bias)
+            noise += safe_uniform(self.bias)
             noise.clip(-1, 1)
         noise *= np.random.choice(self.alpha_rand)
         return lq + noise
@@ -84,7 +85,7 @@ class Noise:
     def __gauss(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.normal(0, 0.25, lq.shape)
         if self.bias != [0, 0]:
-            noise += np.random.uniform(*self.bias)
+            noise += safe_uniform(self.bias)
             noise.clip(-1, 1)
         noise *= np.random.choice(self.alpha_rand)
         return (lq + noise).astype(np.float32)
@@ -92,7 +93,7 @@ class Noise:
     def __uniform_noise(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.uniform(-1, 1, lq.shape)
         if self.bias != [0, 0]:
-            noise += np.random.uniform(*self.bias)
+            noise += safe_uniform(self.bias)
             noise.clip(-1, 1)
         noise *= np.random.choice(self.alpha_rand)
 
@@ -101,21 +102,21 @@ class Noise:
     # Salt_and_pepper noises
     def __salt_and_pepper_core(self, img_shape: tuple) -> (np.ndarray, float):
         noise = np.random.uniform(0, 1, img_shape)
-        probably = np.random.uniform(*self.percentage_salt_or_pepper)
-        return noise, probably
+        probability = safe_uniform(self.percentage_salt_or_pepper)
+        return noise, probability
 
     def __salt_and_pepper(self, lq: np.ndarray) -> np.ndarray:
-        noise, probably = self.__salt_and_pepper_core(lq.shape)
-        lq = np.where(noise > probably, lq, 1)
-        return np.where(noise < 1 - probably, lq, 0).astype(np.float32)
+        noise, probability = self.__salt_and_pepper_core(lq.shape)
+        lq = np.where(noise > probability, lq, 1)
+        return np.where(noise < 1 - probability, lq, 0).astype(np.float32)
 
     def __salt(self, lq: np.ndarray) -> np.ndarray:
-        noise, probably = self.__salt_and_pepper_core(lq.shape)
-        return np.where(noise > probably, lq, 1).astype(np.float32)
+        noise, probability = self.__salt_and_pepper_core(lq.shape)
+        return np.where(noise > probability, lq, 1).astype(np.float32)
 
     def __pepper(self, lq: np.ndarray) -> np.ndarray:
-        noise, probably = self.__salt_and_pepper_core(lq.shape)
-        return np.where(noise < 1 - probably, lq, 0).astype(np.float32)
+        noise, probability = self.__salt_and_pepper_core(lq.shape)
+        return np.where(noise < 1 - probability, lq, 0).astype(np.float32)
 
     # Run module
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
@@ -141,7 +142,7 @@ class Noise:
             "salt_and_pepper": self.__salt_and_pepper,
         }
         try:
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
             y = False
             uv = False
