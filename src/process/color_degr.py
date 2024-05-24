@@ -18,7 +18,7 @@ class Color:
                     Defaults to None.
                 - "gamma" (list of float, optional): Range of gamma values for gamma correction.
                     Defaults to [1.0, 1.0].
-                - "probably" (float, optional): Probability of applying color loss adjustments.
+                - "probability" (float, optional): Probability of applying color loss adjustments.
                     Defaults to 1.0.
     """
 
