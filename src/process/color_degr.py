@@ -1,8 +1,8 @@
-from numpy import random
 from pepeline import fast_color_level
 from .utils import probability
 import numpy as np
 from ..utils.registry import register_class
+from ..utils.random import safe_uniform, safe_randint
 
 
 @register_class("color")
@@ -23,10 +23,10 @@ class Color:
     """
 
     def __init__(self, color_loss_dict: dict):
-        self.high_list = color_loss_dict.get("high")
-        self.low_list = color_loss_dict.get("low")
+        self.high_list = color_loss_dict.get("high", [255, 255])
+        self.low_list = color_loss_dict.get("low", [0, 0])
         self.gamma = color_loss_dict.get("gamma", [1.0, 1.0])
-        self.probably = color_loss_dict.get("probably", 1.0)
+        self.probability = color_loss_dict.get("probability", 1.0)
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Changes levels to the input image.
@@ -39,17 +39,13 @@ class Color:
             tuple: A tuple containing the noisy low-quality image and the corresponding high-quality image.
         """
         try:
-            if probability(self.probably):
+            if probability(self.probability):
                 return lq, hq
             in_low = 0
             in_high = 255
-            high_output = 255
-            low_output = 0
-            if self.high_list:
-                high_output = random.randint(*self.high_list)
-            if self.low_list:
-                low_output = random.randint(*self.low_list)
-            gamma = random.uniform(*self.gamma)
+            high_output = safe_randint(self.high_list)
+            low_output = safe_randint(self.low_list)
+            gamma = safe_uniform(self.gamma)
             lq = fast_color_level(
                 lq,
                 in_low=in_low,
