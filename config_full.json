@@ -2,7 +2,7 @@
   "input": "path/to/input",
   "output": "path/to/output",
   "process":
-  [    
+  [
     {
       "type": "shift",
       "shift_type": ["cmyk"],
@@ -26,7 +26,7 @@
       "not_target":[[-10,10],[-10,10]],
       "probability": 0.5
     },
-    
+
 
     {
       "type": "screentone",
@@ -46,7 +46,7 @@
       },
       "probability": 0.5
     },
-    
+
 
     {
       "type": "dithering",
@@ -74,7 +74,7 @@
       },
 
       "down_down": {
-        "step": 6,
+        "step": [1, 6],
         "alg_down": [ "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
       },
 
@@ -84,8 +84,8 @@
         "gamma_correction": false,
         "probability": 0.5
 
-    }, 
-    
+    },
+
     {
       "type": "halo",
       "type_halo": ["laplacian","unsharp_mask"],
@@ -93,8 +93,8 @@
       "sharpening_factor": [0, 2],
       "amount": [0,1],
       "threshold": [0,20]
-    }, 
-    
+    },
+
     {
       "type": "blur",
       "filter": ["box", "gauss", "median","lens","motion"],
@@ -109,14 +109,14 @@
       "motion_angle": [-30,30],
       "probability": 0.5
     },
-    
+
     {
       "type": "color",
       "high": [240,255],
       "low": [0,15],
       "gamma": [0.9,1.1]
-    }, 
-    
+    },
+
     {
       "type": "sin",
       "shape": [100,1000,100],
@@ -125,13 +125,13 @@
       "vertical": 0.5,
       "probability": 0.5
     },
-    
+
     {
       "type": "saturation",
       "rand": [0.5,1.0],
       "probability": 0.5
     },
-    
+
     {
       "type": "noise",
       "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex",
@@ -140,7 +140,7 @@
       "normalize": true,
       "y_noise": 0.3,
       "uv_noise": 0.3,
-      "alpha": [0.01,1.0,0.01],
+      "alpha": [0.01,0.5,0.01],
 
       "octaves": [1,10,1],
       "frequency": [0.1,0.9,0.1],

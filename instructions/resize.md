@@ -1,71 +1,29 @@
 ```json
 {
   "type": "resize",
-  "alg_lq": [
-    "box",
-    "hamming",
-    "linear",
-    "lagrange",
-    "cubic_catrom",
-    "cubic_mitchell",
-    "cubic_bspline",
-    "lanczos",
-    "gauss",
-    "down_up",
-    "down_down"
-  ],
-  "alg_hq": [
-    "lagrange"
-  ],
+  "alg_lq": ["box", "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+    "lanczos", "gauss", "down_up","down_down"],
+  "alg_hq": ["lagrange"],
   "down_up": {
-    "up": [
-      1,
-      2
-    ],
-    "alg_up": [
-      "nearest",
-      "box",
-      "hamming",
-      "linear",
-      "lagrange",
-      "cubic_catrom",
-      "cubic_mitchell",
-      "cubic_bspline",
-      "lanczos",
-      "gauss"
-    ],
-    "alg_down": [
-      "hamming",
-      "linear",
-      "lagrange",
-      "cubic_catrom",
-      "cubic_mitchell",
-      "cubic_bspline",
-      "lanczos",
-      "gauss",
-      "down_down"
-    ]
+    "up": [1, 2],
+    "alg_up": ["nearest", "box", "hamming", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
+      "cubic_bspline", "lanczos", "gauss"],
+    "alg_down": [ "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+      "lanczos", "gauss","down_down"]
   },
+
   "down_down": {
-    "step": 6,
-    "alg_down": [
-      "linear",
-      "lagrange",
-      "cubic_catrom",
-      "cubic_mitchell",
-      "cubic_bspline"
-    ]
+    "step": [1, 6],
+    "alg_down": [ "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
   },
-  "spread": [
-    1,
-    2,
-    0.25
-  ],
+
+  "spread": [1, 2, 0.05],
   "scale": 4,
   "color_fix": true,
-  "gamma_correction": false,
-  "probability": 0.5
-}
+    "gamma_correction": false,
+    "probability": 0.5
+
+} 
 
 ```
 alg_lq and alg_hq - list of algorithms from which a random algorithm will be selected, down_down and down_up are custom algorithms, I will tell you more about it further on.
