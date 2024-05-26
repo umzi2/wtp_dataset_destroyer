@@ -147,12 +147,12 @@ class Noise:
             y = False
             uv = False
             if lq.ndim == 3:
-                if probability(self.y_noise):
+                if not probability(self.y_noise):
                     y = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 0]
                     uv_array = yuv_img[:, :, 1:]
-                elif probability(self.uv_noise):
+                elif not probability(self.uv_noise):
                     uv = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 1:]
