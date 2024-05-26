@@ -175,7 +175,7 @@
   "size": 1000,
   "shuffle_dataset": true,
   "num_workers": 16,
-  "map_type": "process",
+  "map_type": "thread",
   "tile": {
     "size": 512,
     "no_wb": true
