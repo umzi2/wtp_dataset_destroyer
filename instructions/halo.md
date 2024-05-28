@@ -10,7 +10,7 @@
 ```
 `*` = optional parameters
 
-- `type_halo` - The list of halo algorithms to use
+- `type_halo` - The list of halo algorithms to use. One is randomly picked per image
 - `kernel` - This applies median blur with a random kernel `list[float|int]` (necessary to reduce artifacts)
   - `laplacian`:
     - `sharpening_factor` - Controls the sharpening strength which generates the halo
