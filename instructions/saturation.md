@@ -1,12 +1,11 @@
 ```json 
-{
-  "type": "saturation",
-  "rand": [
-    0.5,
-    1.0
-  ],
-  "probability": 0.5
-}
+  {
+    "type": "saturation",
+    "rand": [0.5, 1.0],
+    "probability": 0.5
+  }
 ```
-- rand - a random number that fits the saturation takes the list [low,high]
-- probability* - chance of triggering
+`*` = optional parameters
+
+- `rand` - The range from which a random value will be picked to control saturation. `[low,high]`
+- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
