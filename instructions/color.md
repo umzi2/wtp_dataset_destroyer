@@ -1,22 +1,15 @@
 ```json
-{
-  "type": "color",
-  "low": [
-    0,
-    10
-  ],
-  "high": [
-    240,
-    255
-  ],
-  "gamma": [
-    0.9,
-    1.1
-  ],
-  "probability": 0.5
-}
+  {
+    "type": "color",
+    "high": [240,255],
+    "low": [0,15],
+    "gamma": [0.9,1.1]
+  }
 ```
-- low* - shifts the minimum color level of the image takes [low,high]
-- high* - shifts the maximum color level of the image takes [low,high]
-- gamma* - I can’t imagine who needs it, but let it be, it shifts the image gamma [low, high]
-- probability* - chance of triggering
+
+`*` = optional parameters
+
+- `low`* - Shifts the minimum color level of the image. Uses `[low,high]`
+- `high`* - Shifts the maximum color level of the image. Uses `[low,high]`
+- `gamma`* - Shifts the gamma of each image. Uses `[low, high]`
+- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
