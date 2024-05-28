@@ -20,7 +20,7 @@
 `*` = optional parameters
 
 standard:
-- `filter` - The list of blur algorithms to use
+- `filter` - The list of blue algorithms to use. One is randomly picked per image
 - `kernel`* - A range of blur levels for each algorithm. `[low,high]`.
    - All but median blur support float numbers.
    - This only applies if `target_kernel` is not set
