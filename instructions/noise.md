@@ -20,7 +20,7 @@
 `*` = optional parameters
 
 
-- `type` - The list of blur algorithms to use
+- `type` - The list of blur algorithms to use. One is randomly picked per image
 - `alpha`* - Controls how transparent the noise is when overlaid
 - `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
 - `y_noise`* - The chance that the noise will be applied only on the tone component in color images. (Generates color noise)
