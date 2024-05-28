@@ -17,8 +17,11 @@
  
  }
 ```
+
+* = optional parameters
+
 - `type` - Ignore this, not configurable
 - `algorithm` - The list of compression algorithms to use
 - `target_compress`* - A range of compression levels for each algorithm. A value is randomly picked between this range `{"algorithm":[low,high]}`
 - `comp`* - The compression level to be used if target_compress is not implemented for the algorithm
-- `probability`* - The chance of applying. 0.5 = 50% chance of being applied
+- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
