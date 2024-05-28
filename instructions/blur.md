@@ -17,7 +17,7 @@
     }
 ```
 
-* = optional parameters
+`*` = optional parameters
 
 standard:
 - `filter` - The list of blur algorithms to use
