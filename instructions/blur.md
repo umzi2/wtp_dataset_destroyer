@@ -23,6 +23,7 @@ standard:
 - `filter` - The list of blur algorithms to use
 - `kernel`* - A range of blur levels for each algorithm. `[low,high]`.
    - All but median blur support float numbers.
+   - This only applies if `target_kernel` is not set
 - `target_kernel`* - Separate kernel range for each blur filter
 - `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
 
