@@ -18,7 +18,7 @@
  }
 ```
 
-* = optional parameters
+`*` = optional parameters
 
 - `type` - Ignore this, not configurable
 - `algorithm` - The list of compression algorithms to use
