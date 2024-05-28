@@ -8,14 +8,16 @@
       "threshold": [0,20]
 }    
 ```
-- type_halo - halo overlay algorithm list
-- kernel - applies median blur with a random kernel `list[float|int]` necessary to reduce artifacts
-- laplacian:
-  - sharpening_factor - sharpness from which we get halo
-  - laplacian - sheet from which the random kernel size for the Laplace filter is taken
-- unsharp_mask:
-  - amount - halo force 
-  - threshold - halo effect threshold
-- probability* - chance of triggering
+`*` = optional parameters
 
-ps This piece from the image to which sharpening was applied takes only the white halo and it comes out at 1 bit, so it’s better to use it before blurring
+- `type_halo` - The list of halo algorithms to use
+- `kernel` - This applies median blur with a random kernel `list[float|int]` (necessary to reduce artifacts)
+  - `laplacian`:
+    - `sharpening_factor` - Controls the sharpening strength which generates the halo
+    - `laplacian` - The range from which the random kernel size for the Laplace filter is taken
+  - `unsharp_mask`:
+    - `amount` - Strength of the halo
+    - `threshold` - Controls the halo threshold
+- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+
+Note: It's better to apply this before blurring. It takes only the white halo and it comes out at 1 bit
