@@ -8,11 +8,9 @@
       "ratio": [0.1,0.9],
       "probability": 0.5
     },
-}
-
+```
 `*` = optional parameters
 
-```
 - `dithering_type`* - The list of dithering algorithms to use. One is randomly picked per image
 - `color_ch`* - The number of colors per channel. Valid range is `[2,255]`
 - `map_size`* - The kernel size is used only for the `order` dithering algorithm
