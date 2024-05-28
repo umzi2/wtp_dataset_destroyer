@@ -28,4 +28,5 @@
   - `size` - tile size
   - `no_wb`* - Ignore pure white and pure black images (bool)
 - `gray`* - All images are read only in grayscale mode
-- `gray_or_color`* - Determines if an image is RGB or gray. If it's RGB, it converts it to grayscale
+- `gray_or_color`* - If an image has shades transitioning smoothly from light to dark and all RGB values for each pixel are almost the same, it gets converted to grayscale.
+  - This is very performance intensive.
