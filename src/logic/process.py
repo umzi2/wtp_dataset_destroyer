@@ -1,7 +1,7 @@
 import os
 
 from tqdm.contrib.concurrent import process_map, thread_map
-from ..process.utils import laplace_filter, lq_hq2grays, color_or_gray
+from ..process.utils import laplace_filter, lq_hq2grays, color_or_gray, img2gray
 from pepeline import read, save
 import numpy as np
 from os import listdir
@@ -9,6 +9,7 @@ from os.path import join
 from tqdm import tqdm
 
 from ..utils.registry import get_class
+import picologging as logging
 
 
 class ImgProcess:
@@ -69,16 +70,22 @@ class ImgProcess:
         self.turn = []
         self.output_lq = join(self.output, "lq")
         self.output_hq = join(self.output, "hq")
-        self.map_type = config.get("map_type", "process")
+        self.map_type = config.get("map_type", "thread")
         self.laplace_filter = config.get("laplace_filter")
         self.num_workers = config.get("num_workers")
+        self.only_lq = config.get("only_lq", False)
+        self.real_name = config.get("real_name")
+        debug = config.get("debug")
+        if debug:
+            logging.basicConfig(level=logging.DEBUG, filename="degr.log", filemode="w", format="%(message)s")
+            self.map_type = "for"
         for process_dict in process:
             process_type = process_dict["type"]
             self.turn.append(get_class(process_type)(process_dict))
 
         if not os.path.exists(self.output_lq):
             os.makedirs(self.output_lq)
-        if not os.path.exists(self.output_hq):
+        if not os.path.exists(self.output_hq) and not self.only_lq:
             os.makedirs(self.output_hq)
 
     def __img_read(self, img_fold: str) -> np.ndarray:
@@ -98,6 +105,11 @@ class ImgProcess:
         save(lq, join(self.output_lq, output_name))
         save(hq, join(self.output_hq, output_name))
 
+    def __only_lq_save(self, lq: np.ndarray, output_name: str) -> None:
+        if self.gray:
+            lq = img2gray(lq)
+        save(lq, join(self.output_lq, output_name))
+
     def process(self, img_fold: str) -> None:
         """Processes an image using the specified image processing techniques.
 
@@ -111,10 +123,17 @@ class ImgProcess:
                     return
             n = self.all_images.index(img_fold)
             lq, hq = img, img
+            if self.real_name:
+                output_name = img_fold
+            else:
+                output_name = f"{n}.png"
+            logging.debug("Real_name: %s Result_name: %s", img_fold, output_name)
             for loss in self.turn:
                 lq, hq = loss.run(lq, hq)
-            output_name = f"{n}.png"
-            self.__img_save(lq, hq, output_name)
+            if self.only_lq:
+                self.__only_lq_save(lq, output_name)
+            else:
+                self.__img_save(lq, hq, output_name)
 
         except Exception as e:
             print(e)
@@ -131,9 +150,9 @@ class ImgProcess:
             n = self.all_images.index(img_fold)
             for Kx, Ky in np.ndindex(h // self.tile_size, w // self.tile_size):
                 img_tile = img[
-                    self.tile_size * Kx : self.tile_size * (Kx + 1),
-                    self.tile_size * Ky : self.tile_size * (Ky + 1),
-                ]
+                           self.tile_size * Kx: self.tile_size * (Kx + 1),
+                           self.tile_size * Ky: self.tile_size * (Ky + 1),
+                           ]
                 if self.laplace_filter:
                     if laplace_filter(img_tile, self.laplace_filter):
                         continue
@@ -142,9 +161,12 @@ class ImgProcess:
                     if mean == 0.0 or mean == 1.0:
                         continue
                 lq, hq = img_tile, img_tile
+                output_name = f"{str(n)}_{Kx}_{Ky}.png"
+                logging.debug("_____________________________________\n\nReal_name: %s Result_name: %s \n", img_fold,
+                              output_name)
                 for loss in self.turn:
                     lq, hq = loss.run(lq, hq)
-                output_name = f"{str(n)}_{Kx}_{Ky}.png"
+
                 self.__img_save(lq, hq, output_name)
 
         except Exception as e:

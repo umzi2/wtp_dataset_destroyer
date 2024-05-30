@@ -11,6 +11,7 @@ from .utils import probability
 from numpy import random
 from ..utils.registry import register_class
 from ..utils.random import safe_uniform, safe_randint
+import picologging as logging
 
 
 @register_class("dithering")
@@ -41,8 +42,11 @@ class Dithering:
         self.ratio = dithering_dict.get("ratio", [0.1, 0.9])
         self.probability = dithering_dict.get("probability", 1.0)
         self.dithering_type = "Burkes"
+        self.unif_quantiz = 8
 
     def __error(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
+        logging.debug("Dithering - type: %s quantization %s", self.dithering_type,
+                      self.unif_quantiz)
         return error_diffusion_dither(
             lq, quantization, DITHERING_MAP[self.dithering_type]
         )
@@ -52,11 +56,15 @@ class Dithering:
 
     def __order(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         map_size = random.choice(self.map_size)
+        logging.debug("Dithering - type: %s map_size: %s quantization %s", self.dithering_type, map_size,
+                      self.unif_quantiz)
         return ordered_dither(lq, quantization, map_size)
 
     def __riemersma(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         history = safe_randint(self.history)
         decay_ratio = safe_uniform(self.ratio)
+        logging.debug("Dithering - type: %s history: %s decay_ratio: %.3f quantization %s", self.dithering_type, history, decay_ratio,
+                      self.unif_quantiz)
         return riemersma_dither(lq, quantization, history, decay_ratio)
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
@@ -86,8 +94,8 @@ class Dithering:
             if probability(self.probability):
                 return lq, hq
             self.dithering_type = random.choice(self.dithering_type_list)
-            unif_quantiz = safe_randint(self.quantize)
-            lq = DITHERING_TYPE_MAP[self.dithering_type](lq, UQ(unif_quantiz))
+            self.unif_quantiz = safe_randint(self.quantize)
+            lq = DITHERING_TYPE_MAP[self.dithering_type](lq, UQ(self.unif_quantiz))
             return np.squeeze(lq), hq
         except Exception as e:
-            print(f"dithering error: {e}")
+            logging.error("Dithering error: %s", e)

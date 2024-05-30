@@ -3,6 +3,7 @@ import numpy as np
 from .utils import probability
 from ..utils.random import safe_uniform
 from ..utils.registry import register_class
+import picologging as logging
 
 
 @register_class("saturation")
@@ -39,11 +40,12 @@ class Saturation:
             if probability(self.probability):
                 return lq, hq
             random_saturation = safe_uniform(self.rand)
+            logging.debug("Saturation - %.3f", random_saturation)
             hsv_image = cv.cvtColor(lq, cv.COLOR_RGB2HSV)
             decreased_saturation = hsv_image.copy()
             decreased_saturation[:, :, 1] = (
-                decreased_saturation[:, :, 1] * random_saturation
+                    decreased_saturation[:, :, 1] * random_saturation
             )
             return cv.cvtColor(decreased_saturation, cv.COLOR_HSV2RGB), hq
         except Exception as e:
-            print(f"Saturation loss error {e}")
+            logging.error("Saturation error: %s", e)

@@ -92,7 +92,7 @@
       "kernel": [0,3],
       "sharpening_factor": [0, 2],
       "amount": [0,1],
-      "threshold": [0,20]
+      "threshold": [0,0.06]
     },
 
     {
@@ -176,6 +176,9 @@
   "shuffle_dataset": true,
   "num_workers": 16,
   "map_type": "thread",
+  "debug": false,
+  "only_lq": false,
+  "real_name": false,
   "tile": {
     "size": 512,
     "no_wb": true

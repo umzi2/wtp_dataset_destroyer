@@ -5,6 +5,7 @@ from numpy import random
 from .utils import probability, lq_hq2grays
 from ..utils.random import safe_uniform, safe_randint
 from ..utils.registry import register_class
+import picologging as logging
 
 
 @register_class("screentone")
@@ -56,7 +57,7 @@ class Screentone:
         self.probability = screentone_dict.get("probability", 1.0)
 
     def __cmyk_halftone(
-        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+            self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
         c_angle = safe_randint(self.color_c)
         m_angle = safe_randint(self.color_m)
@@ -69,30 +70,35 @@ class Screentone:
         lq[..., 3] = screentone(lq[..., 3], dot_size, k_angle)
         if self.cmyk_alpha != [1, 1]:
             alpha = safe_uniform(self.cmyk_alpha)
-            return cvt_color(lq * alpha, CvtType.CMYK2RGB), hq
+            lq *= alpha
+        logging.debug("Screentone - type: cmyk dot: %s cmyk_angle: %s %s %s %s", dot_size, c_angle, m_angle, y_angle,
+                      k_angle)
         return cvt_color(lq, CvtType.CMYK2RGB), hq
 
     def __not_rot_halftone(
-        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+            self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
+        logging.debug("Screentone - type: not_rot dot: %s", dot_size)
         lq[..., 0] = screentone(lq[..., 0], dot_size)
         lq[..., 1] = screentone(lq[..., 1], dot_size)
         lq[..., 2] = screentone(lq[..., 2], dot_size)
         return lq, hq
 
     def __gray_halftone(
-        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+            self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
         lq, hq = lq_hq2grays(lq, hq)
+        logging.debug("Screentone - type: gray dot: %s", dot_size)
         lq = screentone(lq, dot_size)
         return lq, hq
 
     def __rgb_halftone(
-        self, lq: np.ndarray, hq: np.ndarray, dot_size: int
+            self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
         r_angle = safe_randint(self.color_r)
         g_angle = safe_randint(self.color_g)
         b_angle = safe_randint(self.color_b)
+        logging.debug("Screentone - type: rgb dot: %s rgb_angle: %s %s %s", dot_size, r_angle, g_angle, b_angle)
         lq[..., 0] = screentone(lq[..., 0], dot_size, r_angle)
         lq[..., 1] = screentone(lq[..., 1], dot_size, g_angle)
         lq[..., 2] = screentone(lq[..., 2], dot_size, b_angle)
@@ -124,10 +130,10 @@ class Screentone:
                 lq, hq = HALFTONE_TYPE_MAP[color_type](lq, hq, dot_size)
             else:
                 lq = screentone(lq, dot_size)
-
+                logging.debug("Screentone - type: gray dot: %s", dot_size)
             if self.lqhq:
                 hq = lq
             return lq, hq
 
         except Exception as e:
-            print(f"screentone error {e}")
+            logging.error("screentone error: %s", e)

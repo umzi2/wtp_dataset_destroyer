@@ -5,6 +5,7 @@ from .utils import probability
 from .custom_blur import box_blur
 from ..utils.random import safe_uniform
 from ..utils.registry import register_class
+import picologging as logging
 
 
 @register_class("halo")
@@ -47,6 +48,8 @@ class Halo:
         sharpening_factor = safe_uniform(self.factor)
         kernel = safe_uniform(self.kernel)
         laplacian = random.choice(self.laplacian)
+        logging.debug("Halo: type: laplacian sharpening_factor: %.3f kernel: %.3f laplacian_size: %s", sharpening_factor,
+                      kernel, laplacian)
         if kernel:
             img_gray = box_blur(img_gray, kernel)
         laplacian = cv.Laplacian(img_gray, cv.CV_32F, ksize=laplacian)
@@ -57,9 +60,11 @@ class Halo:
         return np.clip(lq + sharpened_image, 0, 1).astype(np.float32)
 
     def __unsharp_mask(self, lq: np.ndarray) -> np.ndarray:
-        sigma =safe_uniform(self.kernel)
+        sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
         threshold = safe_uniform(self.threshold)
+        logging.debug("Halo: type: uniform amount: %.3f kernel: %.3f  threshold: %.3f", amount,
+                      sigma, threshold)
         blurred = cv.GaussianBlur(lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT)
         sharpened = np.clip(float(amount + 1) * lq - float(amount) * blurred, 0, 1)
         if threshold > 0:
@@ -88,4 +93,4 @@ class Halo:
 
             return lq, hq
         except Exception as e:
-            print(f"halo loss error {e}")
+            logging.error("Halo error: %s",e)

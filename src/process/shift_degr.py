@@ -6,6 +6,7 @@ from numpy import random
 
 from ..utils.random import safe_uniform, safe_randint
 from src.utils.registry import register_class
+import picologging as logging
 
 
 def shift(img, amount_x: int, amount_y: int, fill_color: list | float) -> np.ndarray:
@@ -56,6 +57,7 @@ def shift_int(
         amount_y = safe_randint(amount_channel[1])
     if amount_x == 0 and amount_y == 0:
         return img
+    logging.debug("Shift_amount - amount_x: %s amount_y: %s", amount_x, amount_y)
     return shift(img, amount_x, amount_y, fill_color)
 
 
@@ -82,6 +84,7 @@ def shift_percent(
         amount_y = int(shape_img[1] * safe_uniform(amount_channel[1]) / 100)
     if amount_x == 0 and amount_y == 0:
         return img
+    logging.debug("Shift_amount - amount_x: %.3f amount_y: %.3f", amount_x, amount_y)
     return shift(img, amount_x, amount_y, fill_color)
 
 
@@ -210,7 +213,8 @@ class Shift:
             if probability(self.probability):
                 return lq, hq
             type_shift = random.choice(self.type_list)
+            logging.debug("Shift - type: %s", type_shift)
             lq = SHIFT_TYPE_MAP[type_shift](lq)
             return lq, hq
         except Exception as e:
-            print(f"shift error {e}")
+            logging.error("Shift error: %s", e)

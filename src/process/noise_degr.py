@@ -5,6 +5,7 @@ from pepeline import noise_generate, cvt_color, CvtType
 from ..utils.random import safe_uniform, safe_arange
 
 from ..utils.registry import register_class
+import picologging as logging
 
 
 @register_class("noise")
@@ -64,59 +65,84 @@ class Noise:
         self.percentage_salt_or_pepper = noise_dict.get(
             "probability_salt_or_pepper", [0, 0.5]
         )
+        self.default_debug = "Noise - color_type: gray"
 
     def __procedural_noises(self, lq: np.ndarray) -> np.ndarray:
+        octaves = np.random.choice(self.octaves_rand)
+        frequency = np.random.choice(self.frequency_rand)
+        lacunarity = np.random.choice(self.lacunarity_rand)
         noise = noise_generate(
             lq.shape,
             NOISE_MAP[self.noise_type],
-            np.random.choice(self.octaves_rand),
-            np.random.choice(self.frequency_rand),
-            np.random.choice(self.lacunarity_rand),
+            octaves,
+            frequency,
+            lacunarity,
             None,
         )
         if self.normalize_noise:
             noise = normalize(noise)
+        bias = 0
         if self.bias != [0, 0]:
-            noise += safe_uniform(self.bias)
+            bias = safe_uniform(self.bias)
+            noise += bias
             noise.clip(-1, 1)
-        noise *= np.random.choice(self.alpha_rand)
+        alpha = np.random.choice(self.alpha_rand)
+        noise *= alpha
+        logging.debug("%s noise_type: %s alpha: %.3f bias: %.3f octaves: %s frequency: %.3f lacunarity: %.3f",
+                      self.default_debug, self.noise_type, alpha, bias, octaves, frequency, lacunarity)
         return lq + noise
 
     def __gauss(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.normal(0, 0.25, lq.shape)
+        bias = 0
         if self.bias != [0, 0]:
-            noise += safe_uniform(self.bias)
+            bias = safe_uniform(self.bias)
+            noise += bias
             noise.clip(-1, 1)
-        noise *= np.random.choice(self.alpha_rand)
+        alpha = np.random.choice(self.alpha_rand)
+        noise *= alpha
+        logging.debug("%s noise_type: %s alpha: %.3f bias: %.3f",
+                      self.default_debug, self.noise_type, alpha, bias)
         return (lq + noise).astype(np.float32)
 
     def __uniform_noise(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.uniform(-1, 1, lq.shape)
+        bias = 0
         if self.bias != [0, 0]:
-            noise += safe_uniform(self.bias)
+            bias = safe_uniform(self.bias)
+            noise += bias
             noise.clip(-1, 1)
-        noise *= np.random.choice(self.alpha_rand)
+        alpha = np.random.choice(self.alpha_rand)
+        noise *= alpha
+        logging.debug("%s noise_type: %s alpha: %.3f bias: %.3f",
+                      self.default_debug, self.noise_type, alpha, bias)
 
         return (lq + noise).astype(np.float32)
 
     # Salt_and_pepper noises
     def __salt_and_pepper_core(self, img_shape: tuple) -> (np.ndarray, float):
         noise = np.random.uniform(0, 1, img_shape)
-        probability = safe_uniform(self.percentage_salt_or_pepper)
-        return noise, probability
+        probability_sp = safe_uniform(self.percentage_salt_or_pepper)
+        return noise, probability_sp
 
     def __salt_and_pepper(self, lq: np.ndarray) -> np.ndarray:
-        noise, probability = self.__salt_and_pepper_core(lq.shape)
-        lq = np.where(noise > probability, lq, 1)
-        return np.where(noise < 1 - probability, lq, 0).astype(np.float32)
+        noise, probability_sp = self.__salt_and_pepper_core(lq.shape)
+        logging.debug("%s noise_type: %s probability: %.3f",
+                      self.default_debug, self.noise_type, probability_sp)
+        lq = np.where(noise > probability_sp, lq, 1)
+        return np.where(noise < 1 - probability_sp, lq, 0).astype(np.float32)
 
     def __salt(self, lq: np.ndarray) -> np.ndarray:
-        noise, probability = self.__salt_and_pepper_core(lq.shape)
-        return np.where(noise > probability, lq, 1).astype(np.float32)
+        noise, probability_sp = self.__salt_and_pepper_core(lq.shape)
+        logging.debug("%s noise_type: %s probability: %.3f",
+                      self.default_debug, self.noise_type, probability_sp)
+        return np.where(noise > probability_sp, lq, 1).astype(np.float32)
 
     def __pepper(self, lq: np.ndarray) -> np.ndarray:
-        noise, probability = self.__salt_and_pepper_core(lq.shape)
-        return np.where(noise < 1 - probability, lq, 0).astype(np.float32)
+        noise, probability_sp = self.__salt_and_pepper_core(lq.shape)
+        logging.debug("%s noise_type: %s probability: %.3f",
+                      self.default_debug, self.noise_type, probability_sp)
+        return np.where(noise < 1 - probability_sp, lq, 0).astype(np.float32)
 
     # Run module
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
@@ -147,16 +173,21 @@ class Noise:
             y = False
             uv = False
             if lq.ndim == 3:
+
                 if not probability(self.y_noise):
                     y = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 0]
                     uv_array = yuv_img[:, :, 1:]
+                    self.default_debug = "Noise - color_type: y"
                 elif not probability(self.uv_noise):
                     uv = True
                     yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
                     lq = yuv_img[:, :, 1:]
                     y_array = yuv_img[:, :, 0]
+                    self.default_debug = "Noise - color_type: uv"
+                else:
+                    self.default_debug = "Noise - color_type: rgb"
             self.noise_type = np.random.choice(self.type_noise)
             lq = NOISE_TYPE_MAP[self.noise_type](lq)
             lq = np.clip(lq, 0, 1)
@@ -171,4 +202,4 @@ class Noise:
                 hq = lq
             return lq, hq
         except Exception as e:
-            print(f"noise error {e}")
+            logging.error("Noise error: %s", e)

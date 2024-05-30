@@ -6,6 +6,7 @@ from ..utils.random import safe_uniform, safe_randint
 
 from ..utils.registry import register_class
 from .custom_blur import motion_blur, lens_blur, box_blur
+import picologging as logging
 
 
 @register_class("blur")
@@ -51,6 +52,7 @@ class Blur:
                 "median": kernel,
                 "lens": kernel,
             }
+        self.kernel = 0
 
     def __kernel_odd(self, kernel_size: int) -> int:
         if kernel_size % 2 == 0:
@@ -61,18 +63,21 @@ class Blur:
         sigma = safe_uniform(self.kernels["gauss"])
         if sigma <= 0.0:
             return lq
+        logging.debug("Blur -  type: guss kernel: %.3f", sigma)
         return cv.GaussianBlur(lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT)
 
     def __box(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["box"])
         if kernel <= 0.0:
             return lq
+        logging.debug("Blur -  type: box kernel: %.3f", kernel)
         return box_blur(lq, kernel)
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["lens"])
         if kernel <= 0.0:
             return lq
+        logging.debug("Blur -  type: lens kernel: %.3f", kernel)
         return lens_blur(lq, kernel)
 
     def __motion(self, lq: np.ndarray) -> np.ndarray:
@@ -80,14 +85,16 @@ class Blur:
         if size <= 0:
             return lq
         angle = safe_randint(self.angle)
+        logging.debug("Blur -  type: motion size: %s angle: %s", size, angle)
         return motion_blur(lq, size, angle)
 
     def __median(self, lq: np.ndarray) -> np.ndarray:
         kernel_list = self.kernels["median"]
-        kernel = safe_randint((int(kernel_list[0]), int(kernel_list[1])))
+        kernel = safe_randint(kernel_list)
         if kernel == 0:
             return lq
         kernel = self.__kernel_odd(kernel)
+        logging.debug("Blur -  type: median kernel: %s", kernel)
         return (
                 cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
         )
@@ -118,4 +125,4 @@ class Blur:
 
             return lq, hq
         except Exception as e:
-            print(f"blur error {e}")
+            logging.error("Blur error: %s", e)
