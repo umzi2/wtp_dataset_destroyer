@@ -81,9 +81,15 @@
       "spread": [1, 2, 0.05],
       "scale": 4,
       "color_fix": true,
-        "gamma_correction": false,
-        "probability": 0.5
+      "gamma_correction": false,
+      "probability": 0.5
 
+    },
+
+    {
+      "type": "pixelate",
+      "size": [0, 4],
+      "probability": 0.5
     },
 
     {
@@ -92,7 +98,7 @@
       "kernel": [0,3],
       "sharpening_factor": [0, 2],
       "amount": [0,1],
-      "threshold": [0,0.06]
+      "threshold": [0,0.5]
     },
 
     {

@@ -11,8 +11,11 @@
   "laplace_filter": 0.02,
   "size": 1000,
   "shuffle_dataset": true,
-  "gray": false
-  "gray_or_color":true
+  "gray": false,
+  "gray_or_color":true,
+  "debug": false,
+  "only_lq": false,
+  "real_name": false,
 ```
 
 - `input` - input folder
@@ -30,3 +33,8 @@
 - `gray`* - All images are read only in grayscale mode
 - `gray_or_color`* - If an image has shades transitioning smoothly from light to dark and all RGB values for each pixel are almost the same, it gets converted to grayscale.
   - This is very performance intensive.
+- `debug`* - Creates a `debug` folder if it doesn't exist, and in it creates a `debug.log` file where all random values during degradation processes will be logged. When enabled, it ignores map_type by setting it to `for`.
+
+Doesn't work with tile:
+- `only_lq`* - Saves only lq files without hq. `spread` in resize causes discrepancies, so turn it off
+- `real_name`* - When saving, the names do not change
