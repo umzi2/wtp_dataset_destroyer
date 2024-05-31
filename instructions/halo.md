@@ -1,7 +1,7 @@
 ```json
 {
       "type": "halo",
-      "type_halo": ["laplacian","unsharp_mask"],
+      "type_halo": ["laplacian", "unsharp_mask", "unsharp_halo"],
       "kernel": [0,3],
       "sharpening_factor": [0, 2],
       "amount": [0,1],
