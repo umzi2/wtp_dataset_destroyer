@@ -1,4 +1,5 @@
 import numpy as np
+from chainner_ext import binary_threshold
 from numpy import random
 import cv2 as cv
 from .utils import probability
@@ -85,6 +86,32 @@ class Halo:
 
         return lq
 
+    def __unsharp_halo(self, lq):
+        rgb = False
+        if lq.ndim == 3:
+            lq_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
+            rgb = True
+        sigma = safe_uniform(self.kernel)
+        amount = safe_uniform(self.amount)
+        logging.debug(
+            "Halo: type: unsharp_halo amount: %.4f kernel: %.4f ",
+            amount,
+            sigma,
+        )
+        blurred = cv.GaussianBlur(
+            lq_gray, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+        )
+        diff = lq_gray - blurred
+        diff = np.maximum(0, np.sign(diff) * np.abs(diff))
+        diff = binary_threshold(diff * amount, 254 / 255, False).squeeze()
+        if rgb:
+            lq[..., 0] = np.minimum(1, lq[..., 0] + diff)
+            lq[..., 1] = np.minimum(1, lq[..., 1] + diff)
+            lq[..., 2] = np.minimum(1, lq[..., 2] + diff)
+        else:
+            lq = np.minimum(1, lq + diff)
+        return lq
+
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies the selected halo loss reduction technique to the input image.
 
@@ -103,6 +130,8 @@ class Halo:
                 lq = self.__laplacian(lq)
             elif type_halo == "unsharp_mask":
                 lq = self.__unsharp_mask(lq)
+            elif type_halo == "unsharp_halo":
+                lq = self.__unsharp_halo(lq)
 
             return lq, hq
         except Exception as e:
