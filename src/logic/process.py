@@ -9,7 +9,7 @@ from os.path import join
 from tqdm import tqdm
 
 from ..utils.registry import get_class
-import picologging as logging
+import logging
 
 
 class ImgProcess:
@@ -62,7 +62,11 @@ class ImgProcess:
         self.gray_or_color = config.get("gray_or_color")
         self.gray = config.get("gray")
         process = config["process"]
-        self.all_images = listdir(self.input)
+        self.all_images = [
+            file
+            for file in listdir(self.input)
+            if os.path.isfile(os.path.join(self.input, file))
+        ]
         if config.get("shuffle_dataset"):
             np.random.shuffle(self.all_images)
         if config.get("size"):
@@ -77,7 +81,9 @@ class ImgProcess:
         self.real_name = config.get("real_name")
         debug = config.get("debug")
         if debug:
-            logging.basicConfig(level=logging.DEBUG, filename="degr.log", filemode="w", format="%(message)s")
+            if not os.path.exists("debug"):
+                os.makedirs("debug")
+            logging.basicConfig(level=logging.DEBUG, filename="debug/debug.log", filemode="w", format="%(message)s")
             self.map_type = "for"
         for process_dict in process:
             process_type = process_dict["type"]
@@ -127,7 +133,8 @@ class ImgProcess:
                 output_name = img_fold
             else:
                 output_name = f"{n}.png"
-            logging.debug("Real_name: %s Result_name: %s", img_fold, output_name)
+            logging.debug("_____________________________________\n\nReal_name: %s Result_name: %s \n", img_fold,
+                          output_name)
             for loss in self.turn:
                 lq, hq = loss.run(lq, hq)
             if self.only_lq:
