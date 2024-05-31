@@ -1,9 +1,10 @@
 # Instructions for adding new degradations
 
 To add a new degradation, simply create a file `*_degr.py` along the path `src.process`
-In it we import `from ..utils.registry import register_class`.
 
-create a minimal class in it
+In it you must import `from ..utils.registry import register_class`.
+
+Create a minimal class in it like so:
 
 ```py
 import numpy as np

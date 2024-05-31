@@ -17,13 +17,17 @@
     }
 ```
 
+`*` = optional parameters
+
 standard:
-- filter - blur type list
-- kernel* - blur kernel list[low,high], in all cases except median blur you can use float. 
-- target_kernel* - separate kernel spread for each blur filter 
-- probability* - chance of triggering
+- `filter` - The list of blue algorithms to use. One is randomly picked per image
+- `kernel`* - A range of blur levels for each algorithm. `[low,high]`.
+   - All but median blur support float numbers.
+   - This only applies if `target_kernel` is not set
+- `target_kernel`* - Separate kernel range for each blur filter
+- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
 
 
 motion:
-- motion_size* - motion blur size takes list[uint, uint]
-- motion_angle* - rotate motion blur takes list[int, int]
+- `motion_size`* - The motion blur size. Uses `[uint, uint]`
+- `motion_angle`* - Degree of rotation for motion blur. Uses `[int, int]`

@@ -1,6 +1,6 @@
 ```json 
-  "input": "/media/umzi/H/датасеты/descreenton/HR",
-  "output": "/media/umzi/H/датасеты/descreenton/HR2",
+  "input": "path/to/input",
+  "output": "path/to/output",
   "process":[]
   "tile": {
     "size": 512,
@@ -11,19 +11,22 @@
   "laplace_filter": 0.02,
   "size": 1000,
   "shuffle_dataset": true,
-  "gray": true
+  "gray": false
   "gray_or_color":true
 ```
-- input - input folder
-- output - output folder
-- process - a lossy dictionary that will be applied to each image
-- num_workers* - number of processes for parallel processing
-- map_type* - processing type: process, thread and for
-- size* - how many scans to take from the input folder 
-- laplace_filter* - It filters out low saturation images using the laplace operator, accepts a float value, I advise you to experiment with value
-- shuffle_dataset* - shuffles the file list
-- tile*  
-  - size - tile size
-  - no_wb* - ignoring pure white and pure black images (bool)
-- gray* - All images are read only in grayscale mode
-- gray_or_color* - reads images in rgb and then determines the gradation of the gray image or rgb does not make sense when gray is enabled
+
+- `input` - input folder
+- `output` - output folder (saves new HQ and LQ images)
+- `process` - The degradations that will be applied to your images
+- `num_workers`* - The number of processes for parallel processing. It's best to use your CPU core count
+- `map_type`* - Valid processing types: `process`, `thread` and `for`
+  - If you run into issues on Windows, swap to `thread`
+- `size`* - How many images to process from the input folder 
+- `laplace_filte`r* - It filters out images based on low saturation using the laplace operator. Accepts a float value. (experiment with it)
+- `shuffle_dataset`* - Determines whether or not the images will be shuffled
+- `tile`* - This section enables automatic tiling of your images. For example, if you choose `size` 512, it'll split a single image into multiple 512x512 images.  
+  - `size` - tile size
+  - `no_wb`* - Ignore pure white and pure black images (bool)
+- `gray`* - All images are read only in grayscale mode
+- `gray_or_color`* - If an image has shades transitioning smoothly from light to dark and all RGB values for each pixel are almost the same, it gets converted to grayscale.
+  - This is very performance intensive.
