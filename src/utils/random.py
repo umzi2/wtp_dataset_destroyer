@@ -9,7 +9,7 @@ def safe_uniform(rand_list: list[float] | float) -> float:
         return rand_list[0]
     if rand_list[0] >= rand_list[1]:
         return rand_list[0]
-    return uniform(*rand_list)
+    return uniform(rand_list[0], rand_list[1])
 
 
 def safe_randint(rand_list: list[int] | int) -> int:
@@ -19,7 +19,7 @@ def safe_randint(rand_list: list[int] | int) -> int:
         return rand_list[0]
     if rand_list[0] >= rand_list[1]:
         return rand_list[0]
-    return randint(*rand_list)
+    return randint(rand_list[0], rand_list[1])
 
 
 def safe_arange(range_list: list) -> np.ndarray:
