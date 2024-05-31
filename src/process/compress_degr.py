@@ -7,7 +7,7 @@ from time import sleep
 from ..utils.random import safe_randint
 
 from ..utils.registry import register_class
-import picologging as logging
+import logging
 
 
 @register_class("compress")
@@ -84,7 +84,7 @@ class Compress:
             .run_async(pipe_stdin=True, pipe_stdout=True)
         )
 
-        out, err = process2.communicate(input=process1.stdout.read())
+        out, _ = process2.communicate(input=process1.stdout.read())
 
         process1.wait()
         return (
@@ -108,7 +108,7 @@ class Compress:
             "qmax": str(quality),
             "qmin": str(quality),
         }
-        self.__video_core(lq, "mpeg1video", output_args)
+        return self.__video_core(lq, "mpeg1video", output_args)
 
     def __mpeg2(self, lq: np.ndarray, quality: int) -> np.ndarray:
         output_args = {

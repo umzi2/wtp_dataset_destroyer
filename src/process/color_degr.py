@@ -3,7 +3,7 @@ from .utils import probability
 import numpy as np
 from ..utils.registry import register_class
 from ..utils.random import safe_uniform, safe_randint
-import picologging as logging
+import logging
 
 
 @register_class("color")
@@ -55,7 +55,7 @@ class Color:
                 out_high=high_output,
                 gamma=gamma,
             )
-            logging.debug("Color - low_output: %s high_output: %s gamma: %.3f ", low_output, high_output, gamma)
+            logging.debug("Color - low_output: %s high_output: %s gamma: %.4f ", low_output, high_output, gamma)
             return lq, hq
         except Exception as e:
             logging.error("Color error: %s", e)

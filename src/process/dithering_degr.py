@@ -11,7 +11,7 @@ from .utils import probability
 from numpy import random
 from ..utils.registry import register_class
 from ..utils.random import safe_uniform, safe_randint
-import picologging as logging
+import logging
 
 
 @register_class("dithering")
@@ -63,7 +63,7 @@ class Dithering:
     def __riemersma(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         history = safe_randint(self.history)
         decay_ratio = safe_uniform(self.ratio)
-        logging.debug("Dithering - type: %s history: %s decay_ratio: %.3f quantization %s", self.dithering_type, history, decay_ratio,
+        logging.debug("Dithering - type: %s history: %s decay_ratio: %.4f quantization %s", self.dithering_type, history, decay_ratio,
                       self.unif_quantiz)
         return riemersma_dither(lq, quantization, history, decay_ratio)
 

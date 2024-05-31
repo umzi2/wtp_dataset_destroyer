@@ -6,7 +6,7 @@ from ..utils.random import safe_uniform, safe_randint
 
 from ..utils.registry import register_class
 from .custom_blur import motion_blur, lens_blur, box_blur
-import picologging as logging
+import logging
 
 
 @register_class("blur")
@@ -63,21 +63,21 @@ class Blur:
         sigma = safe_uniform(self.kernels["gauss"])
         if sigma <= 0.0:
             return lq
-        logging.debug("Blur -  type: guss kernel: %.3f", sigma)
+        logging.debug("Blur -  type: guss kernel: %.4f", sigma)
         return cv.GaussianBlur(lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT)
 
     def __box(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["box"])
         if kernel <= 0.0:
             return lq
-        logging.debug("Blur -  type: box kernel: %.3f", kernel)
+        logging.debug("Blur -  type: box kernel: %.4f", kernel)
         return box_blur(lq, kernel)
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["lens"])
         if kernel <= 0.0:
             return lq
-        logging.debug("Blur -  type: lens kernel: %.3f", kernel)
+        logging.debug("Blur -  type: lens kernel: %.4f", kernel)
         return lens_blur(lq, kernel)
 
     def __motion(self, lq: np.ndarray) -> np.ndarray:

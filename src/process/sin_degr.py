@@ -4,7 +4,7 @@ import random
 import numpy as np
 from ..utils.registry import register_class
 from ..utils.random import safe_uniform
-import picologging as logging
+import logging
 
 
 @register_class("sin")
@@ -49,10 +49,10 @@ class Sin:
             alpha = safe_uniform(self.alpha)
             vertical = probability(self.vertical_prob)
             bias = safe_uniform(self.bias)
-            logging.debug("Sin - shape: %s alpha: %.3f vertical: %s bias: %.3f", shape, alpha, vertical, bias)
+            logging.debug("Sin - shape: %s alpha: %.4f vertical: %s bias: %.4f", shape, alpha, vertical, bias)
             lq = sin_patern(
                 lq, shape_sin=shape, alpha=alpha, vertical=vertical, bias=bias
             )
             return lq, hq
         except Exception as e:
-            logging.error("Sin error: %s",e)
+            logging.error("Sin error: %s", e)

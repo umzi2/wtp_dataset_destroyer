@@ -6,7 +6,7 @@ from numpy import random
 
 from ..utils.random import safe_uniform, safe_randint
 from src.utils.registry import register_class
-import picologging as logging
+import logging
 
 
 def shift(img, amount_x: int, amount_y: int, fill_color: list | float) -> np.ndarray:
@@ -84,7 +84,7 @@ def shift_percent(
         amount_y = int(shape_img[1] * safe_uniform(amount_channel[1]) / 100)
     if amount_x == 0 and amount_y == 0:
         return img
-    logging.debug("Shift_amount - amount_x: %.3f amount_y: %.3f", amount_x, amount_y)
+    logging.debug("Shift_amount - amount_x: %.4f amount_y: %.4f", amount_x, amount_y)
     return shift(img, amount_x, amount_y, fill_color)
 
 

@@ -5,7 +5,7 @@ from pepeline import noise_generate, cvt_color, CvtType
 from ..utils.random import safe_uniform, safe_arange
 
 from ..utils.registry import register_class
-import picologging as logging
+import logging
 
 
 @register_class("noise")
@@ -88,7 +88,7 @@ class Noise:
             noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
-        logging.debug("%s noise_type: %s alpha: %.3f bias: %.3f octaves: %s frequency: %.3f lacunarity: %.3f",
+        logging.debug("%s noise_type: %s alpha: %.4f bias: %.4f octaves: %s frequency: %.4f lacunarity: %.4f",
                       self.default_debug, self.noise_type, alpha, bias, octaves, frequency, lacunarity)
         return lq + noise
 
@@ -101,7 +101,7 @@ class Noise:
             noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
-        logging.debug("%s noise_type: %s alpha: %.3f bias: %.3f",
+        logging.debug("%s noise_type: %s alpha: %.4f bias: %.4f",
                       self.default_debug, self.noise_type, alpha, bias)
         return (lq + noise).astype(np.float32)
 
@@ -114,7 +114,7 @@ class Noise:
             noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
-        logging.debug("%s noise_type: %s alpha: %.3f bias: %.3f",
+        logging.debug("%s noise_type: %s alpha: %.4f bias: %.4f",
                       self.default_debug, self.noise_type, alpha, bias)
 
         return (lq + noise).astype(np.float32)
@@ -127,20 +127,20 @@ class Noise:
 
     def __salt_and_pepper(self, lq: np.ndarray) -> np.ndarray:
         noise, probability_sp = self.__salt_and_pepper_core(lq.shape)
-        logging.debug("%s noise_type: %s probability: %.3f",
+        logging.debug("%s noise_type: %s probability: %.4f",
                       self.default_debug, self.noise_type, probability_sp)
         lq = np.where(noise > probability_sp, lq, 1)
         return np.where(noise < 1 - probability_sp, lq, 0).astype(np.float32)
 
     def __salt(self, lq: np.ndarray) -> np.ndarray:
         noise, probability_sp = self.__salt_and_pepper_core(lq.shape)
-        logging.debug("%s noise_type: %s probability: %.3f",
+        logging.debug("%s noise_type: %s probability: %.4f",
                       self.default_debug, self.noise_type, probability_sp)
         return np.where(noise > probability_sp, lq, 1).astype(np.float32)
 
     def __pepper(self, lq: np.ndarray) -> np.ndarray:
         noise, probability_sp = self.__salt_and_pepper_core(lq.shape)
-        logging.debug("%s noise_type: %s probability: %.3f",
+        logging.debug("%s noise_type: %s probability: %.4f",
                       self.default_debug, self.noise_type, probability_sp)
         return np.where(noise < 1 - probability_sp, lq, 0).astype(np.float32)
 

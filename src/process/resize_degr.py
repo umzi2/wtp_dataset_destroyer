@@ -7,7 +7,7 @@ from .utils import probability
 from ..utils.random import safe_uniform, safe_randint, safe_arange
 
 from ..utils.registry import register_class
-import picologging as logging
+import logging
 
 
 @register_class("resize")
@@ -110,7 +110,7 @@ class Resize:
             spread = random.choice(self.spread_arange)
             height = self.__real_size(height // spread)
             width = self.__real_size(width // spread)
-            logging.debug("Resize - algorithm_lq: %s algorithm_hq: %s spread: %.3f", algorithm_lq, algorithm_hq, spread)
+            logging.debug("Resize - algorithm_lq: %s algorithm_hq: %s spread: %.4f", algorithm_lq, algorithm_hq, spread)
             if algorithm_lq == "down_up":
                 lq = self.__down_up(lq, width, height)
                 algorithm_lq = random.choice(self.down_up_alg_down)

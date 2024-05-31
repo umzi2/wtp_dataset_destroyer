@@ -5,7 +5,7 @@ from .utils import probability
 from .custom_blur import box_blur
 from ..utils.random import safe_uniform
 from ..utils.registry import register_class
-import picologging as logging
+import logging
 
 
 @register_class("halo")
@@ -48,7 +48,8 @@ class Halo:
         sharpening_factor = safe_uniform(self.factor)
         kernel = safe_uniform(self.kernel)
         laplacian = random.choice(self.laplacian)
-        logging.debug("Halo: type: laplacian sharpening_factor: %.3f kernel: %.3f laplacian_size: %s", sharpening_factor,
+        logging.debug("Halo: type: laplacian sharpening_factor: %.4f kernel: %.4f laplacian_size: %s",
+                      sharpening_factor,
                       kernel, laplacian)
         if kernel:
             img_gray = box_blur(img_gray, kernel)
@@ -63,14 +64,17 @@ class Halo:
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
         threshold = safe_uniform(self.threshold)
-        logging.debug("Halo: type: uniform amount: %.3f kernel: %.3f  threshold: %.3f", amount,
+        logging.debug("Halo: type: uniform amount: %.4f kernel: %.4f  threshold: %.4f", amount,
                       sigma, threshold)
         blurred = cv.GaussianBlur(lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT)
-        sharpened = np.clip(float(amount + 1) * lq - float(amount) * blurred, 0, 1)
-        if threshold > 0:
-            low_contrast_mask = np.absolute(lq - blurred) < threshold
-            np.copyto(sharpened, lq, where=low_contrast_mask)
-        return sharpened
+        if threshold == 0:
+            lq = cv.addWeighted(lq, amount + 1, blurred, -amount, 0)
+        else:
+            diff = lq - blurred
+            diff = np.sign(diff) * np.maximum(0, np.abs(diff) - threshold)
+            lq = lq + diff * amount
+
+        return lq
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Applies the selected halo loss reduction technique to the input image.
@@ -93,4 +97,4 @@ class Halo:
 
             return lq, hq
         except Exception as e:
-            logging.error("Halo error: %s",e)
+            logging.error("Halo error: %s", e)

@@ -5,7 +5,7 @@ from numpy import random
 from .utils import probability, lq_hq2grays
 from ..utils.random import safe_uniform, safe_randint
 from ..utils.registry import register_class
-import picologging as logging
+import logging
 
 
 @register_class("screentone")
