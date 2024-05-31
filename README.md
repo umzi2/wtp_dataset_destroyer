@@ -29,6 +29,9 @@ Designed for web art. Currently it's in early beta.
 
 [Shift](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/shift.md)
 
+[Pixelate](
+https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/pixelate.md)
+
 # Creators:
 [Add Degradation](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/creators/add_degradation.md)
 
