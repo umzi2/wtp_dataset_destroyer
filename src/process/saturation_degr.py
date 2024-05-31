@@ -44,7 +44,7 @@ class Saturation:
             hsv_image = cv.cvtColor(lq, cv.COLOR_RGB2HSV)
             decreased_saturation = hsv_image.copy()
             decreased_saturation[:, :, 1] = (
-                    decreased_saturation[:, :, 1] * random_saturation
+                decreased_saturation[:, :, 1] * random_saturation
             )
             return cv.cvtColor(decreased_saturation, cv.COLOR_HSV2RGB), hq
         except Exception as e:

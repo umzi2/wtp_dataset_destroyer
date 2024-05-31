@@ -55,7 +55,12 @@ class Color:
                 out_high=high_output,
                 gamma=gamma,
             )
-            logging.debug("Color - low_output: %s high_output: %s gamma: %.4f ", low_output, high_output, gamma)
+            logging.debug(
+                "Color - low_output: %s high_output: %s gamma: %.4f ",
+                low_output,
+                high_output,
+                gamma,
+            )
             return lq, hq
         except Exception as e:
             logging.error("Color error: %s", e)

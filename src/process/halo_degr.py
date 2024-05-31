@@ -48,9 +48,12 @@ class Halo:
         sharpening_factor = safe_uniform(self.factor)
         kernel = safe_uniform(self.kernel)
         laplacian = random.choice(self.laplacian)
-        logging.debug("Halo: type: laplacian sharpening_factor: %.4f kernel: %.4f laplacian_size: %s",
-                      sharpening_factor,
-                      kernel, laplacian)
+        logging.debug(
+            "Halo: type: laplacian sharpening_factor: %.4f kernel: %.4f laplacian_size: %s",
+            sharpening_factor,
+            kernel,
+            laplacian,
+        )
         if kernel:
             img_gray = box_blur(img_gray, kernel)
         laplacian = cv.Laplacian(img_gray, cv.CV_32F, ksize=laplacian)
@@ -64,9 +67,15 @@ class Halo:
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
         threshold = safe_uniform(self.threshold)
-        logging.debug("Halo: type: uniform amount: %.4f kernel: %.4f  threshold: %.4f", amount,
-                      sigma, threshold)
-        blurred = cv.GaussianBlur(lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT)
+        logging.debug(
+            "Halo: type: uniform amount: %.4f kernel: %.4f  threshold: %.4f",
+            amount,
+            sigma,
+            threshold,
+        )
+        blurred = cv.GaussianBlur(
+            lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+        )
         if threshold == 0:
             lq = cv.addWeighted(lq, amount + 1, blurred, -amount, 0)
         else:

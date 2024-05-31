@@ -49,7 +49,13 @@ class Sin:
             alpha = safe_uniform(self.alpha)
             vertical = probability(self.vertical_prob)
             bias = safe_uniform(self.bias)
-            logging.debug("Sin - shape: %s alpha: %.4f vertical: %s bias: %.4f", shape, alpha, vertical, bias)
+            logging.debug(
+                "Sin - shape: %s alpha: %.4f vertical: %s bias: %.4f",
+                shape,
+                alpha,
+                vertical,
+                bias,
+            )
             lq = sin_patern(
                 lq, shape_sin=shape, alpha=alpha, vertical=vertical, bias=bias
             )

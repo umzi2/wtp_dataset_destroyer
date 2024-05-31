@@ -53,8 +53,12 @@ class Pixelate:
             logging.debug("Pixelate - size: %.4f", pixel_size)
 
             # Apply the pixelation effect by resizing the image to a smaller size and then back to the original size.
-            lq = resize(lq, (int(shape_img[1] / pixel_size), int(shape_img[0] / pixel_size)), ResizeFilter.Linear,
-                        False)
+            lq = resize(
+                lq,
+                (int(shape_img[1] / pixel_size), int(shape_img[0] / pixel_size)),
+                ResizeFilter.Linear,
+                False,
+            )
             lq = resize(lq, (shape_img[1], shape_img[0]), ResizeFilter.Nearest, False)
 
             return lq, hq

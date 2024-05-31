@@ -84,7 +84,7 @@ class Resize:
         step = safe_randint(self.down_down_step)
         step = (width - width / self.lq_scale) / step
         for down in list(
-                reversed(np.arange(int(width // self.lq_scale), int(width), int(step)))
+            reversed(np.arange(int(width // self.lq_scale), int(width), int(step)))
         )[:-1]:
             lq = resize(
                 lq,
@@ -110,7 +110,12 @@ class Resize:
             spread = random.choice(self.spread_arange)
             height = self.__real_size(height // spread)
             width = self.__real_size(width // spread)
-            logging.debug("Resize - algorithm_lq: %s algorithm_hq: %s spread: %.4f", algorithm_lq, algorithm_hq, spread)
+            logging.debug(
+                "Resize - algorithm_lq: %s algorithm_hq: %s spread: %.4f",
+                algorithm_lq,
+                algorithm_hq,
+                spread,
+            )
             if algorithm_lq == "down_up":
                 lq = self.__down_up(lq, width, height)
                 algorithm_lq = random.choice(self.down_up_alg_down)

@@ -83,7 +83,12 @@ class ImgProcess:
         if debug:
             if not os.path.exists("debug"):
                 os.makedirs("debug")
-            logging.basicConfig(level=logging.DEBUG, filename="debug/debug.log", filemode="w", format="%(message)s")
+            logging.basicConfig(
+                level=logging.DEBUG,
+                filename="debug/debug.log",
+                filemode="w",
+                format="%(message)s",
+            )
             self.map_type = "for"
         for process_dict in process:
             process_type = process_dict["type"]
@@ -133,8 +138,11 @@ class ImgProcess:
                 output_name = img_fold
             else:
                 output_name = f"{n}.png"
-            logging.debug("_____________________________________\n\nReal_name: %s Result_name: %s \n", img_fold,
-                          output_name)
+            logging.debug(
+                "_____________________________________\n\nReal_name: %s Result_name: %s \n",
+                img_fold,
+                output_name,
+            )
             for loss in self.turn:
                 lq, hq = loss.run(lq, hq)
             if self.only_lq:
@@ -157,9 +165,9 @@ class ImgProcess:
             n = self.all_images.index(img_fold)
             for Kx, Ky in np.ndindex(h // self.tile_size, w // self.tile_size):
                 img_tile = img[
-                           self.tile_size * Kx: self.tile_size * (Kx + 1),
-                           self.tile_size * Ky: self.tile_size * (Ky + 1),
-                           ]
+                    self.tile_size * Kx : self.tile_size * (Kx + 1),
+                    self.tile_size * Ky : self.tile_size * (Ky + 1),
+                ]
                 if self.laplace_filter:
                     if laplace_filter(img_tile, self.laplace_filter):
                         continue
@@ -169,8 +177,11 @@ class ImgProcess:
                         continue
                 lq, hq = img_tile, img_tile
                 output_name = f"{str(n)}_{Kx}_{Ky}.png"
-                logging.debug("_____________________________________\n\nReal_name: %s Result_name: %s \n", img_fold,
-                              output_name)
+                logging.debug(
+                    "_____________________________________\n\nReal_name: %s Result_name: %s \n",
+                    img_fold,
+                    output_name,
+                )
                 for loss in self.turn:
                     lq, hq = loss.run(lq, hq)
 

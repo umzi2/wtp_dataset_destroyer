@@ -3,7 +3,9 @@ import cv2
 
 
 def box_blur(img: np.ndarray, kernel_size: float) -> np.ndarray:
-    return cv2.filter2D(img, -1, __box_kernel(kernel_size), borderType=cv2.BORDER_REPLICATE)
+    return cv2.filter2D(
+        img, -1, __box_kernel(kernel_size), borderType=cv2.BORDER_REPLICATE
+    )
 
 
 def __box_kernel(kernel_size: float) -> np.ndarray:

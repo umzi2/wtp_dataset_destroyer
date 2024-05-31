@@ -1,4 +1,4 @@
-#https://github.com/umzi2/Float-lens-blur
+# https://github.com/umzi2/Float-lens-blur
 import numpy as np
 import cv2
 
@@ -16,7 +16,7 @@ def __generate_circle(x: int, y: int, radius: int, center: int) -> bool:
     Returns:
         bool: True if the point is inside the circle, otherwise False.
     """
-    return (x - center) ** 2 + (y - center) ** 2 <= radius ** 2
+    return (x - center) ** 2 + (y - center) ** 2 <= radius**2
 
 
 def lens_blur(image: np.ndarray, dimension: float) -> np.ndarray:
@@ -56,7 +56,9 @@ def __disk_kernel(kernel_size: float) -> np.ndarray:
 
         for i in range(kernel_dim):
             for j in range(kernel_dim):
-                kernel[i, j] = __generate_circle(i, j, circle_radius, circle_center_coord)
+                kernel[i, j] = __generate_circle(
+                    i, j, circle_radius, circle_center_coord
+                )
 
         kernel2 = np.zeros((kernel_dim, kernel_dim), dtype=np.float32)
         circle_center_coord = kernel_dim // 2
@@ -64,7 +66,9 @@ def __disk_kernel(kernel_size: float) -> np.ndarray:
 
         for i in range(kernel_dim):
             for j in range(kernel_dim):
-                kernel2[i, j] = __generate_circle(i, j, circle_radius, circle_center_coord)
+                kernel2[i, j] = __generate_circle(
+                    i, j, circle_radius, circle_center_coord
+                )
 
         kernel = np.clip(kernel + kernel2 * fraction, 0, 1)
     else:
@@ -74,7 +78,9 @@ def __disk_kernel(kernel_size: float) -> np.ndarray:
 
         for i in range(kernel_dim):
             for j in range(kernel_dim):
-                kernel[i, j] = __generate_circle(i, j, circle_radius, circle_center_coord)
+                kernel[i, j] = __generate_circle(
+                    i, j, circle_radius, circle_center_coord
+                )
 
     kernel /= np.sum(kernel)
     return kernel

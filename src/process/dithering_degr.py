@@ -45,8 +45,11 @@ class Dithering:
         self.unif_quantiz = 8
 
     def __error(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
-        logging.debug("Dithering - type: %s quantization %s", self.dithering_type,
-                      self.unif_quantiz)
+        logging.debug(
+            "Dithering - type: %s quantization %s",
+            self.dithering_type,
+            self.unif_quantiz,
+        )
         return error_diffusion_dither(
             lq, quantization, DITHERING_MAP[self.dithering_type]
         )
@@ -56,15 +59,24 @@ class Dithering:
 
     def __order(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         map_size = random.choice(self.map_size)
-        logging.debug("Dithering - type: %s map_size: %s quantization %s", self.dithering_type, map_size,
-                      self.unif_quantiz)
+        logging.debug(
+            "Dithering - type: %s map_size: %s quantization %s",
+            self.dithering_type,
+            map_size,
+            self.unif_quantiz,
+        )
         return ordered_dither(lq, quantization, map_size)
 
     def __riemersma(self, lq: np.ndarray, quantization: UQ) -> np.ndarray:
         history = safe_randint(self.history)
         decay_ratio = safe_uniform(self.ratio)
-        logging.debug("Dithering - type: %s history: %s decay_ratio: %.4f quantization %s", self.dithering_type, history, decay_ratio,
-                      self.unif_quantiz)
+        logging.debug(
+            "Dithering - type: %s history: %s decay_ratio: %.4f quantization %s",
+            self.dithering_type,
+            history,
+            decay_ratio,
+            self.unif_quantiz,
+        )
         return riemersma_dither(lq, quantization, history, decay_ratio)
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):

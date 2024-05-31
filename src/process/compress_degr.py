@@ -51,7 +51,7 @@ class Compress:
             }
 
     def __video_core(
-            self, lq: np.ndarray, codec: str, output_args: dict, container: str = "mpeg"
+        self, lq: np.ndarray, codec: str, output_args: dict, container: str = "mpeg"
     ) -> np.ndarray:
         width, height = lq.shape[:2]
 
@@ -102,7 +102,6 @@ class Compress:
         return self.__video_core(lq, "hevc", output_args)
 
     def __mpeg(self, lq: np.ndarray, quality: int) -> np.ndarray:
-
         output_args = {
             "qscale:v": str(quality),
             "qmax": str(quality),
@@ -164,7 +163,9 @@ class Compress:
 
             algorithm = random.choice(self.algorithm)
             random_comp = safe_randint(self.target_compress[algorithm])
-            logging.debug("Compress - algorithm: %s compress: %s", algorithm, random_comp)
+            logging.debug(
+                "Compress - algorithm: %s compress: %s", algorithm, random_comp
+            )
             lq = COMPRESS_TYPE_MAP[algorithm](lq, random_comp)
 
             if gray:

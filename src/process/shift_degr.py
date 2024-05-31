@@ -36,7 +36,7 @@ def shift(img, amount_x: int, amount_y: int, fill_color: list | float) -> np.nda
 
 
 def shift_int(
-        img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
+    img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
 ) -> (int, int):
     """
     Shifts the image by random integer amounts within the specified ranges.
@@ -62,7 +62,7 @@ def shift_int(
 
 
 def shift_percent(
-        img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
+    img: np.ndarray, amount_channel: list[list[int]], fill_color: list[float]
 ) -> (int, int):
     """
     Shifts the image by random percentages of its dimensions within the specified ranges.
@@ -188,7 +188,9 @@ class Shift:
         cmyk_img = cvt_color(img, CvtType.RGB2CMYK)
         for c in range(4):
             channel_amount = self.cmyk_amount_list[c]
-            cmyk_img[:, :, c] = self.shift_channel(cmyk_img[:, :, c], channel_amount, [0])
+            cmyk_img[:, :, c] = self.shift_channel(
+                cmyk_img[:, :, c], channel_amount, [0]
+            )
         return cvt_color(cmyk_img, CvtType.CMYK2RGB)
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> np.ndarray:

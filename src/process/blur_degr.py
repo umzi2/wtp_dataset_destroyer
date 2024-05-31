@@ -64,7 +64,9 @@ class Blur:
         if sigma <= 0.0:
             return lq
         logging.debug("Blur -  type: guss kernel: %.4f", sigma)
-        return cv.GaussianBlur(lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT)
+        return cv.GaussianBlur(
+            lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+        )
 
     def __box(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["box"])
@@ -96,7 +98,7 @@ class Blur:
         kernel = self.__kernel_odd(kernel)
         logging.debug("Blur -  type: median kernel: %s", kernel)
         return (
-                cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
+            cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
         )
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
