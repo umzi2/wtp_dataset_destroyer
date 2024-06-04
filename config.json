@@ -1,6 +1,6 @@
 {
-  "input": "lq",
-  "output": "degr",
+  "input": "path\to\input",
+  "output": "path\to\output",
   "process":
     [{
       "type": "resize",
@@ -13,8 +13,8 @@
 
     }
     ],
-  "num_workers": 16,
-  "map_type": "process",
+  "num_workers": 8,
+  "map_type": "thread",
 
 
   "tile": {
