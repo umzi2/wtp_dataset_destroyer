@@ -1,6 +1,6 @@
 {
-  "input": "path\to\input",
-  "output": "path\to\output",
+  "input": "path/to/input",
+  "output": "path/to/output",
   "process":
     [{
       "type": "resize",
