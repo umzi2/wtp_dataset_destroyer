@@ -47,7 +47,7 @@ class Sin:
                 return lq, hq
             shape = random.randrange(*self.shape)
             alpha = safe_uniform(self.alpha)
-            vertical = probability(self.vertical_prob)
+            vertical = not probability(self.vertical_prob)
             bias = safe_uniform(self.bias)
             logging.debug(
                 "Sin - shape: %s alpha: %.4f vertical: %s bias: %.4f",
