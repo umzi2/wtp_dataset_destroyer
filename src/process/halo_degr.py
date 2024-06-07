@@ -1,9 +1,7 @@
 import numpy as np
 from chainner_ext import binary_threshold
-from numpy import random
 import cv2 as cv
 from .utils import probability
-from .custom_blur import box_blur
 from ..utils.random import safe_uniform
 from ..utils.registry import register_class
 import logging
