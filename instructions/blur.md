@@ -31,3 +31,19 @@ standard:
 motion:
 - `motion_size`* - The motion blur size. Uses `[uint, uint]`
 - `motion_angle`* - Degree of rotation for motion blur. Uses `[int, int]`
+## Examples:
+
+
+  <div> Raw</div>
+  <img src="images/blur/raw.png" alt="raw" title="raw_img">
+  <div> Box kernel: 2</div>
+  <img src="images/blur/box_2.png" alt="box_2" title="box_img">
+  <div> Gauss kernel: 2</div>
+  <img src="images/blur/gauss_2.png" alt="gauss_2" title="gauss_img">
+  <div> Lens kernel: 2</div>
+  <img src="images/blur/lens_2.png" alt="lens_2" title="lens_img">
+  <div> Median kernel: 3</div>
+  <img src="images/blur/median_3.png" alt="median_3" title="median_img">
+  <div> Motion size: 10, angle 30</div>
+  <img src="images/blur/motion_10_30.png" alt="motion_10_30" title="motion_img">
+

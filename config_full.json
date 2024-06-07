@@ -98,7 +98,8 @@
       "kernel": [0,3],
       "sharpening_factor": [0, 2],
       "amount": [0,1],
-      "threshold": [0,0.5]
+      "threshold": [0,0.5],
+      "probability": 0.5
     },
 
     {
