@@ -14,12 +14,8 @@ class Halo:
     Args:
         halo_loss_dict (dict): A dictionary containing halo loss reduction settings.
             It should include the following keys:
-                - "sharpening_factor" (list of int, optional): Range of sharpening factors.
-                    Defaults to [0, 2].
                 - "kernel" (list of int, optional): Range of kernel sizes.
                     Defaults to [0, 2].
-                - "laplacian" (list of int, optional): List of Laplacian kernel sizes.
-                    Defaults to [3].
                 - "probability" (float, optional): Probability of applying halo loss reduction. Defaults to 1.0.
                 - "type_halo" (list of str, optional): List of halo loss reduction types.
                     Defaults to ["laplacian"].
