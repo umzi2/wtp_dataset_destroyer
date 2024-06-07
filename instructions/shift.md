@@ -1,7 +1,7 @@
 ```json
   {
     "type": "shift",
-    "shift_type": ["cmyk"],
+    "shift_type": ["rgb", "yuv", "cmyk"],
     "percent": true,
     "rgb": {
       "r": [[-10,10],[-10,10]],
@@ -33,3 +33,13 @@
    - The second controls the y offset
 - `not_target`* - Values that will be used if there are no valid values in the channel
 - `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+## Examples:
+### all percent = true
+<div> raw</div>
+<img src="images/shift/raw.png" title="raw_img">
+<div> rgb r = [[-1], [1]] g = [[1], [1]] b = [[-1], [-1]]</div>
+<img src="images/shift/rgb.png" title="rgb_img">
+<div> cmyk c = [[-1], [1]] m = [[1], [1]] y = [[-1], [-1]] k = [[0], [0]]</div>
+<img src="images/shift/cmyk.png" title="cmyk_img">
+<div> yuv y = [[-1], [1]] u = [[1], [1]] v = [[-1], [-1]]</div>
+<img src="images/shift/yuv.png" title="yuv_img">
