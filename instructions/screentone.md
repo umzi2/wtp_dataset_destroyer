@@ -27,3 +27,18 @@
 - `dot_size` - Controls the size of generated points. Accepts a range
 - `lqhq`* - Equates hq to lq, assuming the screentone is first in line
 - `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+## Examples:
+### all dot_size = 7
+<div> raw</div>
+<img src="images/screentone/raw.png" title="raw_img">
+<div> not_rot</div>
+<img src="images/screentone/not_rot.png" title="not_rot_img">
+<div> gray</div>
+<img src="images/screentone/gray.png" title="gray_img">
+<div> rgb r = -30 g = 0 b = 30 </div>
+<img src="images/screentone/rgb.png" title="rgb_img">
+<div> cmyk c = -45 m = 30 y = 15 k = 15</div>
+<img src="images/screentone/cmyk.png" title="cmyk_img">
+<div> cmyk_alpha 0.8</div>
+<img src="images/screentone/cmyk_alpha.png" title="cmyk_alpha_img">
+
