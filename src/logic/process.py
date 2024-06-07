@@ -163,6 +163,8 @@ class ImgProcess:
             img = self.__img_read(img_fold)
             h, w = img.shape[:2]
             n = self.all_images.index(img_fold)
+            if h < self.tile_size or w < self.tile_size:
+                logging.error("Tile size is larger than the size of your images")
             for Kx, Ky in np.ndindex(h // self.tile_size, w // self.tile_size):
                 img_tile = img[
                     self.tile_size * Kx : self.tile_size * (Kx + 1),
