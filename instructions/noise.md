@@ -67,7 +67,7 @@ Additional settings for this noise list ("salt","pepper","salt_and_pepper")
 <img src="images/noise/salt_and_pepper.png" title="salt_and_pepper_img">
 
 ## Examples 2:
-all alpha = 0.5
+### all alpha = 0.5
 <div> uniform y_noise = 1.0</div>
 <img src="images/noise/uniform_y.png" title="uniform_y_img">
 <div> uniform uv_noise = 1.0</div>
