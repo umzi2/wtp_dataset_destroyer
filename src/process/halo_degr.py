@@ -32,37 +32,38 @@ class Halo:
     """
 
     def __init__(self, halo_loss_dict: dict):
-        self.factor = halo_loss_dict.get("sharpening_factor", [0, 2])
         self.kernel = halo_loss_dict.get("kernel", [0, 2])
-        self.laplacian = halo_loss_dict.get("laplacian", [3])
         self.probability = halo_loss_dict.get("probability", 1.0)
-        self.type = halo_loss_dict.get("type_halo", ["laplacian"])
         self.amount = halo_loss_dict.get("amount", [1, 1])
         threshold = halo_loss_dict.get("threshold", [0, 0])
         self.threshold = [threshold[0] / 255, threshold[1] / 255]
+        self.type = halo_loss_dict.get("type_halo", ["unsharp_mask"])
 
-    def __laplacian(self, lq: np.ndarray) -> np.ndarray:
-        if np.ndim(lq) != 2:
-            img_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
-        else:
-            img_gray = lq
-        sharpening_factor = safe_uniform(self.factor)
-        kernel = safe_uniform(self.kernel)
-        laplacian = random.choice(self.laplacian)
-        logging.debug(
-            "Halo: type: laplacian sharpening_factor: %.4f kernel: %.4f laplacian_size: %s",
-            sharpening_factor,
-            kernel,
-            laplacian,
-        )
-        if kernel:
-            img_gray = box_blur(img_gray, kernel)
-        laplacian = cv.Laplacian(img_gray, cv.CV_32F, ksize=laplacian)
-        sharpened_image = img_gray - sharpening_factor * laplacian
-        _, sharpened_image = cv.threshold(sharpened_image, 0.98, 1, 0, cv.THRESH_BINARY)
-        if np.ndim(lq) != 2:
-            sharpened_image = np.stack([sharpened_image] * 3, axis=-1)
-        return np.clip(lq + sharpened_image, 0, 1).astype(np.float32)
+
+    # Removed because unsharp_halo produces similar results
+
+    # def __laplacian(self, lq: np.ndarray) -> np.ndarray:
+    #     if np.ndim(lq) != 2:
+    #         img_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
+    #     else:
+    #         img_gray = lq
+    #     sharpening_factor = safe_uniform(self.factor)
+    #     kernel = safe_uniform(self.kernel)
+    #     laplacian = random.choice(self.laplacian)
+    #     logging.debug(
+    #         "Halo: type: laplacian sharpening_factor: %.4f kernel: %.4f laplacian_size: %s",
+    #         sharpening_factor,
+    #         kernel,
+    #         laplacian,
+    #     )
+    #     if kernel:
+    #         img_gray = box_blur(img_gray, kernel)
+    #     laplacian = cv.Laplacian(img_gray, cv.CV_32F, ksize=laplacian)
+    #     sharpened_image = img_gray - sharpening_factor * laplacian
+    #     _, sharpened_image = cv.threshold(sharpened_image, 0.98, 1, 0, cv.THRESH_BINARY)
+    #     if np.ndim(lq) != 2:
+    #         sharpened_image = np.stack([sharpened_image] * 3, axis=-1)
+    #     return np.clip(lq + sharpened_image, 0, 1).astype(np.float32)
 
     def __unsharp_mask(self, lq: np.ndarray) -> np.ndarray:
         sigma = safe_uniform(self.kernel)
@@ -126,11 +127,9 @@ class Halo:
             if probability(self.probability):
                 return lq, hq
             type_halo = np.random.choice(self.type)
-            if type_halo == "laplacian":
-                lq = self.__laplacian(lq)
-            elif type_halo == "unsharp_mask":
+            if type_halo == "unsharp_mask":
                 lq = self.__unsharp_mask(lq)
-            elif type_halo == "unsharp_halo":
+            else:
                 lq = self.__unsharp_halo(lq)
 
             return lq, hq
