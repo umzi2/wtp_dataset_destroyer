@@ -38,3 +38,8 @@
 - `gamma_correction`* - Enable or disable gamma correction in chainner_ext
 - `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
 
+## Examples:
+<div> Raw</div>
+<img src="images/resize/raw.png" title="raw_img">
+<div> Box scale = 4</div>
+<img src="images/resize/box_4.png" title="box_img">
