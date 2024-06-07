@@ -46,6 +46,8 @@ class Color:
             in_high = 255
             high_output = safe_randint(self.high_list)
             low_output = safe_randint(self.low_list)
+            if low_output > high_output:
+                high_output = low_output+10
             gamma = safe_uniform(self.gamma)
             lq = fast_color_level(
                 lq,
