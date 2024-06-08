@@ -23,5 +23,7 @@ all kernel = 3 amount = 4
 <img src="images/halo/raw.png" title="raw_img">
 <div> Unsharp_halo</div>
 <img src="images/halo/unsharp_halo.png" title="unsharp_halo_img">
+<div> Unsharp_gray</div>
+<img src="images/halo/unsharp_gray.png" title="unsharp_halo_img">
 <div> Unsharp_mask threshold: 10</div>
 <img src="images/halo/unsharp_mask.png" title="unsharp_mask_img">

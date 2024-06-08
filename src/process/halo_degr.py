@@ -33,7 +33,6 @@ class Halo:
         self.threshold = [threshold[0] / 255, threshold[1] / 255]
         self.type = halo_loss_dict.get("type_halo", ["unsharp_mask"])
 
-
     # Removed because unsharp_halo produces similar results
 
     # def __laplacian(self, lq: np.ndarray) -> np.ndarray:
@@ -65,23 +64,20 @@ class Halo:
             rgb = True
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
-        logging.debug(
-            "Halo: type: unsharp_gray amount: %.4f kernel: %.4f ",
-            amount,
-            sigma,
-        )
+
         blurred = cv.GaussianBlur(
             lq_gray, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
         )
         diff = lq_gray - blurred
-        diff = np.maximum(0, np.sign(diff) * np.abs(diff))
+        diff = np.maximum(0, np.sign(diff) * np.abs(diff)) * amount
         if rgb:
-            lq[..., 0] = np.minimum(1, lq[..., 0] + diff)
-            lq[..., 1] = np.minimum(1, lq[..., 1] + diff)
-            lq[..., 2] = np.minimum(1, lq[..., 2] + diff)
+            lq[..., 0] = lq[..., 0] + diff
+            lq[..., 1] = lq[..., 1] + diff
+            lq[..., 2] = lq[..., 2] + diff
         else:
-            lq = np.clip( lq + diff,0,1)
-        return lq
+            lq = lq + diff
+        return np.clip(lq, 0, 1)
+
     def __unsharp_mask(self, lq: np.ndarray) -> np.ndarray:
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
