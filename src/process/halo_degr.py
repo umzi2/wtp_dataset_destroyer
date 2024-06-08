@@ -58,13 +58,36 @@ class Halo:
     #     if np.ndim(lq) != 2:
     #         sharpened_image = np.stack([sharpened_image] * 3, axis=-1)
     #     return np.clip(lq + sharpened_image, 0, 1).astype(np.float32)
-
+    def __unsharp_gray(self, lq: np.ndarray) -> np.ndarray:
+        rgb = False
+        if lq.ndim == 3:
+            lq_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
+            rgb = True
+        sigma = safe_uniform(self.kernel)
+        amount = safe_uniform(self.amount)
+        logging.debug(
+            "Halo: type: unsharp_gray amount: %.4f kernel: %.4f ",
+            amount,
+            sigma,
+        )
+        blurred = cv.GaussianBlur(
+            lq_gray, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+        )
+        diff = lq_gray - blurred
+        diff = np.maximum(0, np.sign(diff) * np.abs(diff))
+        if rgb:
+            lq[..., 0] = np.minimum(1, lq[..., 0] + diff)
+            lq[..., 1] = np.minimum(1, lq[..., 1] + diff)
+            lq[..., 2] = np.minimum(1, lq[..., 2] + diff)
+        else:
+            lq = np.clip( lq + diff,0,1)
+        return lq
     def __unsharp_mask(self, lq: np.ndarray) -> np.ndarray:
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
         threshold = safe_uniform(self.threshold)
         logging.debug(
-            "Halo: type: uniform amount: %.4f kernel: %.4f  threshold: %.4f",
+            "Halo: type: unsharp_mask amount: %.4f kernel: %.4f  threshold: %.4f",
             amount,
             sigma,
             threshold,
@@ -123,6 +146,8 @@ class Halo:
             type_halo = np.random.choice(self.type)
             if type_halo == "unsharp_mask":
                 lq = self.__unsharp_mask(lq)
+            elif type_halo == "unsharp_gray":
+                lq = self.__unsharp_gray(lq)
             else:
                 lq = self.__unsharp_halo(lq)
 
