@@ -49,4 +49,3 @@ YUV_MAP = {
     "709": [CvtType.RGB2YCvCrBt709, CvtType.YCvCr2RGBBt709]
 
 }
-print(SUBSAMPLING_MAP.keys())
