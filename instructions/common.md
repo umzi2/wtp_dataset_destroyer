@@ -36,6 +36,7 @@
   - This is very performance intensive.
 - `debug`* - Creates a `debug` folder if it doesn't exist, and in it creates a `debug.log` file where all random values during degradation processes will be logged. When enabled, it ignores map_type by setting it to `for`.
 - `out_clear`* - Cleans the output directory out_path/lq|hq if it exists and contains files. Just to make the tests easier
+
 Doesn't work with tile:
 - `only_lq`* - Saves only lq files without hq. `spread` in resize causes discrepancies, so turn it off
 - `real_name`* - When saving, the names do not change
