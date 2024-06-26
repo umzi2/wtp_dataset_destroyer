@@ -193,7 +193,7 @@ class Shift:
             )
         return cvt_color(cmyk_img, CvtType.CMYK2RGB)
 
-    def run(self, lq: np.ndarray, hq: np.ndarray) -> np.ndarray:
+    def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """
         Runs the shift transformation on the low-quality (lq) image, optionally returns high-quality (hq) image.
 

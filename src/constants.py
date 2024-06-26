@@ -1,5 +1,5 @@
 from chainner_ext import ResizeFilter
-from pepeline import TypeNoise
+from pepeline import TypeNoise, CvtType
 from chainner_ext import DiffusionAlgorithm
 
 INTERPOLATION_MAP = {
@@ -33,3 +33,20 @@ DITHERING_MAP = {
     "tworowsierra": DiffusionAlgorithm.TwoRowSierra,
     "sierraLite": DiffusionAlgorithm.SierraLite,
 }
+
+SUBSAMPLING_MAP = {
+    "4:4:4": [1, 1, 1],
+    "4:2:2": [1, 0.5, 0.5],
+    "4:2:1": [1, 0.5, 0.25],
+    "4:1:1": [1, 0.25, 0.25],
+    "4:2:0": [1, 0.5, 0.125],
+    "4:1:0": [1, 0.25, 0.125],
+    "3:1:1": [0.75, 0.25, 0.25]
+}
+YUV_MAP = {
+    "2020": [CvtType.RGB2YCvCrBt2020, CvtType.YCvCr2RGBBt2020],
+    "601": [CvtType.RGB2YCbCr, CvtType.YCbCr2RGB],
+    "709": [CvtType.RGB2YCvCrBt709, CvtType.YCvCr2RGBBt709]
+
+}
+print(SUBSAMPLING_MAP.keys())

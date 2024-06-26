@@ -2,6 +2,7 @@ import numpy as np
 from .utils import probability, normalize_noise as normalize
 from ..constants import NOISE_MAP
 from pepeline import noise_generate, cvt_color, CvtType
+from chainner_ext import resize, ResizeFilter
 from ..utils.random import safe_uniform, safe_arange
 
 from ..utils.registry import register_class
@@ -59,6 +60,8 @@ class Noise:
         self.frequency_rand = safe_arange(frequency_range)
         lacunarity_range = noise_dict.get("lacunarity", [0.4, 0.5, 0.5])
         self.lacunarity_rand = safe_arange(lacunarity_range)
+        self.scale = noise_dict.get("scale")
+        self.scale_cof = 1.0
 
         self.bias = noise_dict.get("bias", [0, 0])
         # salt_or_pepper
@@ -66,6 +69,12 @@ class Noise:
             "probability_salt_or_pepper", [0, 0.5]
         )
         self.default_debug = "Noise - color_type: gray"
+
+    def noise_scale(self, noise: np.ndarray) -> np.ndarray:
+        shape = noise.shape
+        self.scale_cof = safe_uniform(self.scale)
+        return resize(noise.astype(np.float32), (int(shape[1] * self.scale_cof), int(shape[0] * self.scale_cof)),
+                      ResizeFilter.CubicBSpline, False).squeeze()[:shape[0], :shape[1]]
 
     def __procedural_noises(self, lq: np.ndarray) -> np.ndarray:
         octaves = np.random.choice(self.octaves_rand)
@@ -102,6 +111,8 @@ class Noise:
 
     def __gauss(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.normal(0, 0.25, lq.shape)
+        if self.scale:
+            noise = self.noise_scale(noise)
         bias = 0
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
@@ -110,16 +121,19 @@ class Noise:
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
-            "%s noise_type: %s alpha: %.4f bias: %.4f",
+            "%s noise_type: %s alpha: %.4f bias: %.4f scale: %.4f",
             self.default_debug,
             self.noise_type,
             alpha,
             bias,
+            self.scale_cof
         )
         return (lq + noise).astype(np.float32)
 
     def __uniform_noise(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.uniform(-1, 1, lq.shape)
+        if self.scale:
+            noise = self.noise_scale(noise)
         bias = 0
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
@@ -128,11 +142,12 @@ class Noise:
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
-            "%s noise_type: %s alpha: %.4f bias: %.4f",
+            "%s noise_type: %s alpha: %.4f bias: %.4f scale: %.4f",
             self.default_debug,
             self.noise_type,
             alpha,
             bias,
+            self.scale_cof
         )
 
         return (lq + noise).astype(np.float32)

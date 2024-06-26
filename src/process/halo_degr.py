@@ -62,6 +62,8 @@ class Halo:
         if lq.ndim == 3:
             lq_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
             rgb = True
+        else:
+            lq_gray = lq
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
 
@@ -105,6 +107,8 @@ class Halo:
         if lq.ndim == 3:
             lq_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
             rgb = True
+        else:
+            lq_gray = lq
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
         logging.debug(

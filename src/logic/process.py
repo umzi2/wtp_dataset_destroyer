@@ -8,6 +8,7 @@ from os import listdir
 from os.path import join
 from tqdm import tqdm
 
+from ..utils.process import del_all_file
 from ..utils.registry import get_class
 import logging
 
@@ -62,6 +63,7 @@ class ImgProcess:
         self.gray_or_color = config.get("gray_or_color")
         self.gray = config.get("gray")
         process = config["process"]
+        del_out_dir = config.get("out_clear")
         self.all_images = [
             file
             for file in listdir(self.input)
@@ -98,6 +100,13 @@ class ImgProcess:
             os.makedirs(self.output_lq)
         if not os.path.exists(self.output_hq) and not self.only_lq:
             os.makedirs(self.output_hq)
+        if del_out_dir:
+            lq_fold = join(self.output, "lq")
+            lq_folds = os.listdir(lq_fold)
+            del_all_file(lq_fold, lq_folds)
+            hq_fold = join(self.output, "hq")
+            hq_folds = os.listdir(hq_fold)
+            del_all_file(hq_fold, hq_folds)
 
     def __img_read(self, img_fold: str) -> np.ndarray:
         input_folder = join(self.input, img_fold)

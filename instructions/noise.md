@@ -7,7 +7,8 @@
   "y_noise": 0.3,
   "uv_noise": 0.3,
   "alpha": [0.01,0.5,0.01],
-
+  "scale": [1, 2],
+  
   "octaves": [1,10,1],
   "frequency": [0.1,0.9,0.1],
   "lacunarity": [0.01,0.5,0.01],
@@ -26,6 +27,7 @@
 - `y_noise`* - The chance that the noise will be applied only on the tone component in color images. (Generates color noise)
 - `uv_noise`* - The chance **that noise will only affect color components, ignoring tone in color images** (Generates monochrome noise)
 - `bias` - The noise offset. Uses `[int,int]` with min -1, max 1
+- `scale` - Noise resize increases noise, works only with uniform and gauss.
 
 Additional settings for this noise list ("perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex")
 - `normalize`* - Normalizes noise within the range of `-1 - 1` (bool)
