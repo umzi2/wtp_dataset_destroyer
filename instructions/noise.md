@@ -24,8 +24,10 @@
 - `type` - The list of blur algorithms to use. One is randomly picked per image
 - `alpha`* - Controls how transparent the noise is when overlaid
 - `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
-- `y_noise`* - The chance that the noise will be applied only on the tone component in color images. (Generates color noise)
-- `uv_noise`* - The chance **that noise will only affect color components, ignoring tone in color images** (Generates monochrome noise)
+- `y_noise`* - Generates color noise. 0 = enabled, 1 = disabled
+  - The chance that the noise will be applied only on the tone component in color images.
+- `uv_noise`* - Generates monochrome noise. 0 = enabled, 1 = disabled
+  - The chance **that noise will only affect color components, ignoring tone in color images**
 - `bias` - The noise offset. Uses `[int,int]` with min -1, max 1
 - `scale` - Noise resize increases noise, works only with uniform and gauss.
 
