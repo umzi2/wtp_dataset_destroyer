@@ -46,7 +46,7 @@ class Resize:
     """
 
     def __init__(self, resize_dict: dict):
-        spread = resize_dict.get("spread", [1, 1, 1])
+        spread = resize_dict.get("spread", [1])
         self.spread_arange = safe_arange(spread)
 
         self.lq_algorithm = resize_dict["alg_lq"]
@@ -107,7 +107,9 @@ class Resize:
             height, width = lq.shape[:2]
             algorithm_lq = random.choice(self.lq_algorithm)
             algorithm_hq = random.choice(self.hq_algorithm)
-            spread = random.choice(self.spread_arange)
+            spread = 1
+            if len(self.spread_arange) > 1:
+                spread = random.choice(self.spread_arange)
             height = self.__real_size(height // spread)
             width = self.__real_size(width // spread)
             logging.debug(
