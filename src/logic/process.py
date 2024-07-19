@@ -2,7 +2,7 @@ import os
 
 from tqdm.contrib.concurrent import process_map, thread_map
 from ..process.utils import laplace_filter, lq_hq2grays, color_or_gray, img2gray
-from pepeline import read, save
+from pepeline import read, save, ImgColor, ImgFormat
 import numpy as np
 from os import listdir
 from os.path import join
@@ -111,9 +111,9 @@ class ImgProcess:
     def __img_read(self, img_fold: str) -> np.ndarray:
         input_folder = join(self.input, img_fold)
         if self.gray:
-            img = read(str(input_folder), 0, 0)
+            img = read(str(input_folder), ImgColor.GRAY, ImgFormat.F32)
         else:
-            img = read(str(input_folder), 1, 0)
+            img = read(str(input_folder), ImgColor.RGB, ImgFormat.F32)
         if self.gray_or_color:
             img = color_or_gray(img)
         return img

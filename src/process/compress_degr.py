@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import random
 import cv2 as cv
-import ffmpeg
+import sys
 from .utils import probability
 from time import sleep
 from ..utils.random import safe_randint
@@ -9,6 +9,11 @@ from ..utils.random import safe_randint
 from ..utils.registry import register_class
 import logging
 
+if sys.version_info < (3, 12):
+    import ffmpeg
+else:
+    logging.error("FFmpeg not imported. Python version 3.12 is not supported. "
+                  "Please use a Python version lower than 3.12.")
 
 @register_class("compress")
 class Compress:
@@ -53,45 +58,48 @@ class Compress:
     def __video_core(
         self, lq: np.ndarray, codec: str, output_args: dict, container: str = "mpeg"
     ) -> np.ndarray:
-        width, height = lq.shape[:2]
+        if sys.version_info < (3, 12):
+            width, height = lq.shape[:2]
 
-        # Encode image using ffmpeg
-        process1 = (
-            ffmpeg.input(
-                "pipe:", format="rawvideo", pix_fmt="bgr24", s=f"{width}x{height}"
+            # Encode image using ffmpeg
+            process1 = (
+                ffmpeg.input(
+                    "pipe:", format="rawvideo", pix_fmt="bgr24", s=f"{width}x{height}"
+                )
+                .output("pipe:", format=container, vcodec=codec, **output_args)
+                .global_args(
+                    "-loglevel", "fatal"
+                )  # Disable error reporting because of buffer errors
+                .global_args("-max_muxing_queue_size", "300000")
+                .run_async(pipe_stdin=True, pipe_stdout=True)
             )
-            .output("pipe:", format=container, vcodec=codec, **output_args)
-            .global_args(
-                "-loglevel", "fatal"
-            )  # Disable error reporting because of buffer errors
-            .global_args("-max_muxing_queue_size", "300000")
-            .run_async(pipe_stdin=True, pipe_stdout=True)
-        )
-        process1.stdin.write(lq.tobytes())
-        process1.stdin.flush()  # Ensure all data is written
-        process1.stdin.close()
+            process1.stdin.write(lq.tobytes())
+            process1.stdin.flush()  # Ensure all data is written
+            process1.stdin.close()
 
-        # Add a delay between each image to help resolve buffer errors
-        sleep(0.1)
+            # Add a delay between each image to help resolve buffer errors
+            sleep(0.1)
 
-        # Decode compressed video back into image format using ffmpeg
-        process2 = (
-            ffmpeg.input("pipe:", format=container)
-            .output("pipe:", format="rawvideo", pix_fmt="bgr24")
-            .global_args(
-                "-loglevel", "fatal"
-            )  # Disable error reporting because of buffer errors
-            .run_async(pipe_stdin=True, pipe_stdout=True)
-        )
+            # Decode compressed video back into image format using ffmpeg
+            process2 = (
+                ffmpeg.input("pipe:", format=container)
+                .output("pipe:", format="rawvideo", pix_fmt="bgr24")
+                .global_args(
+                    "-loglevel", "fatal"
+                )  # Disable error reporting because of buffer errors
+                .run_async(pipe_stdin=True, pipe_stdout=True)
+            )
 
-        out, _ = process2.communicate(input=process1.stdout.read())
+            out, _ = process2.communicate(input=process1.stdout.read())
 
-        process1.wait()
-        return (
-            np.frombuffer(out, np.uint8)[: (height * width * 3)]
-            .reshape(lq.shape)
-            .copy()
-        )
+            process1.wait()
+            return (
+                np.frombuffer(out, np.uint8)[: (height * width * 3)]
+                .reshape(lq.shape)
+                .copy()
+            )
+        else:
+            return lq
 
     def __h264(self, lq: np.ndarray, quality: int) -> np.ndarray:
         output_args = {"crf": quality}
