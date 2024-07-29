@@ -12,8 +12,7 @@ import logging
 if sys.version_info < (3, 12):
     import ffmpeg
 else:
-    logging.error("FFmpeg not imported. Python version 3.12 is not supported. "
-                  "Please use a Python version lower than 3.12.")
+    logging.warning("FFmpeg doesn't work with Python 3.12. Use an older version of Python.")
 
 @register_class("compress")
 class Compress:
