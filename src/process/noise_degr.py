@@ -61,6 +61,10 @@ class Noise:
         lacunarity_range = noise_dict.get("lacunarity", [0.4, 0.5, 0.5])
         self.lacunarity_rand = safe_arange(lacunarity_range)
         self.scale = noise_dict.get("scale")
+        self.noise_clip = noise_dict.get("clip")
+        if self.noise_clip:
+            self.black_clip = self.noise_clip[0]
+            self.white_clip = self.noise_clip[1]
         self.scale_cof = 1.0
 
         self.bias = noise_dict.get("bias", [0, 0])
@@ -73,8 +77,15 @@ class Noise:
     def noise_scale(self, noise: np.ndarray) -> np.ndarray:
         shape = noise.shape
         self.scale_cof = safe_uniform(self.scale)
-        return resize(noise.astype(np.float32), (int(shape[1] * self.scale_cof), int(shape[0] * self.scale_cof)),
-                      ResizeFilter.CubicBSpline, False).squeeze()[:shape[0], :shape[1]]
+        return normalize(resize(noise.astype(np.float32) * 0.5 + 0.5,
+                                (int(shape[1] * self.scale_cof), int(shape[0] * self.scale_cof)),
+                                ResizeFilter.Lanczos, False).squeeze()[:shape[0], :shape[1]])
+
+    def __noise_clip(self, noise: np.ndarray, img: np.ndarray) -> np.ndarray:
+        black_noise_mask = img > self.black_clip
+        white_noise_mask = img < self.white_clip
+        noise_mask = black_noise_mask & white_noise_mask
+        return np.where(noise_mask, noise, 0)
 
     def __procedural_noises(self, lq: np.ndarray) -> np.ndarray:
         octaves = np.random.choice(self.octaves_rand)
@@ -94,7 +105,6 @@ class Noise:
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
             noise += bias
-            noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
@@ -107,7 +117,9 @@ class Noise:
             frequency,
             lacunarity,
         )
-        return lq + noise
+        if self.noise_clip:
+            noise = self.__noise_clip(noise, lq)
+        return (lq + noise).clip(0, 1)
 
     def __gauss(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.normal(0, 0.25, lq.shape)
@@ -117,7 +129,6 @@ class Noise:
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
             noise += bias
-            noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
@@ -128,7 +139,9 @@ class Noise:
             bias,
             self.scale_cof
         )
-        return (lq + noise).astype(np.float32)
+        if self.noise_clip:
+            noise = self.__noise_clip(noise, lq)
+        return (lq + noise).clip(0, 1).astype(np.float32)
 
     def __uniform_noise(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.uniform(-1, 1, lq.shape)
@@ -138,7 +151,6 @@ class Noise:
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
             noise += bias
-            noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
@@ -149,8 +161,9 @@ class Noise:
             bias,
             self.scale_cof
         )
-
-        return (lq + noise).astype(np.float32)
+        if self.noise_clip:
+            noise = self.__noise_clip(noise, lq)
+        return (lq + noise).clip(0, 1).astype(np.float32)
 
     # Salt_and_pepper noises
     def __salt_and_pepper_core(self, img_shape: tuple) -> (np.ndarray, float):
@@ -246,4 +259,4 @@ class Noise:
                 hq = lq
             return lq, hq
         except Exception as e:
-            logging.error("Noise error: %s", e)
+            logging.error(f"Noise error: {e}")
