@@ -42,8 +42,14 @@
         "r": [-45,45],
         "g": [-45,45],
         "b": [-45,45],
-        "cmyk_alpha": [0.5,1.0]
+        "cmyk_alpha": [0.5,1.0],
+        "1_ch_dot_type": ["circle"],
+        "2_ch_dot_type": ["circle"],
+        "3_ch_dot_type": ["circle"],
+        "4_ch_dot_type": ["circle"]
       },
+      "dot_type": ["circle"],
+      "angle": [0,0],
       "probability": 0.5
     },
 
@@ -116,13 +122,14 @@
 
     {
       "type": "blur",
-      "filter": ["box", "gauss", "median","lens","motion"],
+      "filter": ["box", "gauss", "median","lens","motion","random"],
       "kernel": [0, 1],
       "target_kernel": {
-        "box": [0,2],
-        "gauss": [0,2],
+        "box": [0,1],
+        "gauss": [0,1],
         "median": [0,1],
-        "lens":[1,2]
+        "lens":[0,1],
+        "random": [0,1]
       },
       "motion_size": [0,10],
       "motion_angle": [-30,30],
@@ -155,7 +162,7 @@
       "type": "noise",
       "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex",
         "supersimplex","uniform","salt","salt_and_pepper","pepper","gauss"],
-
+      "clip": [0,1],
       "normalize": true,
       "y_noise": 0.3,
       "uv_noise": 0.3,
@@ -174,6 +181,9 @@
     {
       "type":"compress",
       "algorithm": ["jpeg", "webp","h264","hevc","mpeg","mpeg2","vp9"],
+      "jpeg_sampling": [
+        "4:4:4", "4:4:0", "4:2:2", "4:2:0"
+      ],
       "target_compress": {
         "h264": [23,32],
         "hevc": [20,34],

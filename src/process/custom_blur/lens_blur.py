@@ -32,7 +32,7 @@ def lens_blur(image: np.ndarray, dimension: float) -> np.ndarray:
     """
     image_array = image
     kernel = __disk_kernel(dimension)
-    convolved = cv2.filter2D(image_array, -1, kernel, borderType=cv2.BORDER_REPLICATE)
+    convolved = cv2.filter2D(image_array, -1, kernel, borderType=cv2.BORDER_REFLECT)
     return convolved
 
 
