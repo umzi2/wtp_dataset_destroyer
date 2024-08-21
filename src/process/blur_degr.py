@@ -1,5 +1,7 @@
 from numpy import random
 import numpy as np
+
+from .custom_blur.rkernel_blur import random_kernel_blur
 from .utils import probability
 import cv2 as cv
 from ..utils.random import safe_uniform, safe_randint
@@ -54,7 +56,8 @@ class Blur:
             }
         self.kernel = 0
 
-    def __kernel_odd(self, kernel_size: int) -> int:
+    @staticmethod
+    def __kernel_odd(kernel_size: int) -> int:
         if kernel_size % 2 == 0:
             kernel_size += 1
         return kernel_size
@@ -90,6 +93,13 @@ class Blur:
         logging.debug("Blur -  type: motion size: %s angle: %s", size, angle)
         return motion_blur(lq, size, angle)
 
+    def __random(self, lq: np.ndarray) -> np.ndarray:
+        kernel = safe_uniform(self.kernels["lens"])
+        if kernel <= 0.0:
+            return lq
+        logging.debug("Blur -  type: random kernel: %.4f", kernel)
+        return random_kernel_blur(lq, kernel)
+
     def __median(self, lq: np.ndarray) -> np.ndarray:
         kernel_list = self.kernels["median"]
         kernel = safe_randint(kernel_list)
@@ -98,7 +108,7 @@ class Blur:
         kernel = self.__kernel_odd(kernel)
         logging.debug("Blur -  type: median kernel: %s", kernel)
         return (
-            cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
+                cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
         )
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
@@ -118,6 +128,7 @@ class Blur:
                 "median": self.__median,
                 "lens": self.__lens,
                 "motion": self.__motion,
+                "random": self.__random,
             }
 
             if probability(self.probability):
