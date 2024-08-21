@@ -1,5 +1,6 @@
+import cv2
 from chainner_ext import ResizeFilter
-from pepeline import TypeNoise, CvtType
+from pepeline import TypeNoise, CvtType, TypeDot
 from chainner_ext import DiffusionAlgorithm
 
 INTERPOLATION_MAP = {
@@ -48,4 +49,16 @@ YUV_MAP = {
     "601": [CvtType.RGB2YCbCr, CvtType.YCbCr2RGB],
     "709": [CvtType.RGB2YCvCrBt709, CvtType.YCvCr2RGBBt709]
 
+}
+JPEG_SUBSAMPLING = {
+    "4:4:4": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_444,
+    "4:4:0": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_440,
+    "4:2:2": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_422,
+    "4:2:0": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_420
+}
+DOT_TYPE = {
+    "line": TypeDot.LINE,
+    "cross": TypeDot.CROSS,
+    "circle": TypeDot.CIRCLE,
+    "ellipse": TypeDot.ELLIPSE
 }
