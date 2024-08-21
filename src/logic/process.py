@@ -142,6 +142,8 @@ class ImgProcess:
                 if laplace_filter(img, self.laplace_filter):
                     return
             n = self.all_images.index(img_fold)
+            seed = np.random.randint(2**30)+n
+            np.random.seed(seed)
             lq, hq = img, img
             if self.real_name:
                 output_name = img_fold
@@ -172,6 +174,8 @@ class ImgProcess:
             img = self.__img_read(img_fold)
             h, w = img.shape[:2]
             n = self.all_images.index(img_fold)
+            seed = np.random.randint(2 ** 30) + n
+            np.random.seed(seed)
             if h < self.tile_size or w < self.tile_size:
                 logging.error(f"Tile size is larger than the size of your images: {img_fold}")
             for Kx, Ky in np.ndindex(h // self.tile_size, w // self.tile_size):
@@ -188,10 +192,10 @@ class ImgProcess:
                         continue
                 lq, hq = img_tile, img_tile
                 output_name = f"{str(n)}_{Kx}_{Ky}.png"
+                seed = np.random.randint(2 ** 30) + Kx + Ky
+                np.random.seed(seed)
                 logging.debug(
-                    "_____________________________________\n\nReal_name: %s Result_name: %s \n",
-                    img_fold,
-                    output_name,
+                    f"_____________________________________\n\nReal_name: {img_fold} Result_name: {output_name} \n"
                 )
                 for loss in self.turn:
                     lq, hq = loss.run(lq, hq)
