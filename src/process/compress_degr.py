@@ -4,6 +4,8 @@ import cv2 as cv
 import sys
 from .utils import probability
 from time import sleep
+
+from ..constants import JPEG_SUBSAMPLING
 from ..utils.random import safe_randint
 
 from ..utils.registry import register_class
@@ -13,6 +15,7 @@ if sys.version_info < (3, 12):
     import ffmpeg
 else:
     logging.warning("FFmpeg doesn't work with Python 3.12. Use an older version of Python.")
+
 
 @register_class("compress")
 class Compress:
@@ -33,6 +36,7 @@ class Compress:
         compress = compress_dict.get("comp", [90, 100])
         target = compress_dict.get("target_compress")
         self.probability = compress_dict.get("probability", 1.0)
+        self.jpeg_sampling = compress_dict.get("jpeg_sampling", ["4:2:2"])
         if target:
             self.target_compress = {
                 "jpeg": target.get("jpeg", compress),
@@ -55,7 +59,7 @@ class Compress:
             }
 
     def __video_core(
-        self, lq: np.ndarray, codec: str, output_args: dict, container: str = "mpeg"
+            self, lq: np.ndarray, codec: str, output_args: dict, container: str = "mpeg"
     ) -> np.ndarray:
         if sys.version_info < (3, 12):
             width, height = lq.shape[:2]
@@ -125,7 +129,9 @@ class Compress:
         return self.__video_core(lq, "mpeg2video", output_args)
 
     def __jpeg(self, lq: np.ndarray, quality: int) -> np.ndarray:
-        encode_param = [int(cv.IMWRITE_JPEG_QUALITY), quality]
+
+        encode_param = [int(cv.IMWRITE_JPEG_QUALITY), quality, cv.IMWRITE_JPEG_SAMPLING_FACTOR,
+                        JPEG_SUBSAMPLING[random.choice(self.jpeg_sampling)]]
         _, encimg = cv.imencode(".jpg", lq, encode_param)
         return cv.imdecode(encimg, 1).copy()
 
