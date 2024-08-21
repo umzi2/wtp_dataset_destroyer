@@ -129,9 +129,12 @@ class Compress:
         return self.__video_core(lq, "mpeg2video", output_args)
 
     def __jpeg(self, lq: np.ndarray, quality: int) -> np.ndarray:
-
+        jpeg_sampling = random.choice(self.jpeg_sampling)
         encode_param = [int(cv.IMWRITE_JPEG_QUALITY), quality, cv.IMWRITE_JPEG_SAMPLING_FACTOR,
-                        JPEG_SUBSAMPLING[random.choice(self.jpeg_sampling)]]
+                        JPEG_SUBSAMPLING[jpeg_sampling]]
+        logging.debug(
+            f"Compress - jpeg sampling: {jpeg_sampling}"
+        )
         _, encimg = cv.imencode(".jpg", lq, encode_param)
         return cv.imdecode(encimg, 1).copy()
 

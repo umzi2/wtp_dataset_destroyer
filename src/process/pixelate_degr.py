@@ -59,7 +59,7 @@ class Pixelate:
                 ResizeFilter.Linear,
                 False,
             )
-            lq = resize(lq, (shape_img[1], shape_img[0]), ResizeFilter.Nearest, False)
+            lq = resize(lq, (shape_img[1], shape_img[0]), ResizeFilter.Nearest, False).squeeze()
 
             return lq, hq
         except Exception as e:
