@@ -6,8 +6,8 @@ from chainner_ext import DiffusionAlgorithm
 INTERPOLATION_MAP = {
     "nearest": ResizeFilter.Nearest,
     "box": ResizeFilter.Box,
-    # 'hermite': ResizeFilter.Hermite,#strong artifacts can cause
-    "hamming": ResizeFilter.Hamming,
+    'hermite': ResizeFilter.Hermite,#strong artifacts can cause
+    # "hamming": ResizeFilter.Hamming,
     "linear": ResizeFilter.Linear,
     # 'hann': ResizeFilter.Hann,#strong artifacts can cause
     "lagrange": ResizeFilter.Lagrange,

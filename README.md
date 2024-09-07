@@ -33,6 +33,8 @@ Designed for web art. Currently it's in early beta.
 https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/pixelate.md)
 
 [Subsampling](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/subsampling.md)
+
+[Canny](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/canny.md)
 # Creators:
 [Add Degradation](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/creators/add_degradation.md)
 

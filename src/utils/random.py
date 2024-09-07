@@ -20,5 +20,5 @@ def safe_randint(rand_list: list[int] | int) -> int:
 
 def safe_arange(range_list: list) -> np.ndarray:
     if len(range_list) == 1 or range_list[0] >= range_list[1]:
-        return np.ndarray([range_list[0]])
+        return np.array([range_list[0]])
     return np.arange(*range_list)

@@ -20,6 +20,8 @@ class Screentone:
                 - "lqhq" (bool, optional): Flag indicating if the high-quality image should be replaced by the low-quality.
                     Defaults to None.
                 - "dot_size" (list of int, optional): Range of dot sizes for screentone effects. Defaults to [7].
+                - "dot_type" (list of str, optional): List of dot types for screentone effects. Defaults to ["circle"].
+                - "angle" (list of int, optional): Range of angles for dot rotation. Defaults to [0, 0].
                 - "color" (dict, optional): Dictionary containing color-specific settings.
                     Defaults to None.
                 - "probability" (float, optional): Probability of applying screentone effects. Defaults to 1.0.
@@ -40,6 +42,16 @@ class Screentone:
                     Defaults to [0, 0].
                 - "r" (list of int, optional): Range of angles for the R (red) channel halftone.
                     Defaults to [0, 0].
+                - "cmyk_alpha" (list of float, optional): Range of alpha values for the CMYK channels.
+                    Defaults to [1, 1].
+                - "1_ch_dot_type" (list of str, optional): List of dot types for single-channel halftones.
+                    Defaults to the value of "dot_type".
+                - "2_ch_dot_type" (list of str, optional): List of dot types for two-channel halftones.
+                    Defaults to the value of "dot_type".
+                - "3_ch_dot_type" (list of str, optional): List of dot types for three-channel halftones.
+                    Defaults to the value of "dot_type".
+                - "4_ch_dot_type" (list of str, optional): List of dot types for four-channel halftones.
+                    Defaults to the value of "dot_type".
     """
 
     def __init__(self, screentone_dict: dict):
@@ -67,6 +79,16 @@ class Screentone:
     def __cmyk_halftone(
             self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
+        """Applies CMYK halftone effect to the image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image in CMYK color space.
+            hq (numpy.ndarray): The high-quality image.
+            dot_size (int): The size of the halftone dots.
+
+        Returns:
+            tuple: A tuple containing the CMYK halftoned low-quality image and the corresponding high-quality image.
+        """
         c_angle = safe_randint(self.color_c)
         m_angle = safe_randint(self.color_m)
         y_angle = safe_randint(self.color_y)
@@ -91,6 +113,16 @@ class Screentone:
     def __not_rot_halftone(
             self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
+        """Applies non-rotated halftone effect to the image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image in RGB color space.
+            hq (numpy.ndarray): The high-quality image.
+            dot_size (int): The size of the halftone dots.
+
+        Returns:
+            tuple: A tuple containing the non-rotated halftoned low-quality image and the corresponding high-quality image.
+        """
         dot_type1 = DOT_TYPE.get(random.choice(self.one_ch_dot_type_list), DOT_TYPE["circle"])
         dot_type2 = DOT_TYPE.get(random.choice(self.two_ch_dot_type_list), DOT_TYPE["circle"])
         dot_type3 = DOT_TYPE.get(random.choice(self.three_ch_dot_type_list), DOT_TYPE["circle"])
@@ -104,6 +136,16 @@ class Screentone:
     def __gray_halftone(
             self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
+        """Applies grayscale halftone effect to the image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image in grayscale.
+            hq (numpy.ndarray): The high-quality image.
+            dot_size (int): The size of the halftone dots.
+
+        Returns:
+            tuple: A tuple containing the grayscale halftoned low-quality image and the corresponding high-quality image.
+        """
         lq, hq = lq_hq2grays(lq, hq)
         dot_type1 = DOT_TYPE.get(random.choice(self.one_ch_dot_type_list), DOT_TYPE["circle"])
         logging.debug(f"Screentone - type: gray dot: {dot_size} gray dot_type: {dot_type1}")
@@ -113,6 +155,16 @@ class Screentone:
     def __rgb_halftone(
             self, lq: np.ndarray, hq: np.ndarray, dot_size: int
     ) -> (np.ndarray, np.ndarray):
+        """Applies RGB halftone effect to the image.
+
+        Args:
+            lq (numpy.ndarray): The low-quality image in RGB color space.
+            hq (numpy.ndarray): The high-quality image.
+            dot_size (int): The size of the halftone dots.
+
+        Returns:
+            tuple: A tuple containing the RGB halftoned low-quality image and the corresponding high-quality image.
+        """
         dot_type1 = DOT_TYPE.get(random.choice(self.one_ch_dot_type_list), DOT_TYPE["circle"])
         dot_type2 = DOT_TYPE.get(random.choice(self.two_ch_dot_type_list), DOT_TYPE["circle"])
         dot_type3 = DOT_TYPE.get(random.choice(self.three_ch_dot_type_list), DOT_TYPE["circle"])
@@ -128,15 +180,24 @@ class Screentone:
         return lq, hq
 
     def __hsv_screentone(self, lq: np.ndarray, hq: np.ndarray, dot_size: int) -> (np.ndarray, np.ndarray):
+        """Applies HSV screentone effect to the image.
 
+        Args:
+            lq (numpy.ndarray): The low-quality image in RGB color space.
+            hq (numpy.ndarray): The high-quality image.
+            dot_size (int): The size of the halftone dots.
+
+        Returns:
+            tuple: A tuple containing the HSV screentoned low-quality image and the corresponding high-quality image.
+        """
         dot_type1 = DOT_TYPE.get(random.choice(self.one_ch_dot_type_list), DOT_TYPE["circle"])
         v_angle = safe_randint(self.angle)
         logging.debug(
-            f"Screentone - type: hsv dot: {dot_size} hsv angle: {v_angle} hsv dot_type: {dot_type1} ",
-
+            f"Screentone - type: hsv dot: {dot_size} hsv angle: {v_angle} hsv dot_type: {dot_type1}",
         )
         lq = cv2.cvtColor(lq, cv2.COLOR_RGB2HSV)
-        lq[..., 2] = screentone(lq[..., 2], dot_size, v_angle, dot_type=dot_type1)
+        from pepeline import fast_color_level
+        lq[..., 2] = screentone(fast_color_level(lq[..., 2], 2, 253), dot_size, v_angle, dot_type=dot_type1)
         lq = cv2.cvtColor(lq, cv2.COLOR_HSV2RGB)
         return lq, hq
 

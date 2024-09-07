@@ -41,11 +41,13 @@ class Blur:
             box = target.get("box", kernel)
             median = target.get("median", kernel)
             lens = target.get("lens", kernel)
+            random_kernel = target.get("random",kernel)
             self.kernels = {
                 "gauss": gauss,
                 "box": box,
                 "median": median,
                 "lens": lens,
+                "random": random_kernel,
             }
         else:
             self.kernels = {
@@ -53,6 +55,7 @@ class Blur:
                 "box": kernel,
                 "median": kernel,
                 "lens": kernel,
+                "random":kernel
             }
         self.kernel = 0
 
@@ -94,7 +97,7 @@ class Blur:
         return motion_blur(lq, size, angle)
 
     def __random(self, lq: np.ndarray) -> np.ndarray:
-        kernel = safe_uniform(self.kernels["lens"])
+        kernel = safe_uniform(self.kernels["random"])
         if kernel <= 0.0:
             return lq
         logging.debug("Blur -  type: random kernel: %.4f", kernel)
