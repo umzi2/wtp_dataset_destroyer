@@ -78,14 +78,14 @@
 
     {
       "type": "resize",
-      "alg_lq": ["box", "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+      "alg_lq": ["box", "hermite", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
         "lanczos", "gauss", "down_up","down_down"],
       "alg_hq": ["lagrange"],
       "down_up": {
         "up": [1, 2],
-        "alg_up": ["nearest", "box", "hamming", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
+        "alg_up": ["nearest", "box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
           "cubic_bspline", "lanczos", "gauss"],
-        "alg_down": [ "hamming", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+        "alg_down": [ "hermite", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
           "lanczos", "gauss","down_down"]
       },
 
