@@ -1,14 +1,15 @@
 ```json
 {
   "type": "noise",
-  "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex", "uniform", "salt", "salt_and_pepper", "pepper", "gauss"],
-
+  "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex",
+    "supersimplex","uniform","salt","salt_and_pepper","pepper","gauss"],
+  "clip": [0,1],
   "normalize": true,
   "y_noise": 0.3,
   "uv_noise": 0.3,
   "alpha": [0.01,0.5,0.01],
   "scale": [1, 2],
-  
+
   "octaves": [1,10,1],
   "frequency": [0.1,0.9,0.1],
   "lacunarity": [0.01,0.5,0.01],
@@ -26,7 +27,7 @@
 - `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
 - `y_noise`* - Generates monochrome noise. (e.g. 0.5 = 50% chance of being applied)
   - The chance **that noise will only affect color components, ignoring tone in color images**
-
+- `clip`* 
 - `uv_noise`* - Generates color noise. (e.g. 0.5 = 50% chance of being applied)
   - The chance that the noise will be applied only on the tone component in color images.
 - `bias` - The noise offset. Uses `[int,int]` with min -1, max 1

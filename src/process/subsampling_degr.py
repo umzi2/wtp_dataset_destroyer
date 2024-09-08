@@ -103,14 +103,12 @@ class Subsampling:
         try:
             if lq.ndim == 2 or lq.shape[2] == 1 or probability(self.probability):
                 return lq, hq
-
             format_type = choice(self.format_list)
             yuv = YUV_MAP.get(choice(self.ycbcr_type), YUV_MAP["601"])
             lq = cvt_color(lq, yuv[0])
 
             if format_type in SUBSAMPLING_MAP.keys() and format_type != "4:4:4":
                 lq = self.__sample(lq, format_type)
-
             if self.blur_kernels:
                 sigma = safe_uniform(self.blur_kernels)
                 if sigma != 0.0:
@@ -121,7 +119,6 @@ class Subsampling:
                     lq[..., 2] = cv.GaussianBlur(
                         lq[..., 2], (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
                     )
-
             lq = cvt_color(lq, yuv[1])
             return lq, hq
         except Exception as e:

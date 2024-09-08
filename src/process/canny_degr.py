@@ -51,8 +51,6 @@ class Canny:
                 return lq, hq
             thread1 = np.random.choice(self.thread1_list)
             thread2 = thread1 + np.random.choice(self.thread2_list)
-            print(thread2)
-            print(thread1)
             aperture_size = np.random.choice(self.aperture_size)
             lq_masc = 1 - cv2.Canny((lq * 255).astype(np.uint8), thread1, thread2, apertureSize=aperture_size,
                                     L2gradient=True) // 255
