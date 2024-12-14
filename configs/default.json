@@ -4,7 +4,7 @@
   "process":
     [{
       "type": "resize",
-      "alg_lq": ["linear","nearest"],
+      "alg_lq": ["linear", "nearest"],
         "alg_hq": ["linear"],
         "spread": [0.25, 1.1, 0.25],
         "scale": 1,

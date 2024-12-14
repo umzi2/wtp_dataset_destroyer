@@ -1,22 +1,38 @@
-```json 
-    {
-      "type": "dithering",
-      "dithering_type":["floydsteinberg", "jarvisjudiceninke", "stucki", "atkinson", "burkes", "sierra", "tworowsierra", "sierraLite", "order", "riemersma", "quantize"],
-      "color_ch": [2,10],
-      "map_size":  [2,4,8,16],
-      "history": [10, 15],
-      "ratio": [0.1,0.9],
-      "probability": 0.5
-    }
+```json
+{
+  "type": "dithering",
+  "type_dither": ["floyd", "bayer"],
+  "bits": [1,4],
+  "probability": 0.5
+}
 ```
-`*` = optional parameters
 
-- `dithering_type`* - The list of dithering algorithms to use. One is randomly picked per image
-- `color_ch`* - The number of colors per channel. Valid range is `[2,255]`
-- `map_size`* - The kernel size is used only for the `order` dithering algorithm
-- `history`* - Used for `riemersma`. Uses `[low,high]` 2-inf
-- `ratio`* - Used for `riemersma`. Uses `[low,high]` 0.001-0.999
-- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+### Parameters
+- `type_dither`* - Controls the dithering algorithm
+  - Default: ["floyd"]
+  - Options:
+    - "floyd": Floyd-Steinberg dithering
+      - Creates a diffused, natural-looking pattern
+      - Better for photographic images
+    - "bayer": Ordered dithering
+      - Creates a regular, grid-like pattern
+      - Better for graphics and text
+
+- `bits`* - Controls color depth reduction
+  - Format: [min, max]
+  - Default: [1, 1]
+  - Range: 1-8
+  - Example: [1,4] means:
+    - 1 bit = Black & White only (2 colors)
+    - 2 bits = 4 colors
+    - 3 bits = 8 colors
+    - 4 bits = 16 colors
+  - Lower values create more obvious dithering
+
+- `probability`* - Chance of applying effect
+  - Default: 1.0
+  - Range: 0.0 to 1.0
+
 ## Examples:
 all color_ch = 8
 <div> Raw</div>
@@ -43,5 +59,3 @@ all color_ch = 8
 <img src="images/dithering/order.png" title="order_img">
 <div> Riemersma history: 10 ratio: 0.5</div>
 <img src="images/dithering/riemersma.png" title="riemersma_img">
-
-

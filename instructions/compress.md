@@ -1,35 +1,69 @@
 ```json
- {
-   "type":"compress",
-   "algorithm": ["jpeg", "webp","h264","av1","mpeg","mpeg2","vp9"],
-   "jpeg_sampling": [
-        "4:4:4", "4:4:0", "4:2:2", "4:2:0"
-      ],
-   "target_compress": {
-     "h264": [23,32],
-     "hevc": [20,34],
-     "mpeg": [2,20],
-     "mpeg2": [2,20],
-     "vp9": [20,35],
-     "jpeg": [40,100],
-     "webp": [40,100]
-   },
- 
-   "comp": [40, 100],
-   "probability": 0.5
- 
- }
+{
+  "type": "compress",
+  "algorithm": ["jpeg", "webp", "h264", "av1", "mpeg", "mpeg2", "vp9", "hevc"],
+  "jpeg_sampling": [
+    "4:4:4", "4:4:0", "4:2:2", "4:2:0"
+  ],
+  "target_compress": {
+    "jpeg": [40,100],
+    "webp": [40,100],
+    "h264": [23,32],
+    "hevc": [20,34],
+    "av1": [20,35],
+    "vp9": [20,35],
+    "mpeg": [2,20],
+    "mpeg2": [2,20]
+  },
+  "comp": [40, 100],
+  "probability": 0.5
+}
 ```
 
-`*` = optional parameters
+### Basic Parameters
+- `algorithm` - List of compression algorithms to choose from
+  - One is randomly selected per image
+  - Note: HEVC encoding may cause errors (pts<dts or memory segmentation)
 
-- `type` - Ignore this, not configurable
-- `algorithm` - The list of compression algorithms to use
-- `jpeg_sampling`* - jpeg_sampling: A list of sampling factors for JPEG compression. Sampling factors determine the chroma subsampling method used to reduce color information in the image, which helps in compressing the image more efficiently. Common values include "4:4:4", "4:2:2", and "4:2:0", where lower ratios imply higher compression and loss of color detail.
-- `target_compress`* - A range of compression levels for each algorithm. A value is randomly picked between this range `{"algorithm":[low,high]}`
-- `comp`* - The compression level to be used if target_compress is not implemented for the algorithm
-- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
-## Examples:
+- `probability`* - Chance of applying compression
+  - Range: 0.0 to 1.0
+  - Default: 1.0
+  - Example: 0.5 = 50% chance
+
+### Compression Settings
+- `target_compress`* - Algorithm-specific compression ranges
+  - Format: `{"algorithm": [min, max]}`
+  - Values are randomly selected from the specified ranges
+  - If not specified for an algorithm, falls back to `comp` value
+
+- `comp`* - Default compression range
+  - Format: [min, max]
+  - Default: [90, 100]
+  - Used when algorithm has no `target_compress` entry
+
+### JPEG-Specific Settings
+- `jpeg_sampling`* - Chroma subsampling options
+  - Default: ["4:2:2"]
+  - Available options:
+    - "4:4:4": No subsampling, highest quality
+    - "4:4:0": Reduced vertical chroma resolution
+    - "4:2:2": Horizontal chroma subsampling
+    - "4:2:0": Both horizontal and vertical subsampling
+
+### Compression Ranges by Algorithm
+1. Image Formats:
+   - JPEG: 40-100 (higher = better quality)
+   - WebP: 40-100 (higher = better quality)
+
+2. Video Codecs:
+   - H.264: 23-32 (lower = better quality)
+   - HEVC: 20-34 (lower = better quality)
+   - AV1: 20-35 (lower = better quality)
+   - VP9: 20-35 (lower = better quality)
+   - MPEG: 2-20 (lower = better quality)
+   - MPEG2: 2-20 (lower = better quality)
+
+### Examples:
 
 <div> Raw</div>
 <img src="images/compress/raw.png" title="raw_img">

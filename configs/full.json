@@ -1,8 +1,7 @@
 {
   "input": "path/to/input",
   "output": "path/to/output",
-  "process":
-  [
+  "process": [
     {
       "type": "shift",
       "shift_type": ["cmyk","rgb","yuv"],
@@ -27,7 +26,6 @@
       "probability": 0.5
     },
 
-
     {
       "type": "screentone",
       "lqhq": false,
@@ -38,7 +36,6 @@
         "m": [-45,45],
         "y": [-45,45],
         "k": [-45,45],
-
         "r": [-45,45],
         "g": [-45,45],
         "b": [-45,45],
@@ -55,7 +52,7 @@
 
     {
       "type":"canny",
-      "thread1" : [10,150,1],
+      "thread1": [10,150,1],
       "thread2": [10,100,1],
       "aperture_size":[3,5],
       "white": 0.5,
@@ -63,61 +60,55 @@
       "probability": 0.5
     },
 
-
     {
       "type": "dithering",
       "dithering_type":["floydsteinberg", "jarvisjudiceninke", "stucki", "atkinson", "burkes", "sierra",
-        "tworowsierra", "sierraLite","order","riemersma","quantize"],
-      "color_ch": [2,10],
-      "map_size":  [2,4,8,16],
-      "history": [10, 15],
+        "tworowsierra", "sierraLite", "order", "riemersma", "quantize"],
+        "color_ch": [2,10],
+        "map_size":  [2,4,8,16],
+        "history": [10, 15],
       "ratio": [0.1,0.9],
       "probability": 0.5
     },
 
-
     {
       "type": "resize",
-      "alg_lq": ["box", "hermite", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
-        "lanczos", "gauss", "down_up","down_down"],
+      "alg_lq": ["box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+        "lanczos", "gauss", "down_up", "down_down"],
       "alg_hq": ["lagrange"],
       "down_up": {
-        "up": [1, 2],
+        "up": [1,2],
         "alg_up": ["nearest", "box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
           "cubic_bspline", "lanczos", "gauss"],
-        "alg_down": [ "hermite", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
-          "lanczos", "gauss","down_down"]
+        "alg_down": ["hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+          "lanczos", "gauss", "down_down"]
       },
-
       "down_down": {
-        "step": [1, 6],
-        "alg_down": [ "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
+        "step": [1,6],
+        "alg_down": ["linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
       },
-
-      "spread": [1, 2, 0.05],
+      "spread": [1,2,0.05],
       "scale": 4,
       "color_fix": true,
-      "gamma_correction": false,
+      "gamma_correction": true,  
       "probability": 0.5
-
     },
 
     {
       "type":"subsampling",
-      "down": ["box", "hamming", "nearest", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+      "down": ["box", "hamming", "nearest", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
         "lanczos", "gauss"],
       "up": ["box", "hamming", "linear", "nearest", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
         "lanczos", "gauss"],
       "sampling": ["4:4:4", "4:2:2", "4:2:1", "4:1:1", "4:2:0", "4:1:0", "3:1:1"],
-      "yuv": ["601","709","2020"],
+      "yuv": ["601","709","2020"],  
       "blur": [0.0,4],
       "probability": 0.5
-
     },
 
     {
       "type": "pixelate",
-      "size": [0, 4],
+      "size": [0,4],
       "probability": 0.5
     },
 
@@ -132,8 +123,8 @@
 
     {
       "type": "blur",
-      "filter": ["box", "gauss", "median","lens","motion","random"],
-      "kernel": [0, 1],
+      "filter": ["box", "gauss", "median", "lens", "motion", "random"],
+      "kernel": [0,1],
       "target_kernel": {
         "box": [0,1],
         "gauss": [0,1],
@@ -167,33 +158,29 @@
       "rand": [0.5,1.0],
       "probability": 0.5
     },
-
+    
     {
       "type": "noise",
       "type_noise": ["perlinsuflet", "perlin", "opensimplex", "simplex",
-        "supersimplex","uniform","salt","salt_and_pepper","pepper","gauss"],
+        "supersimplex", "uniform", "salt", "salt_and_pepper", "pepper", "gauss"],
       "clip": [0,1],
       "normalize": true,
       "y_noise": 0.3,
       "uv_noise": 0.3,
       "alpha": [0.01,0.5,0.01],
-      "scale": [1, 2],
-
+      "scale": [1,2],
       "octaves": [1,10,1],
       "frequency": [0.1,0.9,0.1],
       "lacunarity": [0.01,0.5,0.01],
       "probability_salt_or_pepper": [0,0.02],
-
-      "bias": [-0.5, 0.5],
+      "bias": [-0.5,0.5],
       "probability": 0.5
     },
 
     {
       "type":"compress",
-      "algorithm": ["jpeg", "webp","h264","av1","mpeg","mpeg2","vp9"],
-      "jpeg_sampling": [
-        "4:4:4", "4:4:0", "4:2:2", "4:2:0"
-      ],
+      "algorithm": ["jpeg", "webp", "h264", "av1", "mpeg", "mpeg2", "vp9"],
+      "jpeg_sampling": ["4:4:4", "4:2:2"],  
       "target_compress": {
         "h264": [23,32],
         "av1": [20,34],
@@ -203,16 +190,13 @@
         "jpeg": [40,100],
         "webp": [40,100]
       },
-
-      "comp": [40, 100],
+      "comp": [40,100],
       "probability": 0.5
-
     }
-],
-
+  ],
 
   "laplace_filter": 0.02,
-  "size": 1000,
+  "size": 10000,  
   "shuffle_dataset": true,
   "num_workers": 16,
   "map_type": "thread",
@@ -220,11 +204,9 @@
   "only_lq": false,
   "real_name": false,
   "out_clear": true,
-  "tile": {
-    "size": 512,
-    "no_wb": true
+   "tile": {  
+     "size": 512,
+     "no_wb": true
   },
-
-  "gray": true
-
+  "gray": false
 }
