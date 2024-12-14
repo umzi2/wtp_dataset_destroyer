@@ -1,5 +1,5 @@
 # WTP Dataset Destroyer
-A tool for creating paired image datasets with configurable degradation effects. Perfect for training image restoration and enhancement models.
+A tool for creating paired image datasets with configurable degradation Degradations. Perfect for training image restoration and enhancement models.
 
 ## Documentation
 
@@ -7,7 +7,7 @@ A tool for creating paired image datasets with configurable degradation effects.
 - [Basic Information](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/basic_info.md)
 - [Common Parameters](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/common.md)
 
-### Effects
+### Degradations
 - [Blur](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/blur.md)
 - [Canny](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/canny.md)
 - [Color](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/color.md)
@@ -27,7 +27,7 @@ A tool for creating paired image datasets with configurable degradation effects.
 - [Add Degradation](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/creators/add_degradation.md)
 
 ## TODO:
-* Add more degradation effects
+* Add more degradation Degradations
 
 ## Credits:
 - Resize is implemented through [chainner rs](https://github.com/chaiNNer-org/chaiNNer-rs)
