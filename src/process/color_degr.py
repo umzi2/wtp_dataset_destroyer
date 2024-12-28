@@ -47,7 +47,7 @@ class Color:
             high_output = safe_randint(self.high_list)
             low_output = safe_randint(self.low_list)
             if low_output > high_output:
-                high_output = low_output+10
+                high_output = low_output + 10
             gamma = safe_uniform(self.gamma)
             lq = fast_color_level(
                 lq,
@@ -58,11 +58,8 @@ class Color:
                 gamma=gamma,
             )
             logging.debug(
-                "Color - low_output: %s high_output: %s gamma: %.4f ",
-                low_output,
-                high_output,
-                gamma,
+                f"Color - low_output: {low_output} high_output: {high_output} gamma: {gamma}"
             )
             return lq, hq
         except Exception as e:
-            logging.error("Color error: %s", e)
+            logging.error(f"Color error: {e}")

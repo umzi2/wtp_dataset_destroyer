@@ -1,10 +1,12 @@
 import numpy as np
+
+from .custom_blur import motion_blur
 from .utils import probability, normalize_noise as normalize
 from ..constants import NOISE_MAP
 from pepeline import noise_generate, cvt_color, CvtType
 from chainner_ext import resize, ResizeFilter
-from ..utils.random import safe_uniform, safe_arange
-
+from ..utils.random import safe_uniform, safe_arange, safe_randint
+import cv2 as cv
 from ..utils.registry import register_class
 import logging
 
@@ -60,13 +62,28 @@ class Noise:
         self.frequency_rand = safe_arange(frequency_range)
         lacunarity_range = noise_dict.get("lacunarity", [0.4, 0.5, 0.5])
         self.lacunarity_rand = safe_arange(lacunarity_range)
-        self.scale = noise_dict.get("scale")
+        scale = noise_dict.get("scale")
+        self.scale_probability = 0.0
+        if scale:
+            scale = scale[0]
+            self.scale_size = scale.get("size", [1, 2])
+            self.scale_sigma = scale.get("sigma", [1, 2])
+            self.scale_amount = scale.get("amount", [1, 3])
+            self.scale_probability = scale.get("probability", 1)
         self.noise_clip = noise_dict.get("clip")
         if self.noise_clip:
             self.black_clip = self.noise_clip[0]
             self.white_clip = self.noise_clip[1]
         self.scale_cof = 1.0
-
+        motion = noise_dict.get("motion")
+        self.motion_probability = 0.0
+        if motion:
+            motion = motion[0]
+            self.size = motion.get("size", [0, 3])
+            self.angle = motion.get("angle", [0, 360])
+            self.sigma = motion.get("sigma", [0, 1])
+            self.amount = motion.get("amount", [0, 1])
+            self.motion_probability = motion.get("probability", 1)
         self.bias = noise_dict.get("bias", [0, 0])
         # salt_or_pepper
         self.percentage_salt_or_pepper = noise_dict.get(
@@ -74,12 +91,34 @@ class Noise:
         )
         self.default_debug = "Noise - color_type: gray"
 
+    def motion(self, noise):
+        noise = motion_blur(noise, safe_randint(self.size), safe_randint(self.angle))
+        sigma = safe_uniform(self.sigma)
+        amount = safe_uniform(self.amount)
+        blurred = cv.GaussianBlur(
+            noise, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+        )
+
+        return cv.addWeighted(noise, amount + 1, blurred, -amount, 0)
+
     def noise_scale(self, noise: np.ndarray) -> np.ndarray:
         shape = noise.shape
-        self.scale_cof = safe_uniform(self.scale)
-        return normalize(resize(noise.astype(np.float32) * 0.5 + 0.5,
-                                (int(shape[1] * self.scale_cof), int(shape[0] * self.scale_cof)),
-                                ResizeFilter.Lanczos, False).squeeze()[:shape[0], :shape[1]])
+        self.scale_cof = safe_uniform(self.scale_size)
+        noise = normalize(
+            resize(
+                noise.astype(np.float32) * 0.5 + 0.5,
+                (int(shape[1] * self.scale_cof), int(shape[0] * self.scale_cof)),
+                ResizeFilter.Lanczos,
+                False,
+            ).squeeze()[: shape[0], : shape[1]]
+        )
+        sigma = safe_uniform(self.scale_sigma)
+        amount = safe_uniform(self.scale_amount)
+        blurred = cv.GaussianBlur(
+            noise, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+        )
+
+        return cv.addWeighted(noise, amount + 1, blurred, -amount, 0)
 
     def __noise_clip(self, noise: np.ndarray, img: np.ndarray) -> np.ndarray:
         black_noise_mask = img > self.black_clip
@@ -101,10 +140,13 @@ class Noise:
         )
         if self.normalize_noise:
             noise = normalize(noise)
+        if not probability(self.motion_probability):
+            noise = self.motion(noise)
         bias = 0
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
             noise += bias
+            noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
@@ -119,16 +161,20 @@ class Noise:
         )
         if self.noise_clip:
             noise = self.__noise_clip(noise, lq)
+
         return (lq + noise).clip(0, 1)
 
     def __gauss(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.normal(0, 0.25, lq.shape)
-        if self.scale:
+        if not probability(self.motion_probability):
+            noise = self.motion(noise)
+        if not probability(self.scale_probability):
             noise = self.noise_scale(noise)
         bias = 0
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
             noise += bias
+            noise = noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
@@ -137,20 +183,23 @@ class Noise:
             self.noise_type,
             alpha,
             bias,
-            self.scale_cof
+            self.scale_cof,
         )
         if self.noise_clip:
             noise = self.__noise_clip(noise, lq)
-        return (lq + noise).clip(0, 1).astype(np.float32)
+        return (lq + noise).astype(np.float32)
 
     def __uniform_noise(self, lq: np.ndarray) -> np.ndarray:
         noise = np.random.uniform(-1, 1, lq.shape)
-        if self.scale:
+        if not probability(self.motion_probability):
+            noise = self.motion(noise)
+        if not probability(self.scale_probability):
             noise = self.noise_scale(noise)
         bias = 0
         if self.bias != [0, 0]:
             bias = safe_uniform(self.bias)
             noise += bias
+            noise = noise.clip(-1, 1)
         alpha = np.random.choice(self.alpha_rand)
         noise *= alpha
         logging.debug(
@@ -159,13 +208,12 @@ class Noise:
             self.noise_type,
             alpha,
             bias,
-            self.scale_cof
+            self.scale_cof,
         )
         if self.noise_clip:
             noise = self.__noise_clip(noise, lq)
-        return (lq + noise).clip(0, 1).astype(np.float32)
+        return (lq + noise).astype(np.float32)
 
-    # Salt_and_pepper noises
     def __salt_and_pepper_core(self, img_shape: tuple) -> (np.ndarray, float):
         noise = np.random.uniform(0, 1, img_shape)
         probability_sp = safe_uniform(self.percentage_salt_or_pepper)
@@ -179,8 +227,8 @@ class Noise:
             self.noise_type,
             probability_sp,
         )
-        lq = np.where(noise > probability_sp, lq, 1)
-        return np.where(noise < 1 - probability_sp, lq, 0).astype(np.float32)
+        lq = np.where(noise > probability_sp / 2, lq, 1)
+        return np.where(noise < 1 - probability_sp / 2, lq, 0).astype(np.float32)
 
     def __salt(self, lq: np.ndarray) -> np.ndarray:
         noise, probability_sp = self.__salt_and_pepper_core(lq.shape)
@@ -190,6 +238,8 @@ class Noise:
             self.noise_type,
             probability_sp,
         )
+        if self.noise_clip:
+            noise = self.__noise_clip(noise, lq)
         return np.where(noise > probability_sp, lq, 1).astype(np.float32)
 
     def __pepper(self, lq: np.ndarray) -> np.ndarray:
@@ -200,9 +250,10 @@ class Noise:
             self.noise_type,
             probability_sp,
         )
+        if self.noise_clip:
+            noise = self.__noise_clip(noise, lq)
         return np.where(noise < 1 - probability_sp, lq, 0).astype(np.float32)
 
-    # Run module
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """Adds noise to the input image.
 
@@ -245,15 +296,17 @@ class Noise:
                     self.default_debug = "Noise - color_type: uv"
                 else:
                     self.default_debug = "Noise - color_type: rgb"
+
             self.noise_type = np.random.choice(self.type_noise)
             lq = NOISE_TYPE_MAP[self.noise_type](lq)
-            lq = np.clip(lq, 0, 1)
             if y:
                 lq = np.stack((lq, uv_array[:, :, 0], uv_array[:, :, 1]), axis=-1)
                 lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
             elif uv:
                 lq = np.stack((y_array, lq[:, :, 0], lq[:, :, 1]), axis=-1)
                 lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
+            else:
+                lq = lq.clip(0, 1)
 
             if self.lqhq:
                 hq = lq

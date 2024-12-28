@@ -5,7 +5,6 @@ from pepeline import fast_color_level
 from ..constants import INTERPOLATION_MAP
 from .utils import probability
 from ..utils.random import safe_uniform, safe_randint, safe_arange
-
 from ..utils.registry import register_class
 import logging
 
@@ -53,11 +52,16 @@ class Resize:
         self.hq_algorithm = resize_dict["alg_hq"]
         self.lq_scale = resize_dict["scale"]
         down_up = resize_dict.get("down_up")
+        up_down = resize_dict.get("up_down")
         down_down = resize_dict.get("down_down")
         if down_up:
-            self.down_up_spread = down_up["up"]
+            self.down_up_spread = down_up["down"]
             self.down_up_alg_up = down_up["alg_up"]
             self.down_up_alg_down = down_up["alg_down"]
+        if up_down:
+            self.up_down_spread = up_down["up"]
+            self.up_down_alg_up = up_down["alg_up"]
+            self.up_down_alg_down = up_down["alg_down"]
         if down_down:
             self.down_down_step = down_down["step"]
             self.down_down_alg = down_down["alg_down"]
@@ -66,15 +70,30 @@ class Resize:
         self.gamma_correction = resize_dict.get("gamma_correction", False)
 
     def __real_size(self, size: int) -> int:
-        return size - (size % (size // self.lq_scale * self.lq_scale))
+        return size // self.lq_scale * self.lq_scale
 
-    def __down_up(self, lq: np.ndarray, width: int, height: int) -> np.ndarray:
-        up = safe_uniform(self.down_up_spread)
-        algorithm_up = random.choice(self.down_up_alg_up)
+    def __up_down(self, lq: np.ndarray, width: int, height: int) -> np.ndarray:
+        up = safe_uniform(self.up_down_spread)
+        algorithm_up = random.choice(self.up_down_alg_up)
+        logging.debug(f"Resize - up_down up: {up:.4f} algorithm_up: {algorithm_up}")
         lq = resize(
             lq,
             (int(width * up), int(height * up)),
             INTERPOLATION_MAP[algorithm_up],
+            gamma_correction=self.gamma_correction,
+        )
+        return lq
+
+    def __down_up(self, lq: np.ndarray, width: int, height: int) -> np.ndarray:
+        down = safe_uniform(self.down_up_spread)
+        algorithm_down = random.choice(self.down_up_alg_down)
+        logging.debug(
+            f"Resize - down_up down: {down:.4f} algorithm_down: {algorithm_down}"
+        )
+        lq = resize(
+            lq,
+            (int(width / down), int(height / down)),
+            INTERPOLATION_MAP[algorithm_down],
             gamma_correction=self.gamma_correction,
         )
         return lq
@@ -107,22 +126,23 @@ class Resize:
             height, width = lq.shape[:2]
             algorithm_lq = random.choice(self.lq_algorithm)
             algorithm_hq = random.choice(self.hq_algorithm)
-            spread = 1
-            if len(self.spread_arange) > 1:
-                spread = random.choice(self.spread_arange)
+            spread = random.choice(self.spread_arange)
             height = self.__real_size(height // spread)
             width = self.__real_size(width // spread)
             logging.debug(
-                "Resize - algorithm_lq: %s algorithm_hq: %s spread: %.4f",
-                algorithm_lq,
-                algorithm_hq,
-                spread,
+                f"Resize - algorithm_lq: {algorithm_lq} algorithm_hq: {algorithm_hq} spread: {spread:.4f}"
             )
             if algorithm_lq == "down_up":
                 lq = self.__down_up(lq, width, height)
-                algorithm_lq = random.choice(self.down_up_alg_down)
+                algorithm_lq = random.choice(self.down_up_alg_up)
+                logging.debug(f"Resize - down_up new_algorithm_lq: {algorithm_lq}")
+            if algorithm_lq == "up_down":
+                lq = self.__up_down(lq, width, height)
+                algorithm_lq = random.choice(self.up_down_alg_down)
+                logging.debug(f"Resize - up_down new_algorithm_lq: {algorithm_lq}")
             if algorithm_lq == "down_down":
                 algorithm_lq = random.choice(self.down_down_alg)
+                logging.debug(f"Resize - down_down new_algorithm_lq: {algorithm_lq}")
                 lq = self.__down_down(lq, width, height, algorithm_lq)
 
             lq = resize(
@@ -139,8 +159,8 @@ class Resize:
             )
 
             if self.color_fix:
-                lq = fast_color_level(lq, 0, 250)
-                hq = fast_color_level(hq, 0, 250)
+                lq = fast_color_level(lq, 0, 254)
+                hq = fast_color_level(hq, 0, 254)
             return lq.squeeze(), hq.squeeze()
         except Exception as e:
             logging.error("Resize error: %s", e)

@@ -57,7 +57,7 @@ def shift_int(
         amount_y = safe_randint(amount_channel[1])
     if amount_x == 0 and amount_y == 0:
         return img
-    logging.debug("Shift_amount - amount_x: %s amount_y: %s", amount_x, amount_y)
+    logging.debug(f"Shift_amount - amount_x: {amount_x} amount_y: {amount_y}")
     return shift(img, amount_x, amount_y, fill_color)
 
 
@@ -84,7 +84,11 @@ def shift_percent(
         amount_y = int(shape_img[1] * safe_uniform(amount_channel[1]) / 100)
     if amount_x == 0 and amount_y == 0:
         return img
-    logging.debug("Shift_amount - amount_x: %.4f amount_y: %.4f", amount_x, amount_y)
+    logging.debug(
+        f"Shift_amount - amount_x: {amount_x:.4f} amount_y: {amount_y:.4f}",
+        amount_x,
+        amount_y,
+    )
     return shift(img, amount_x, amount_y, fill_color)
 
 
@@ -215,8 +219,8 @@ class Shift:
             if probability(self.probability):
                 return lq, hq
             type_shift = random.choice(self.type_list)
-            logging.debug("Shift - type: %s", type_shift)
+            logging.debug(f"Shift - type: {type_shift}")
             lq = SHIFT_TYPE_MAP[type_shift](lq)
             return lq, hq
         except Exception as e:
-            logging.error("Shift error: %s", e)
+            logging.error(f"Shift error: {e}")

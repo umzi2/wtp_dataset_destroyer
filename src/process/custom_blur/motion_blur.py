@@ -3,6 +3,8 @@ import cv2
 
 
 def motion_blur(img: np.ndarray, size: int, angle: float) -> np.ndarray:
+    if size == 0:
+        return img
     k = np.zeros((size, size), dtype=np.float32)
     k[(size - 1) // 2, :] = np.ones(size, dtype=np.float32)
     k = cv2.warpAffine(

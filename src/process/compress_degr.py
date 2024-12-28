@@ -1,15 +1,15 @@
-import io
+import subprocess
+
 import numpy as np
-from av import AVError
 from numpy import random
 import cv2 as cv
-import av
 from .utils import probability
 
-from ..constants import JPEG_SUBSAMPLING
+from ..constants import JPEG_SUBSAMPLING, VIDEO_SUBSAMPLING
 from ..utils.random import safe_randint
 from ..utils.registry import register_class
 import logging
+
 
 @register_class("compress")
 class Compress:
@@ -28,72 +28,100 @@ class Compress:
 
     def __init__(self, compress_dict: dict):
         self.algorithm = compress_dict["algorithm"]
-        compress = compress_dict.get("comp", [90, 100])
+        compress = compress_dict.get("compress", [90, 100])
         target = compress_dict.get("target_compress")
         self.probability = compress_dict.get("probability", 1.0)
         self.jpeg_sampling = compress_dict.get("jpeg_sampling", ["4:2:2"])
-        if "hevc" in self.algorithm:
-            logging.warning(
-                'HEVC encoding in pyav often causes errors such as pts<dts or memory segmentation errors. '
-                'If you have solutions or insights, please let us know.'
-            )
+        self.video_sampling = compress_dict.get("video_sampling", ["444", "422", "420"])
         if target:
             self.target_compress = {
                 "jpeg": target.get("jpeg", compress),
                 "webp": target.get("webp", compress),
                 "h264": target.get("h264", compress),
                 "hevc": target.get("hevc", compress),
-                "av1": target.get("av1", compress),
                 "vp9": target.get("vp9", compress),
-                "mpeg": target.get("mpeg", compress),
                 "mpeg2": target.get("mpeg2", compress),
             }
         else:
             self.target_compress = {
                 "jpeg": compress,
                 "webp": compress,
-                "av1": compress,
                 "h264": compress,
                 "hevc": compress,
                 "vp9": compress,
-                "mpeg": compress,
                 "mpeg2": compress,
             }
 
     def __video_core(
-            self, lq: np.ndarray, codec: str, output_args: dict, container: str = "mpeg"
+        self, lq: np.ndarray, codec: str, output_args: list, container: str = "mpeg"
     ) -> np.ndarray:
-        """Compresses a video frame using the specified codec and parameters.
+        height, width, _ = lq.shape
+        sampling = VIDEO_SUBSAMPLING[random.choice(self.video_sampling)]
+        process1 = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-loglevel",
+                "error",
+                "-y",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-s",
+                f"{width}x{height}",
+                "-r",
+                "30",
+                "-i",
+                "pipe:",
+                "-vcodec",
+                codec,
+                "-an",
+                "-f",
+                container,
+                "-pix_fmt",
+                f"{sampling}",
+            ]
+            + output_args
+            + ["pipe:"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+        )
 
-        Args:
-            lq (numpy.ndarray): The input video frame in RGB format.
-            codec (str): The codec to use for compression (e.g., "h264", "hevc").
-            output_args (dict): Additional parameters for the codec.
-            container (str, optional): The container format. Defaults to "mpeg".
+        process1.stdin.write(lq.tobytes())
+        process1.stdin.flush()
+        process1.stdin.close()
 
-        Returns:
-            numpy.ndarray: The compressed video frame in RGB format.
-        """
-        frame = av.VideoFrame.from_ndarray(lq, format="bgr24")
-        encoded_buffer = io.BytesIO()
-        output_container = av.open(encoded_buffer, 'w', format=container)
-        stream = output_container.add_stream(codec, rate=1)
-        stream.width = frame.width
-        stream.height = frame.height
-        stream.pix_fmt = 'yuv420p'
-        stream.options = output_args
-        for packet in stream.encode(frame):
-            output_container.mux(packet)
-        for packet in stream.encode():
-            output_container.mux(packet)
-        output_container.close()
-        encoded_buffer.seek(0)
-        input_container = av.open(encoded_buffer, 'r')
-        input_stream = input_container.streams.video[0]
-        for frame in input_container.decode(input_stream):
-            numpy_frame = frame.to_ndarray(format='bgr24')
-        input_container.close()
-        return numpy_frame
+        process2 = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-loglevel",
+                "error",
+                "-f",
+                container,
+                "-i",
+                "pipe:",
+                "-pix_fmt",
+                "rgb24",
+                "-f",
+                "image2pipe",
+                "-vcodec",
+                "rawvideo",
+                "pipe:",
+            ],
+            stdin=process1.stdout,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        raw_frame = process2.stdout.read()
+        process2.stdout.close()
+        process2.stderr.close()
+        process1.wait()
+        process2.wait()
+        frame_data = np.frombuffer(raw_frame, dtype=np.uint8).reshape(
+            (height, width, 3)
+        )
+        logging.debug(f"Blur - {codec} subsampling: {sampling}")
+        return frame_data
 
     def __h264(self, lq: np.ndarray, quality: int) -> np.ndarray:
         """Compresses an image using H.264 codec.
@@ -105,8 +133,9 @@ class Compress:
         Returns:
             numpy.ndarray: The compressed image.
         """
-        output_args = {"crf": str(quality)}
-        return self.__video_core(lq, "h264", output_args)
+        output_args = ["-crf", str(quality)]
+        output_img = self.__video_core(lq, "h264", output_args)
+        return output_img
 
     def __hevc(self, lq: np.ndarray, quality: int) -> np.ndarray:
         """Compresses an image using HEVC codec.
@@ -118,24 +147,9 @@ class Compress:
         Returns:
             numpy.ndarray: The compressed image, or the original if an error occurs.
         """
-        output_args = {"crf": str(quality), "x265-params": "log-level=0"}
-        try:
-            return self.__video_core(lq, "hevc", output_args)
-        except AVError:
-            return lq
+        output_args = ["-crf", str(quality), "-x265-params", "log-level=0"]
 
-    def __av1(self, lq: np.ndarray, quality: int) -> np.ndarray:
-        """Compresses an image using AV1 codec.
-
-        Args:
-            lq (numpy.ndarray): The input image in RGB format.
-            quality (int): The quality level for compression.
-
-        Returns:
-            numpy.ndarray: The compressed image.
-        """
-        output_args = {"crf": str(quality), "preset": "0"}
-        return self.__video_core(lq, 'av1', output_args, 'webm')
+        return self.__video_core(lq, "hevc", output_args)
 
     def __mpeg2(self, lq: np.ndarray, quality: int) -> np.ndarray:
         """Compresses an image using MPEG-2 codec.
@@ -147,12 +161,30 @@ class Compress:
         Returns:
             numpy.ndarray: The compressed image.
         """
-        output_args = {
-            "qscale:v": str(quality),
-            "qmax": str(quality),
-            "qmin": str(quality),
-        }
-        return self.__video_core(lq, "mpeg2video", output_args)
+        output_args = [
+            "-qscale:v",
+            str(quality),
+            "-qmax",
+            str(quality),
+            "-qmin",
+            str(quality),
+        ]
+        output_img = self.__video_core(lq, "mpeg2video", output_args)
+        return output_img
+
+    def __vp9(self, lq: np.ndarray, quality: int) -> np.ndarray:
+        """Compresses an image using VP9 codec.
+
+        Args:
+            lq (numpy.ndarray): The input image in RGB format.
+            quality (int): The quality level for compression.
+
+        Returns:
+            numpy.ndarray: The compressed image.
+        """
+        output_args = ["-crf", str(quality), "-b:v", "0"]
+        output_img = self.__video_core(lq, "libvpx-vp9", output_args, "webm")
+        return output_img
 
     def __jpeg(self, lq: np.ndarray, quality: int) -> np.ndarray:
         """Compresses an image using JPEG format.
@@ -165,26 +197,15 @@ class Compress:
             numpy.ndarray: The compressed image.
         """
         jpeg_sampling = random.choice(self.jpeg_sampling)
-        encode_param = [int(cv.IMWRITE_JPEG_QUALITY), quality, cv.IMWRITE_JPEG_SAMPLING_FACTOR,
-                        JPEG_SUBSAMPLING[jpeg_sampling]]
-        logging.debug(
-            f"Compress - jpeg sampling: {jpeg_sampling}"
-        )
+        encode_param = [
+            int(cv.IMWRITE_JPEG_QUALITY),
+            quality,
+            cv.IMWRITE_JPEG_SAMPLING_FACTOR,
+            JPEG_SUBSAMPLING[jpeg_sampling],
+        ]
+        logging.debug(f"Compress - jpeg sampling: {jpeg_sampling}")
         _, encimg = cv.imencode(".jpg", lq, encode_param)
         return cv.imdecode(encimg, 1).copy()
-
-    def __vp9(self, lq: np.ndarray, quality: int) -> np.ndarray:
-        """Compresses an image using VP9 codec.
-
-        Args:
-            lq (numpy.ndarray): The input image in RGB format.
-            quality (int): The quality level for compression.
-
-        Returns:
-            numpy.ndarray: The compressed image.
-        """
-        output_args = {"crf": str(quality), "b:v": "0", "cpu-used": "5"}
-        return self.__video_core(lq, "libvpx-vp9", output_args, "webm")
 
     def __webp(self, lq: np.ndarray, quality: int) -> np.ndarray:
         """Compresses an image using WebP format.
@@ -216,7 +237,6 @@ class Compress:
             "webp": self.__webp,
             "h264": self.__h264,
             "hevc": self.__hevc,
-            "av1": self.__av1,
             "mpeg2": self.__mpeg2,
             "vp9": self.__vp9,
         }
@@ -225,22 +245,21 @@ class Compress:
                 return lq, hq
             gray = False
             if lq.ndim == 3 and lq.shape[2] == 3:
-                lq = cv.cvtColor((lq * 255).astype(np.uint8), cv.COLOR_RGB2BGR)
+                lq = (lq * 255.0).astype(np.uint8)
+                lq = cv.cvtColor(lq, cv.COLOR_RGB2BGR)
             else:
-                lq = cv.cvtColor((lq * 255).astype(np.uint8), cv.COLOR_GRAY2BGR)
+                lq = cv.cvtColor((lq * 255.0).astype(np.uint8), cv.COLOR_GRAY2BGR)
                 gray = True
 
             algorithm = random.choice(self.algorithm)
             random_comp = safe_randint(self.target_compress[algorithm])
-            logging.debug(
-                "Compress - algorithm: %s compress: %s", algorithm, random_comp
-            )
+            logging.debug(f"Compress - algorithm: {algorithm} compress: {random_comp}")
             lq = COMPRESS_TYPE_MAP[algorithm](lq, random_comp)
 
             if gray:
                 lq = cv.cvtColor(lq, cv.COLOR_BGR2GRAY)
             else:
                 lq = cv.cvtColor(lq, cv.COLOR_BGR2RGB)
-            return (lq / 255).astype(np.float32), hq
+            return lq.astype(np.float32) / 255.0, hq
         except Exception as e:
-            logging.error("Compress error: %s", e)
+            logging.error(f"Compress error: {e}")

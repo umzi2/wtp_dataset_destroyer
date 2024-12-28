@@ -50,15 +50,11 @@ class Sin:
             vertical = not probability(self.vertical_prob)
             bias = safe_uniform(self.bias)
             logging.debug(
-                "Sin - shape: %s alpha: %.4f vertical: %s bias: %.4f",
-                shape,
-                alpha,
-                vertical,
-                bias,
+                f"Sin - shape: {shape} alpha: {alpha:.4f} vertical: {vertical} bias: {bias:.4f}"
             )
             lq = sin_patern(
                 lq, shape_sin=shape, alpha=alpha, vertical=vertical, bias=bias
             )
-            return lq, hq
+            return lq.clip(0, 1), hq
         except Exception as e:
-            logging.error("Sin error: %s", e)
+            logging.error(f"Sin error: {e}")

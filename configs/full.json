@@ -57,7 +57,7 @@
       "aperture_size":[3,5],
       "white": 0.5,
       "lq_hq": true,
-      "probability": 0.5
+      "probability": 1
     },
 
     {

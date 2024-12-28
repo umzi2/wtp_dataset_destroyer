@@ -33,30 +33,6 @@ class Halo:
         self.threshold = [threshold[0] / 255, threshold[1] / 255]
         self.type = halo_loss_dict.get("type_halo", ["unsharp_mask"])
 
-    # Removed because unsharp_halo produces similar results
-
-    # def __laplacian(self, lq: np.ndarray) -> np.ndarray:
-    #     if np.ndim(lq) != 2:
-    #         img_gray = cv.cvtColor(lq, cv.COLOR_RGB2GRAY)
-    #     else:
-    #         img_gray = lq
-    #     sharpening_factor = safe_uniform(self.factor)
-    #     kernel = safe_uniform(self.kernel)
-    #     laplacian = random.choice(self.laplacian)
-    #     logging.debug(
-    #         "Halo: type: laplacian sharpening_factor: %.4f kernel: %.4f laplacian_size: %s",
-    #         sharpening_factor,
-    #         kernel,
-    #         laplacian,
-    #     )
-    #     if kernel:
-    #         img_gray = box_blur(img_gray, kernel)
-    #     laplacian = cv.Laplacian(img_gray, cv.CV_32F, ksize=laplacian)
-    #     sharpened_image = img_gray - sharpening_factor * laplacian
-    #     _, sharpened_image = cv.threshold(sharpened_image, 0.98, 1, 0, cv.THRESH_BINARY)
-    #     if np.ndim(lq) != 2:
-    #         sharpened_image = np.stack([sharpened_image] * 3, axis=-1)
-    #     return np.clip(lq + sharpened_image, 0, 1).astype(np.float32)
     def __unsharp_gray(self, lq: np.ndarray) -> np.ndarray:
         rgb = False
         if lq.ndim == 3:
@@ -66,12 +42,22 @@ class Halo:
             lq_gray = lq
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
-
+        threshold = safe_uniform(self.threshold)
+        logging.debug(
+            f"Halo: type: unsharp_gray amount: {amount:.4f} kernel: {sigma:.4f}  threshold: {threshold:.4f}"
+        )
         blurred = cv.GaussianBlur(
             lq_gray, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
         )
         diff = lq_gray - blurred
-        diff = np.maximum(0, np.sign(diff) * np.abs(diff)) * amount
+        if threshold == 0:
+            diff = np.maximum(0, np.sign(diff) * np.abs(diff)) * amount
+        else:
+            diff = (
+                np.maximum(0, np.sign(diff) * np.maximum(0, np.abs(diff) - threshold))
+                * amount
+            )
+
         if rgb:
             lq[..., 0] = lq[..., 0] + diff
             lq[..., 1] = lq[..., 1] + diff
@@ -85,10 +71,7 @@ class Halo:
         amount = safe_uniform(self.amount)
         threshold = safe_uniform(self.threshold)
         logging.debug(
-            "Halo: type: unsharp_mask amount: %.4f kernel: %.4f  threshold: %.4f",
-            amount,
-            sigma,
-            threshold,
+            f"Halo: type: unsharp_mask amount: {amount:.4f} kernel: {sigma:.4f}  threshold: {threshold:.4f}"
         )
         blurred = cv.GaussianBlur(
             lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
@@ -112,9 +95,7 @@ class Halo:
         sigma = safe_uniform(self.kernel)
         amount = safe_uniform(self.amount)
         logging.debug(
-            "Halo: type: unsharp_halo amount: %.4f kernel: %.4f ",
-            amount,
-            sigma,
+            f"Halo: type: unsharp_halo amount: {amount:.4f} kernel: {sigma:.4f} "
         )
         blurred = cv.GaussianBlur(
             lq_gray, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT

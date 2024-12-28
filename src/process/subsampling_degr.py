@@ -43,8 +43,13 @@ class Subsampling:
         self.probability = sub.get("probability", 1.0)
 
     @staticmethod
-    def __down_up(lq: np.ndarray, shape: [int, int], scale: float, down_alg: ResizeFilter,
-                  up_alg: ResizeFilter) -> np.ndarray:
+    def __down_up(
+        lq: np.ndarray,
+        shape: [int, int],
+        scale: float,
+        down_alg: ResizeFilter,
+        up_alg: ResizeFilter,
+    ) -> np.ndarray:
         """
         Applies downscaling followed by upscaling to an image.
 
@@ -62,7 +67,9 @@ class Subsampling:
             resize(
                 lq, (int(shape[1] * scale), int(shape[0] * scale)), down_alg, False
             ).squeeze(),
-            (shape[1], shape[0]), up_alg, False
+            (shape[1], shape[0]),
+            up_alg,
+            False,
         ).squeeze()
 
     def __sample(self, lq: np.ndarray, format_sampling: str) -> np.ndarray:
@@ -80,7 +87,9 @@ class Subsampling:
         down_alg = INTERPOLATION_MAP[choice(self.down_alg)]
         up_alg = INTERPOLATION_MAP[choice(self.up_alg)]
         scale_list = SUBSAMPLING_MAP[format_sampling]
-        logging.debug(f"Subsampling: format - {format_sampling} down_alg - {down_alg} up_alg - {up_alg}")
+        logging.debug(
+            f"Subsampling: format - {format_sampling} down_alg - {down_alg} up_alg - {up_alg}"
+        )
         for index in range(3):
             scale = scale_list[index]
             if scale != 1:
@@ -114,10 +123,18 @@ class Subsampling:
                 if sigma != 0.0:
                     logging.debug(f"Subsampling blur: sigma - {sigma}")
                     lq[..., 1] = cv.GaussianBlur(
-                        lq[..., 1], (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+                        lq[..., 1],
+                        (0, 0),
+                        sigmaX=sigma,
+                        sigmaY=sigma,
+                        borderType=cv.BORDER_REFLECT,
                     )
                     lq[..., 2] = cv.GaussianBlur(
-                        lq[..., 2], (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
+                        lq[..., 2],
+                        (0, 0),
+                        sigmaX=sigma,
+                        sigmaY=sigma,
+                        borderType=cv.BORDER_REFLECT,
                     )
             lq = cvt_color(lq, yuv[1])
             return lq, hq

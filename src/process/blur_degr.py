@@ -41,7 +41,7 @@ class Blur:
             box = target.get("box", kernel)
             median = target.get("median", kernel)
             lens = target.get("lens", kernel)
-            random_kernel = target.get("random",kernel)
+            random_kernel = target.get("random", kernel)
             self.kernels = {
                 "gauss": gauss,
                 "box": box,
@@ -55,7 +55,7 @@ class Blur:
                 "box": kernel,
                 "median": kernel,
                 "lens": kernel,
-                "random":kernel
+                "random": kernel,
             }
         self.kernel = 0
 
@@ -69,7 +69,7 @@ class Blur:
         sigma = safe_uniform(self.kernels["gauss"])
         if sigma <= 0.0:
             return lq
-        logging.debug("Blur -  type: guss kernel: %.4f", sigma)
+        logging.debug(f"Blur - type: lens kernel: {sigma:.4f}", sigma)
         return cv.GaussianBlur(
             lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
         )
@@ -78,14 +78,14 @@ class Blur:
         kernel = safe_uniform(self.kernels["box"])
         if kernel <= 0.0:
             return lq
-        logging.debug("Blur -  type: box kernel: %.4f", kernel)
+        logging.debug(f"Blur - type: lens kernel: {kernel:.4f}", kernel)
         return box_blur(lq, kernel)
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["lens"])
         if kernel <= 0.0:
             return lq
-        logging.debug("Blur -  type: lens kernel: %.4f", kernel)
+        logging.debug(f"Blur - type: lens kernel: {kernel:.4f}", kernel)
         return lens_blur(lq, kernel)
 
     def __motion(self, lq: np.ndarray) -> np.ndarray:
@@ -93,14 +93,14 @@ class Blur:
         if size <= 0:
             return lq
         angle = safe_randint(self.angle)
-        logging.debug("Blur -  type: motion size: %s angle: %s", size, angle)
+        logging.debug(f"Blur - type: motion size: {size} angle: {angle}")
         return motion_blur(lq, size, angle)
 
     def __random(self, lq: np.ndarray) -> np.ndarray:
         kernel = safe_uniform(self.kernels["random"])
         if kernel <= 0.0:
             return lq
-        logging.debug("Blur -  type: random kernel: %.4f", kernel)
+        logging.debug(f"Blur - type: lens kernel: {kernel:.4f}", kernel)
         return random_kernel_blur(lq, kernel)
 
     def __median(self, lq: np.ndarray) -> np.ndarray:
@@ -109,9 +109,9 @@ class Blur:
         if kernel == 0:
             return lq
         kernel = self.__kernel_odd(kernel)
-        logging.debug("Blur -  type: median kernel: %s", kernel)
+        logging.debug(f"Blur - type: lens kernel: {kernel:.4f}", kernel)
         return (
-                cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
+            cv.medianBlur((lq * 255).astype(np.uint8), kernel).astype(np.float32) / 255
         )
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):

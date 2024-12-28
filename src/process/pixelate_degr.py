@@ -14,7 +14,7 @@ class Pixelate:
     The pixelation effect is controlled by the size of the pixel blocks and the probability of applying the effect.
     """
 
-    def __init__(self, noise_dict: dict):
+    def __init__(self, pixelate_dict: dict):
         """
         Initializes the Pixelate class with specified configuration.
 
@@ -23,8 +23,8 @@ class Pixelate:
                 - `size` (list): A list with two elements representing the range of pixel block sizes. Default is [1, 1].
                 - `probability` (float): The probability of applying the pixelation effect. Default is 1.0.
         """
-        self.size_range = noise_dict.get("size", [1, 1])
-        self.probability = noise_dict.get("probability", 1.0)
+        self.size_range = pixelate_dict.get("size", [1, 1])
+        self.probability = pixelate_dict.get("probability", 1.0)
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """
@@ -50,7 +50,7 @@ class Pixelate:
             if pixel_size <= 1:
                 return lq, hq
 
-            logging.debug("Pixelate - size: %.4f", pixel_size)
+            logging.debug(f"Pixelate - size: {pixel_size:.4f}")
 
             # Apply the pixelation effect by resizing the image to a smaller size and then back to the original size.
             lq = resize(
@@ -59,8 +59,10 @@ class Pixelate:
                 ResizeFilter.Linear,
                 False,
             )
-            lq = resize(lq, (shape_img[1], shape_img[0]), ResizeFilter.Nearest, False).squeeze()
+            lq = resize(
+                lq, (shape_img[1], shape_img[0]), ResizeFilter.Nearest, False
+            ).squeeze()
 
             return lq, hq
         except Exception as e:
-            logging.error("Pixelate error: %s", e)
+            logging.error(f"Pixelate error: {e}")
