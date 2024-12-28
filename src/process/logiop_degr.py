@@ -7,8 +7,8 @@ from src.utils.registry import register_class, get_class
 @register_class("and")
 class AndOperator:
     def __init__(self, and_dict: dict):
-        one_process = and_dict["one_process"]
-        two_process = and_dict["two_process"]
+        one_process = and_dict["one_degradation"]
+        two_process = and_dict["two_degradation"]
         self.probability_one = and_dict.get("probability_one", 1.0)
         self.probability_two = and_dict.get("probability_two", 0.5)
         self.turn_one = []
@@ -33,8 +33,8 @@ class AndOperator:
 @register_class("or")
 class OrOperator:
     def __init__(self, or_dict: dict):
-        one_process = or_dict["one_process"]
-        two_process = or_dict["two_process"]
+        one_process = or_dict["one_degradation"]
+        two_process = or_dict["two_degradation"]
         self.probability_one = or_dict.get("probability_one", 0.5)
         self.probability_two = or_dict.get("probability_two", 0.5)
         self.turn_one = []

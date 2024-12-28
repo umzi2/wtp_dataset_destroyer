@@ -1,5 +1,5 @@
-input = "/run/media/umzi/H/resselt_new/detect/test/in/"
-output = "output"
+input = "path/to/input"
+output = "path/to/output"
 
 degradation {
   type = "shift"
@@ -154,6 +154,7 @@ degradation {
   high = [240,255]
   low = [0,15]
   gamma = [0.9,1.1]
+  probability = 0.5
 }
 
 degradation {
@@ -169,6 +170,74 @@ degradation {
   type = "saturation"
   rand = [0.5,1.0]
   probability = 0.5
+}
+
+degradation {
+  type = "and"
+  probability_one = 0.5
+  probability_two = 0.5
+  one_degradation {
+    type = "saturation"
+    rand = [0.5,1.0]
+    probability = 0.5
+  }
+  one_degradation {
+      type = "color"
+      high = [240,255]
+      low = [0,15]
+      gamma = [0.9,1.1]
+      probability = 0.5
+    }
+
+  two_degradation {
+    type = "blur"
+    filter = ["box", "gauss", "median","lens","motion","random"]
+    kernel = [0, 1]
+    target_kernel = {
+      box = [0,1]
+      gauss = [0,1]
+      median = [0,1]
+      lens = [0,1]
+      random = [0,1]
+    }
+    motion_size = [0,10]
+    motion_angle = [-30,30]
+    probability = 0.5
+  }
+}
+
+degradation {
+  type = "or"
+  probability_one = 0.5
+  probability_two = 0.5
+  one_degradation {
+    type = "saturation"
+    rand = [0.5,1.0]
+    probability = 0.5
+  }
+  one_degradation {
+      type = "color"
+      high = [240,255]
+      low = [0,15]
+      gamma = [0.9,1.1]
+      probability = 0.5
+    }
+
+  two_degradation {
+    type = "blur"
+    filter = ["box", "gauss", "median","lens","motion","random"]
+    kernel = [0, 1]
+    target_kernel = {
+      box = [0,1]
+      gauss = [0,1]
+      median = [0,1]
+      lens = [0,1]
+      random = [0,1]
+    }
+    motion_size = [0,10]
+    motion_angle = [-30,30]
+    probability = 0.5
+  }
 }
 
 degradation {
