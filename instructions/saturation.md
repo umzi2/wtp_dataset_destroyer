@@ -1,14 +1,29 @@
-```json 
-  {
-    "type": "saturation",
-    "rand": [0.5, 1.0],
-    "probability": 0.5
-  }
+```json
+{
+  "type": "saturation",
+  "rand": [0.1,0.9],
+  "probability": 0.5
+}
 ```
 `*` = optional parameters
 
-- `rand` - The range from which a random value will be picked to control saturation. `[low,high]`
-- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+### Parameters
+- `rand`* - Controls color saturation level
+  - Format: [min, max]
+  - Default: [0.5, 1.0]
+  - Range: 0.0-1.0
+  - Example: [0.1,0.9] means:
+    - Values randomly chosen between 0.1-0.9
+    - 0.0 = Complete grayscale
+    - 0.5 = Half saturation
+    - 1.0 = Full original saturation
+  - Lower values create faded/washed-out look
+
+- `probability`* - Chance of applying effect
+  - Default: 1.0
+  - Range: 0.0 to 1.0
+  - No effect on grayscale images
+
 ## Examples:
 <div> Raw</div>
 <img src="images/saturation/raw.png" title="raw_img">

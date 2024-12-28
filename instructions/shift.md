@@ -4,35 +4,68 @@
     "shift_type": ["rgb", "yuv", "cmyk"],
     "percent": true,
     "rgb": {
-      "r": [[-10,10],[-10,10]],
-      "g": [[-10,10],[-10,10]],
-      "b": [[-10,10],[-10,10]]
-    },
-    "cmyk": {
-      "c": [[-10,10],[-10,10]],
-      "m": [[-10,10],[-10,10]],
-      "y": [[-10,10],[-10,10]],
-      "k": [[0,0],[0,0]]
+      "r": [[0,5], [0,5]],
+      "g": [[0,5], [0,5]],
+      "b": [[0,5], [0,5]]
     },
     "yuv": {
-      "y": [[-10,10],[-10,10]],
-      "u": [[-10,10],[-10,10]],
-      "v": [[-10,10],[-10,10]]
+      "y": [[0,5], [0,5]],
+      "u": [[0,5], [0,5]],
+      "v": [[0,5], [0,5]]
     },
-    "not_target":[[-10,10],[-10,10]],
+    "cmyk": {
+      "c": [[0,5], [0,5]],
+      "m": [[0,5], [0,5]],
+      "y": [[0,5], [0,5]],
+      "k": [[0,5], [0,5]]
+    },
     "probability": 0.5
   }
 ```
 `*` = optional parameters
 
-- `shift_type`* - The list of offset type to use. One is randomly picked per image.
-  - In fact the type is the space in which channel offsets occur
-- `percent`* - If true, the offset values = the offset percentage. If false, the offset values are in pixels
-- `(rgb,cmyk,yuv)`* - Ranges from which the offset is set for each color channel. Each channel is a range: `[[int, int],[int, int]]`
-   - The first range controls the x offset
-   - The second controls the y offset
-- `not_target`* - Values that will be used if there are no valid values in the channel
-- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+### Basic Parameters
+- `shift_type`* - Color spaces to apply shifts in
+  - Default: ["rgb"]
+  - Options: "rgb", "yuv", "cmyk"
+  - Multiple types can be used
+  - Each type creates different artifacts
+
+- `percent`* - Controls shift measurement
+  - Default: false
+  - true: Shifts are % of image size
+  - false: Shifts are in pixels
+
+- `probability`* - Chance of applying effect
+  - Default: 1.0
+  - Range: 0.0 to 1.0
+
+### Channel Shift Settings
+Each channel has format: [[x_min,x_max], [y_min,y_max]]
+- x values control horizontal shift
+- y values control vertical shift
+- Positive = right/down shift
+- Negative = left/up shift
+
+#### RGB Shifts
+- `rgb.r`* - Red channel shift range
+- `rgb.g`* - Green channel shift range
+- `rgb.b`* - Blue channel shift range
+Example: [[0,5], [0,5]] means:
+  - Random x shift: 0-5 pixels/percent right
+  - Random y shift: 0-5 pixels/percent down
+
+#### YUV Shifts
+- `yuv.y`* - Luminance shift range
+- `yuv.u`* - Blue-difference shift range
+- `yuv.v`* - Red-difference shift range
+
+#### CMYK Shifts
+- `cmyk.c`* - Cyan shift range
+- `cmyk.m`* - Magenta shift range
+- `cmyk.y`* - Yellow shift range
+- `cmyk.k`* - Black shift range
+
 ## Examples:
 ### all percent = true
 <div> raw</div>

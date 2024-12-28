@@ -1,25 +1,55 @@
 ```json
 {
-  "type":"subsampling",
-  "down": ["box", "hamming", "linear",  "lagrange", 
-           "cubic_catrom", "cubic_mitchell", "cubic_bspline",
-           "lanczos", "gauss"],
-  "up": ["box", "hamming", "linear",  "lagrange",  
-         "cubic_catrom", "cubic_mitchell", "cubic_bspline",
-         "lanczos", "gauss"],
-  "sampling": ["4:4:4", "4:2:2", "4:2:1", "4:1:1", "4:2:0", "4:1:0", "3:1:1"],
-  "yuv": ["601","709","2020"],
-  "blur": [0.0,4],
+  "type": "subsampling",
+  "down": ["nearest", "bilinear", "bicubic"],
+  "up": ["nearest", "bilinear", "bicubic"],
+  "sampling": ["4:4:4", "4:2:2", "4:2:0", "4:1:1"],
+  "blur": [3,7],
+  "yuv": ["601", "709", "2020"],
   "probability": 0.5
-
 }
 ```
-`*` = optional parameters
 
-* `down`* - reduction filters `default: nearest`
-* `up`* - magnification filters `default: nearest`
-* `sampling`* - subsampling format, more details at [wikipedia]( https://en.wikipedia.org/wiki/Chroma_subsampling)`default: 4:4:4`
-* `yuv`* - YUV standard, if you repeat whs then it is 601 `default: 601`
-* `blur`* - degree of blur of chroma channels `default: None`
-* `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied) `default: 1`
+### Basic Parameters
+- `down`* - Downscaling algorithms for color channels
+  - Default: ["nearest"]
+  - Options:
+    - "nearest": Fast but blocky
+    - "bilinear": Smooth but can blur
+    - "bicubic": Best quality but slower
+  - One algorithm randomly selected per image
 
+- `up`* - Upscaling algorithms for color channels
+  - Default: ["nearest"]
+  - Same options as `down`
+  - Different up/down combinations create unique artifacts
+
+### Color Settings
+- `sampling`* - Chroma subsampling formats
+  - Default: ["4:4:4"]
+  - Options:
+    - "4:4:4": No subsampling (full quality)
+    - "4:2:2": Half horizontal chroma resolution
+    - "4:2:0": Quarter chroma resolution
+    - "4:1:1": Quarter horizontal chroma resolution
+  - Lower ratios = more color artifacts
+
+- `yuv`* - YUV color space standard
+  - Default: ["601"]
+  - Options:
+    - "601": Standard for SD content (BT.601)
+    - "709": Standard for HD content (BT.709)
+    - "2020": Standard for UHD content (BT.2020)
+  - Affects color conversion accuracy
+
+### Enhancement
+- `blur`* - Optional blur kernel size
+  - Format: [min, max]
+  - Default: None (no blur)
+  - Must be odd numbers
+  - Larger values create more blur
+  - Helps reduce subsampling artifacts
+
+- `probability`* - Chance of applying effect
+  - Default: 1.0
+  - Range: 0.0 to 1.0

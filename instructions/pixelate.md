@@ -1,14 +1,28 @@
 ```json
-    {
-      "type": "pixelate",
-      "size": [0, 10],
-      "probability": 0.9
-    }
+{
+  "type": "pixelate",
+  "size": [1,10],
+  "probability": 0.5
+}
 ```
 `*` = optional parameters
 
-- `size` - the degree of pixelation accepts an array `[low, high]`. It is important to note that it works not with int sizes, but with float.
-- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+### Parameters
+- `size`* - Controls pixel block size
+  - Format: [min, max]
+  - Default: [1, 1]
+  - Example: [1,10] means:
+    - Original pixels are grouped into blocks
+    - Block size varies from 1x1 (no effect) to 10x10
+    - Each block becomes a single color (average)
+    - Larger values create more obvious "mosaic" effect
+  - Values ≤ 1 have no effect
+  - Integer values work best
+
+- `probability`* - Chance of applying effect
+  - Default: 1.0
+  - Range: 0.0 to 1.0
+
 ## Examples:
 <div> Raw</div>
 <img src="images/pixelate/raw.png" title="raw_img">

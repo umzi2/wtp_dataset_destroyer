@@ -19,6 +19,61 @@
   "out_clear": true,
 ```
 
+# Common Parameters and Concepts
+
+## Parameter Formats
+
+### Ranges
+Many effects use range formats for randomization:
+- `[min, max]`: Random value between min and max
+- `[min, max, step]`: Random value between min and max in steps
+  - Example: [1, 5, 2] means choose from [1, 3, 5]
+
+### Probabilities
+- All effects support `probability`
+- Format: 0.0 to 1.0
+  - 0.0 = Never apply
+  - 0.5 = 50% chance
+  - 1.0 = Always apply
+- Default: 1.0 if not specified
+
+### Color Spaces
+Several effects work in different color spaces:
+1. RGB (Red, Green, Blue)
+   - Standard color space
+   - Each channel 0-255
+   - Used by most effects
+
+2. YUV/YCbCr
+   - Y: Brightness
+   - U/Cb: Blue difference
+   - V/Cr: Red difference
+   - Used by: compress, shift, subsampling
+
+3. CMYK
+   - C: Cyan
+   - M: Magenta
+   - Y: Yellow
+   - K: Black
+   - Used by: screentone, shift
+
+### Image Types
+Effects handle different image types:
+- Color (RGB/BGR): 3 channels
+- Grayscale: 1 channel
+- Alpha channel: Preserved if present
+
+### Optional Parameters
+- Marked with `*` in documentation
+- Have default values
+- Can be omitted from configuration
+
+### Effect Order
+- Effects are applied in sequence
+- Order can affect final result
+- Some effects work better early/late in chain
+
+### Examples:
 - `input` - input folder
 - `output` - output folder (saves new HQ and LQ images)
 - `process` - The degradations that will be applied to your images
@@ -26,7 +81,7 @@
 - `map_type`* - Valid processing types: `process`, `thread` and `for`
   - If you run into issues on Windows, swap to `thread`
 - `size`* - How many images to process from the input folder 
-- `laplace_filte`r* - It filters out images based on low saturation using the laplace operator. Accepts a float value. (experiment with it)
+- `laplace_filter`* - It filters out images based on low saturation using the laplace operator. Accepts a float value. (experiment with it)
 - `shuffle_dataset`* - Determines whether or not the images will be shuffled
 - `tile`* - This section enables automatic tiling of your images. For example, if you choose `size` 512, it'll split a single image into multiple 512x512 images.  
   - `size` - tile size

@@ -9,40 +9,44 @@
   "uv_noise": 0.3,
   "alpha": [0.01,0.5,0.01],
   "scale": [1, 2],
-
   "octaves": [1,10,1],
   "frequency": [0.1,0.9,0.1],
   "lacunarity": [0.01,0.5,0.01],
   "probability_salt_or_pepper": [0,0.02],
-
   "bias": [-0.5, 0.5],
   "probability": 0.5
 }
 ```
 `*` = optional parameters
 
+### Basic Parameters
+- `type` - The type of noise to apply. One is randomly selected from the list for each image
+- `alpha`* - Controls noise intensity. Format: [min, max, step]
+- `probability`* - Chance of applying the noise effect (e.g., 0.5 = 50% chance)
+- `clip`* - Restricts noise to areas where image values are between [min, max]
+- `bias`* - Offset added to noise values. Range: [-1, 1]
+- `scale`* - Adjusts noise pattern size (only works with uniform and gaussian noise)
 
-- `type` - The list of blur algorithms to use. One is randomly picked per image
-- `alpha`* - Controls how transparent the noise is when overlaid
-- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
-- `y_noise`* - Generates monochrome noise. (e.g. 0.5 = 50% chance of being applied)
-  - The chance **that noise will only affect color components, ignoring tone in color images**
-- `clip`* 
-- `uv_noise`* - Generates color noise. (e.g. 0.5 = 50% chance of being applied)
-  - The chance that the noise will be applied only on the tone component in color images.
-- `bias` - The noise offset. Uses `[int,int]` with min -1, max 1
-- `scale` - Noise resize increases noise, works only with uniform and gauss.
+### Channel Control
+- `y_noise`* - Probability of applying noise only to luminance (Y channel)
+- `uv_noise`* - Probability of applying noise only to chrominance (UV channels)
 
-Additional settings for this noise list ("perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex")
-- `normalize`* - Normalizes noise within the range of `-1 - 1` (bool)
-  - 👋 opensimplex
-- `octaves`* - Noise re-call amount. Accepts `[low, high, step]`
-- `frequency`* - Division of image point size. Accepts `[low, high, step]`
-  - Image point size refers to the size of the smallest discernible element (pixel) in an image
-- `lacunarity`* - Controls how much the frequency decreases when the frequency is multiplied by the lacunarity. Accepts `[low, high, step]`.
+### Procedural Noise Parameters
+(For "perlinsuflet", "perlin", "opensimplex", "simplex", "supersimplex")
+- `normalize`* - Normalizes noise to range [-1, 1]
+- `octaves`* - Number of noise layers to combine. Format: [min, max, step]
+- `frequency`* - Controls noise pattern size. Format: [min, max, step]
+  - Lower values create larger patterns, higher values create finer details
+- `lacunarity`* - Controls frequency change between octaves. Format: [min, max, step]
+  - Higher values create more detail in subsequent octaves
 
-Additional settings for this noise list ("salt","pepper","salt_and_pepper")
-- `probability_salt_or_pepper`* - The percentage of salt and pepper noise applied
+### Salt and Pepper Parameters
+(For "salt", "pepper", "salt_and_pepper")
+- `probability_salt_or_pepper`* - Percentage of pixels affected by the noise
+  - For "salt": pixels set to 1 (white)
+  - For "pepper": pixels set to 0 (black)
+  - For "salt_and_pepper": pixels randomly set to either 0 or 1
+
 ## Examples 1:
 ### all alpha: 0.5
 <div> raw</div>
@@ -78,5 +82,3 @@ Additional settings for this noise list ("salt","pepper","salt_and_pepper")
 <img src="images/noise/uniform_y.png" title="uniform_y_img">
 <div> uniform uv_noise = 1.0</div>
 <img src="images/noise/uniform_uv.png" title="uniform_uv_img">
-
-

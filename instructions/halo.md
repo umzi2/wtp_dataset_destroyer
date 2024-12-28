@@ -1,22 +1,42 @@
-```json
 {
-      "type": "halo",
-      "type_halo": [ "unsharp_mask", "unsharp_halo"],
-      "kernel": [0,3],
-      "amount": [0,1],
-      "threshold": [0,20]
-}    
-```
-`*` = optional parameters
+  "type": "halo",
+  "type_halo": ["unsharp_mask"],
+  "kernel": [0,2],
+  "amount": [1,3],
+  "threshold": [0,50],
+  "probability": 0.5
+}
 
-- `type_halo` - The list of halo algorithms to use. One is randomly picked per image
-- `kernel` - This applies median blur with a random kernel `list[float|int]` (necessary to reduce artifacts)
-- `amount` - Strength of the halo
-  - `unsharp_mask`:
-    - `threshold` - Controls the halo threshold. Accepts a `list[float|int]`, with a range of 0-1. Note that these are not pixel values but percentages. (i.e., 0.5 ~= 50% threshold.)
-- `probability`* - The chance of applying (e.g. 0.5 = 50% chance of being applied)
+### Parameters
+- `type_halo`* - Controls how halos are generated
+  - Default: ["unsharp_mask"]
+  - Uses unsharp masking to create light/dark edges around objects
+  - Creates the "glow" or "halo" effect often seen in over-processed images
+  - Simulates over-sharpening artifacts
 
-Note: It's better to apply this before blurring. It takes only the white halo and it comes out at 1 bit
+- `kernel`* - Controls the width of the halo effect
+  - Format: [min, max]
+  - Default: [0, 2]
+  - Larger values create wider, more noticeable halos
+  - Smaller values create thin, subtle edges
+
+- `amount`* - Controls the intensity of the halo
+  - Format: [min, max]
+  - Default: [1, 1]
+  - Higher values create stronger contrast at edges
+  - Values > 2 create very obvious halos
+
+- `threshold`* - Controls which edges get halos
+  - Format: [min, max]
+  - Default: [0, 0]
+  - Range: 0-255
+  - Only applies halos where pixel difference > threshold
+  - Higher values only affect high-contrast edges
+
+- `probability`* - Chance of applying effect
+  - Default: 1.0
+  - Range: 0.0 to 1.0
+
 ## Examples:
 all kernel = 3 amount = 4
 <div> Raw</div>
