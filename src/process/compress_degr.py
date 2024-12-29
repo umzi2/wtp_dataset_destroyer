@@ -55,7 +55,7 @@ class Compress:
     def __video_core(
         self, lq: np.ndarray, codec: str, output_args: list, container: str = "mpeg"
     ) -> np.ndarray:
-        height, width, _ = lq.shape
+        height, width, channel = lq.shape
         sampling = VIDEO_SUBSAMPLING[random.choice(self.video_sampling)]
         process1 = subprocess.Popen(
             [
@@ -112,13 +112,13 @@ class Compress:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        raw_frame = process2.stdout.read()
+        raw_frame = process2.stdout.read()[:(height * width * channel)]
         process2.stdout.close()
         process2.stderr.close()
         process1.wait()
         process2.wait()
         frame_data = np.frombuffer(raw_frame, dtype=np.uint8).reshape(
-            (height, width, 3)
+            (height, width, channel)
         )
         logging.debug(f"Blur - {codec} subsampling: {sampling}")
         return frame_data
