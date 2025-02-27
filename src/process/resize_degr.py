@@ -70,7 +70,10 @@ class Resize:
         self.gamma_correction = resize_dict.get("gamma_correction", False)
 
     def __real_size(self, size: int) -> int:
-        return size // self.lq_scale * self.lq_scale
+        real_size= size // self.lq_scale * self.lq_scale
+        if real_size//self.lq_scale%2 !=0:
+            return real_size-self.lq_scale
+        return real_size
 
     def __up_down(self, lq: np.ndarray, width: int, height: int) -> np.ndarray:
         up = safe_uniform(self.up_down_spread)
@@ -133,7 +136,7 @@ class Resize:
                 f"Resize - algorithm_lq: {algorithm_lq} algorithm_hq: {algorithm_hq} spread: {spread:.4f}"
             )
             if algorithm_lq == "down_up":
-                lq = self.__down_up(lq, width, height)
+                lq = self.__down_up(lq, width//self.lq_scale, height//self.lq_scale)
                 algorithm_lq = random.choice(self.down_up_alg_up)
                 logging.debug(f"Resize - down_up new_algorithm_lq: {algorithm_lq}")
             if algorithm_lq == "up_down":

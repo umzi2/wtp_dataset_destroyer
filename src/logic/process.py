@@ -7,8 +7,6 @@ import numpy as np
 from os import listdir
 from os.path import join
 from tqdm import tqdm
-# import psutil
-
 from ..utils.process import del_all_file
 from ..utils.registry import get_class
 import logging
@@ -109,9 +107,10 @@ class ImgProcess:
             lq_fold = join(self.output, "lq")
             lq_folds = os.listdir(lq_fold)
             del_all_file(lq_fold, lq_folds)
-            hq_fold = join(self.output, "hq")
-            hq_folds = os.listdir(hq_fold)
-            del_all_file(hq_fold, hq_folds)
+            if not self.only_lq:
+                hq_fold = join(self.output, "hq")
+                hq_folds = os.listdir(hq_fold)
+                del_all_file(hq_fold, hq_folds)
 
     def __img_read(self, img_fold: str) -> np.ndarray:
         input_folder = join(self.input, img_fold)
@@ -188,7 +187,7 @@ class ImgProcess:
             seed = np.random.randint(2**30) + index
             np.random.seed(seed)
             if h < self.tile_size or w < self.tile_size:
-                logging.error(f"Image {img_fold} is smaller than tile size")
+                return
             for Kx, Ky in np.ndindex(h // self.tile_size, w // self.tile_size):
                 img_tile = img[
                     self.tile_size * Kx : self.tile_size * (Kx + 1),
@@ -214,7 +213,10 @@ class ImgProcess:
                 )
                 for loss in self.turn:
                     lq, hq = loss.run(lq, hq)
-                self.__img_save(lq, hq, output_name)
+                if self.only_lq:
+                    self.__only_lq_save(lq, output_name)
+                else:
+                    self.__img_save(lq, hq, output_name)
 
         except Exception as e:
             logging.error("Processing failed for %s: %s", img_fold, str(e))

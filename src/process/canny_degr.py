@@ -1,4 +1,3 @@
-from .custom_blur import lens_blur
 from .utils import probability
 import numpy as np
 from ..utils.registry import register_class
@@ -40,11 +39,9 @@ class Canny:
     def black_scale(self, img, scale):
         if scale == 0:
             return img
-        masc = (img > 1 / 255).astype(np.float32)
-        masc = lens_blur(masc, scale)
-        masc = masc > 254 / 255
-        img = np.where(masc, img, 0.0)
-        return img
+        kernel = np.ones([int(np.round(scale)),int(np.round(scale))])#create_linse_kernel(np.round(scale),False)
+        dilated_image = cv2.dilate(1-img, kernel.astype(np.uint8)).clip(0,1)
+        return 1-dilated_image
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
         """

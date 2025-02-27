@@ -69,7 +69,7 @@ class Blur:
         sigma = safe_uniform(self.kernels["gauss"])
         if sigma <= 0.0:
             return lq
-        logging.debug(f"Blur - type: lens kernel: {sigma:.4f}")
+        logging.debug(f"Blur - type: gauss kernel: {sigma:.4f}")
         return cv.GaussianBlur(
             lq, (0, 0), sigmaX=sigma, sigmaY=sigma, borderType=cv.BORDER_REFLECT
         )
@@ -78,7 +78,7 @@ class Blur:
         kernel = safe_uniform(self.kernels["box"])
         if kernel <= 0.0:
             return lq
-        logging.debug(f"Blur - type: lens kernel: {kernel:.4f}")
+        logging.debug(f"Blur - type: box kernel: {kernel:.4f}")
         return box_blur(lq, kernel)
 
     def __lens(self, lq: np.ndarray) -> np.ndarray:

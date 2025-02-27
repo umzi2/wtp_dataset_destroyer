@@ -2,11 +2,11 @@ import os
 import random
 import shutil
 
-in_dir = "/run/media/umzi/H/dat/df2k/digital_art_v2_ab/train/train"
-out_dir = "/run/media/umzi/H/dat/df2k/digital_art_v2_ab/train/val"
+in_dir = "/run/media/umzi/H/dat/screentone_classifer/train/train"
+out_dir = "/run/media/umzi/H/dat/screentone_classifer/train/val"
 img_name_list = os.listdir(in_dir)
 random.shuffle(img_name_list)
-img_name_list = img_name_list[:250]
+img_name_list = img_name_list[:1000]
 for img_name in img_name_list:
     shutil.move(os.path.join(in_dir, img_name), os.path.join(out_dir, img_name))
 # in_dir = "/run/media/umzi/H/dat/df2k/digital_art_v3/train/train/"
@@ -28,19 +28,19 @@ for img_name in img_name_list:
 # line = 3
 # noise = 4
 # dirs = [
-# "/run/media/umzi/H/dat/df2k/digital_art_v2_ab/zero/lq",
-#     "/run/media/umzi/H/dat/df2k/digital_art_v2_ab/circle/lq",
-#     "/run/media/umzi/H/dat/df2k/digital_art_v2_ab/cross/lq",
-#     "/run/media/umzi/H/dat/df2k/digital_art_v2_ab/line/lq"
+# "/run/media/umzi/H/dat/screentone_classifer/train/zero/lq",
+#     "/run/media/umzi/H/dat/screentone_classifer/train/circle/lq/",
+#     "/run/media/umzi/H/dat/screentone_classifer/train/cross/lq",
+#     "/run/media/umzi/H/dat/screentone_classifer/train/line/lq"
 #
 #
 # ]
-# out_dir = "/run/media/umzi/H/dat/df2k/digital_art_v2_ab/train/train"
+# out_dir = "/run/media/umzi/H/dat/screentone_classifer/train/train"
 # nn=0
 # n = 0
 # for dir in dirs:
 #     img_names = os.listdir(dir)
 #     for img_name in img_names:
-#         shutil.copy(os.path.join(dir,img_name),os.path.join(out_dir,f"{nn}_{n}.png"))
+#         shutil.move(os.path.join(dir,img_name),os.path.join(out_dir,f"{nn}_{n}.png"))
 #         nn+=1
 #     n+=1

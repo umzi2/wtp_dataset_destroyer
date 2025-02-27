@@ -41,6 +41,7 @@ class Compress:
                 "hevc": target.get("hevc", compress),
                 "vp9": target.get("vp9", compress),
                 "mpeg2": target.get("mpeg2", compress),
+                "mpeg4": target.get("mpeg4", compress),
             }
         else:
             self.target_compress = {
@@ -50,6 +51,7 @@ class Compress:
                 "hevc": compress,
                 "vp9": compress,
                 "mpeg2": compress,
+                "mpeg4":  compress,
             }
 
     def __video_core(
@@ -62,6 +64,7 @@ class Compress:
                 "ffmpeg",
                 "-loglevel",
                 "error",
+                "-threads", "0",
                 "-y",
                 "-f",
                 "rawvideo",
@@ -96,6 +99,7 @@ class Compress:
                 "ffmpeg",
                 "-loglevel",
                 "error",
+                "-threads", "0",
                 "-f",
                 container,
                 "-i",
@@ -171,7 +175,26 @@ class Compress:
         ]
         output_img = self.__video_core(lq, "mpeg2video", output_args)
         return output_img
+    def __mpeg4(self, lq: np.ndarray, quality: int) -> np.ndarray:
+        """Compresses an image using MPEG-2 codec.
 
+        Args:
+            lq (numpy.ndarray): The input image in RGB format.
+            quality (int): The quality level for compression.
+
+        Returns:
+            numpy.ndarray: The compressed image.
+        """
+        output_args = [
+            "-qscale:v",
+            str(quality),
+            "-qmax",
+            str(quality),
+            "-qmin",
+            str(quality),
+        ]
+        output_img = self.__video_core(lq, "mpeg4", output_args)
+        return output_img
     def __vp9(self, lq: np.ndarray, quality: int) -> np.ndarray:
         """Compresses an image using VP9 codec.
 
@@ -238,6 +261,7 @@ class Compress:
             "h264": self.__h264,
             "hevc": self.__hevc,
             "mpeg2": self.__mpeg2,
+            "mpeg4": self.__mpeg4,
             "vp9": self.__vp9,
         }
         try:
