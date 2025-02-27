@@ -1,22 +1,22 @@
-```json 
-  "input": "path/to/input",
-  "output": "path/to/output",
-  "process":[]
-  "tile": {
-    "size": 512,
-    "no_wb": true
-  },
-  "num_workers": 16,
-  "map_type": "process",
-  "laplace_filter": 0.02,
-  "size": 1000,
-  "shuffle_dataset": true,
-  "gray": false,
-  "gray_or_color":true,
-  "debug": false,
-  "only_lq": false,
-  "real_name": false,
-  "out_clear": true,
+```hcl
+input = "path/to/input"
+output = "path/to/output"
+degradation {}...
+tile = {
+  size = 512
+  no_wb = true
+}
+num_workers = 16
+map_type = "thread"
+laplace_filter = 0.02
+size = 1000
+shuffle_dataset = true
+gray = false
+gray_or_color = true
+debug = false
+only_lq = false
+real_name = false
+out_clear = true
 ```
 
 # Common Parameters and Concepts
@@ -76,7 +76,7 @@ Effects handle different image types:
 ### Examples:
 - `input` - input folder
 - `output` - output folder (saves new HQ and LQ images)
-- `process` - The degradations that will be applied to your images
+- `degradation` - The degradations that will be applied to your images
 - `num_workers`* - The number of processes for parallel processing. It's best to use your CPU core count
 - `map_type`* - Valid processing types: `process`, `thread` and `for`
   - If you run into issues on Windows, swap to `thread`
