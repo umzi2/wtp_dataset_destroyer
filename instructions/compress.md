@@ -1,22 +1,21 @@
-```json
-{
-  "type": "compress",
-  "algorithm": ["jpeg", "webp", "h264", "av1", "mpeg", "mpeg2", "vp9", "hevc"],
-  "jpeg_sampling": [
+```hcl
+degradation {
+  type ="compress"
+  algorithm = ["jpeg", "webp", "h264", "hevc", "mpeg2", "mpeg4", "vp9"]
+  jpeg_sampling = [
     "4:4:4", "4:4:0", "4:2:2", "4:2:0"
-  ],
-  "target_compress": {
-    "jpeg": [40,100],
-    "webp": [40,100],
-    "h264": [23,32],
-    "hevc": [20,34],
-    "av1": [20,35],
-    "vp9": [20,35],
-    "mpeg": [2,20],
-    "mpeg2": [2,20]
-  },
-  "comp": [40, 100],
-  "probability": 0.5
+  ]
+  target_compress = {
+    h264 = [23,32]
+    hevc = [20,34]
+    mpeg4 = [2,20]
+    mpeg2 = [2,20]
+    vp9 = [20,35]
+    jpeg = [40,100]
+    webp = [40,100]
+  }
+  compress = [40, 100]
+  probability = 0.5
 }
 ```
 
@@ -58,9 +57,8 @@
 2. Video Codecs:
    - H.264: 23-32 (lower = better quality)
    - HEVC: 20-34 (lower = better quality)
-   - AV1: 20-35 (lower = better quality)
    - VP9: 20-35 (lower = better quality)
-   - MPEG: 2-20 (lower = better quality)
+   - MPEG4: 2-20 (lower = better quality)
    - MPEG2: 2-20 (lower = better quality)
 
 ### Examples:
@@ -75,10 +73,6 @@
 <img src="images/compress/webp_50.png" title="webp_img">
 <div> h264 32</div>
 <img src="images/compress/h264_32.png" title="h264_img">
-<div> av1 35</div>
-<img src="images/compress/av1_35.png" title="av1_img">
-<div> Mpeg 20</div>
-<img src="images/compress/mpeg_20.png" title="mpeg_img">
 <div> Mpeg2 20</div>
 <img src="images/compress/mpeg2_20.png" title="mpeg2_img">
 <div> Vp9 35</div>
