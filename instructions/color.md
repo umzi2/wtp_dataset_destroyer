@@ -1,10 +1,10 @@
-```json
-{
-  "type": "color",
-  "high": [200,255],
-  "low": [0,50],
-  "gamma": [0.8,1.2],
-  "probability": 0.5
+```hcl
+degradation {
+  type = "color"
+  high = [240,255]
+  low = [0,15]
+  gamma = [0.9,1.1]
+  probability = 0.5
 }
 ```
 
