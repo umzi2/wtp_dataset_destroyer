@@ -1,8 +1,8 @@
 ```json
-{
-  "type": "saturation",
-  "rand": [0.1,0.9],
-  "probability": 0.5
+degradation {
+  type = "saturation"
+  rand = [0.5,1.0]
+  probability = 0.5
 }
 ```
 `*` = optional parameters
