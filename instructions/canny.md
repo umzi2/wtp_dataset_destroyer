@@ -1,13 +1,15 @@
-{
-  "type":"canny",
-  "thread1" : [10,150,1],
-  "thread2": [10,100,1],
-  "aperture_size":[3,5],
-  "white": 0.5,
-  "lq_hq": true,
-  "probability": 0.5
+```hcl
+degradation {
+  type = "canny"
+  thread1 = [10, 150, 1]
+  thread2 = [10, 100, 1]
+  aperture_size = [3, 5]
+  scale = [0, 1, 0.25]
+  white = 0.5
+  lq_hq = true
+  probability = 0.5
 }
-
+```
 ### Edge Detection Parameters
 - `thread1`* - First threshold for the Canny edge detector
   - Format: [min, max, step]
@@ -27,6 +29,10 @@
   - Larger values detect stronger edges
 
 ### Appearance Control
+- `scale`* - edge size control
+  - Format: [min, max, step]
+  - Default: [0, 1, 0.25]
+  - If the value is 0, no outlines are applied; otherwise, the contour is increased to the rounded-up value of the contour. For example, if Canny typically produces a contour of 1 pixel, with a value of 3, the contour will be 3 pixels.
 - `white`* - Controls edge appearance
   - Range: 0.0 to 1.0
   - Default: 0.0
