@@ -1,28 +1,32 @@
-```json
-  {
-    "type": "screentone",
-    "lqhq": false,
-    "dot_size": [5,15],
-    "color": {
-      "type_halftone": ["rgb","cmyk","gray","not_rot","hsv"],
-      "c": [15,75],
-      "m": [15,75],
-      "y": [15,75],
-      "k": [15,75],
-
-      "r": [15,75],
-      "g": [15,75],
-      "b": [15,75],
-      "cmyk_alpha": [0.5,1.0],
-      "1_ch_dot_type": ["circle"],
-      "2_ch_dot_type": ["circle"],
-      "3_ch_dot_type": ["circle"],
-      "4_ch_dot_type": ["circle"]
-    },
-    "dot_type": ["circle", "diamond", "line"],
-    "angle": [0,90],
-    "probability": 0.5
-  }
+```hcl
+degradation {
+  type = "screentone"
+  lqhq = false
+  dot_size = [7]
+    color {
+      type_halftone = ["rgb","cmyk","gray","not_rot","hcl"]
+      dot{
+        angle = [-45,45]
+        type = ["circle"]
+      }
+      dot{
+        angle = [-45,45]
+        type = ["ellipse"]
+      }
+      dot{
+        angle = [-45,45]
+        type = ["circle"]
+      }
+      dot{
+        angle = [-45,45]
+        type = ["circle"]
+      }
+      cmyk_alpha = [0.5,1.0]
+    }
+  dot_type = ["circle"]
+  angle = [-45,45]
+  probability = 0.5
+}
 ```
 `*` = optional parameters
 
