@@ -1,8 +1,8 @@
-```json
-{
-  "type": "pixelate",
-  "size": [1,10],
-  "probability": 0.5
+```hcl
+degradation {
+  type = "pixelate"
+  size = [1, 10]
+  probability = 0.5
 }
 ```
 `*` = optional parameters
