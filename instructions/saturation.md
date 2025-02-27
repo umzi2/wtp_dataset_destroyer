@@ -1,4 +1,4 @@
-```json
+```hcl
 degradation {
   type = "saturation"
   rand = [0.5,1.0]
