@@ -1,11 +1,11 @@
-```json
-{
-  "type": "sin",
-  "shape": [100,1000,100],
-  "alpha": [0.1,0.5],
-  "bias": [0.8,1.2],
-  "vertical": 0.5,
-  "probability": 0.5
+```hcl
+degradation {
+   type = "sin"
+   shape = [100,1000,100]
+   alpha = [0.1,0.5]
+   bias = [-1,1]
+   vertical = 0.5
+   probability = 0.5
 }
 ```
 ### Parameters

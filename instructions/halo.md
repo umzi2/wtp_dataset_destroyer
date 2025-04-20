@@ -1,12 +1,13 @@
-{
-  "type": "halo",
-  "type_halo": ["unsharp_mask"],
-  "kernel": [0,2],
-  "amount": [1,3],
-  "threshold": [0,50],
-  "probability": 0.5
+```hcl
+degradation {
+  type = "halo"
+  type_halo = ["unsharp_mask","unsharp_halo","unsharp_gray"]
+  kernel = [0,3]
+  amount = [0,1]
+  threshold = [0,0.5]
+  probability = 0.5
 }
-
+```
 ### Parameters
 - `type_halo`* - Controls how halos are generated
   - Default: ["unsharp_mask"]
@@ -29,7 +30,7 @@
 - `threshold`* - Controls which edges get halos
   - Format: [min, max]
   - Default: [0, 0]
-  - Range: 0-255
+  - Range: 0.0-1.0
   - Only applies halos where pixel difference > threshold
   - Higher values only affect high-contrast edges
 

@@ -20,18 +20,19 @@ This document covers basic information on how to configure `wtp_dataset_destroye
    - `sin`: Sinusoidal patterns
    - `shift`: Color channel misalignment
    - `resize`: Resolution changes
-
+   - `and`:  If the first degradation group triggers, the second one will also be executed.
+   - `or`: If the first degradation group does not trigger, the second one will be executed.
 ### Disabling degradations
 To disable degradations, simply delete the section from your config file. This is what a section looks like:
-```py
-    {
-      "type": "sin",
-      "shape": [100,1000,100],
-      "alpha": [0.1,0.5],
-      "bias": [-1,1],
-      "vertical": 0.5,
-      "probability": 0.5
-    }
+```hcl
+degradation {
+   type = "sin"
+   shape = [100,1000,100]
+   alpha = [0.1,0.5]
+   bias = [-1,1]
+   vertical = 0.5
+   probability = 0.5
+}
 ```
 Notice the { } enclosing the section. This defines a valid section that you can remove.
 

@@ -1,0 +1,27 @@
+```hcl
+  degradation {
+    type = "or" #and
+    probability_one = 0.5
+    probability_two = 0.5
+    one_degradation { ... }
+    two_degradation { ... }
+  }
+```
+### Type
+- `or` - if the first degradation group does not trigger, the second one will be executed.
+- `and` - if the first degradation group triggers, the second one will also be executed.
+### Probability
+- `probability_one` - the chance of triggering the first degradation group (e.g., 0.5 = 50%).
+- `probability_two` - depending on the type, if the process moves to the second degradation group, it will trigger with this probability (e.g., 0.5 = 50%).
+### Degradatio
+- `one_degradation` - a group of degradations that execute if probability_one is triggered. It works the same way as regular degradations but uses a different name.
+- `two_degradation` - the second group of degradations, working on the same principle.
+- Both `one_degradation` and `two_degradation` can be defined multiple times, for example:
+```hcl
+one_degradation { ... }
+one_degradation { ... }
+two_degradation { ... }
+two_degradation { ... }
+```
+
+

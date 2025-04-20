@@ -1,24 +1,27 @@
-```json
-{
-  "type": "resize",
-  "spread": [1,4,1],
-  "alg_lq": ["nearest", "bilinear", "bicubic", "lanczos"],
-  "alg_hq": ["lanczos"],
-  "scale": 4,
-  "down_up": {
-    "spread": [1,4,1],
-    "alg_up": ["nearest", "bilinear"],
-    "alg_down": ["nearest", "bilinear"]
-  },
-  "down_down": {
-    "step": 2,
-    "alg": ["nearest", "bilinear"]
-  },
-  "probability": 0.5,
-  "color_fix": true,
-  "gamma_correction": true,
-  "olq": false
-}
+```hcl
+degradation {
+  type = "resize"
+  alg_lq = ["box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+    "lanczos", "gauss", "down_up", "down_down", "up_down"]
+  alg_hq = ["lagrange"]
+  down_up = {
+    down = [1, 2]
+    alg_up = ["nearest", "box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
+      "cubic_bspline", "lanczos", "gauss", "down_down"]
+    alg_down = [ "hermite", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+      "lanczos", "gauss"]
+  }
+  up_down = {
+    up = [1, 2]
+    alg_up = ["nearest", "box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
+      "cubic_bspline", "lanczos", "gauss"]
+    alg_down = [ "hermite", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+      "lanczos", "gauss","down_down"]
+  }
+  down_down = {
+    step = [1, 6]
+    alg_down = [ "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline"]
+  }
 ```
 
 ### Basic Parameters
@@ -42,10 +45,14 @@
 - `alg_lq` - Algorithms for low quality image. One is randomly picked per image
 - `alg_hq` - Algorithms for high quality image. One is randomly picked per image
 - `scale` - Base scaling factor
-
+### Up-Down Resize
+- `up_down` - This algorithm increases the resolution of the image through resizing, then downsizes it again.
+- `up` - Scale range for up-down
+- `alg_up` - Upscaling algorithms
+- `alg_down` - Downscaling algorithms
 ### Down-Up Resize
-- `down_up` - This algorithm increases the resolution of the image through resizing, then downsizes it again.
-- `spread` - Scale range for down-up
+- `down_up` - This algorithm reduces the resolution of an image by resizing it and then increases its size again.
+- `down` - Scale range for down-up
 - `alg_up` - Upscaling algorithms
 - `alg_down` - Downscaling algorithms
 

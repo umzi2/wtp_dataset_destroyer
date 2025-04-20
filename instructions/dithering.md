@@ -1,32 +1,30 @@
-```json
-{
-  "type": "dithering",
-  "type_dither": ["floyd", "bayer"],
-  "bits": [1,4],
-  "probability": 0.5
+```hcl
+degradation {
+  type = "dithering"
+  dithering_type = ["floydsteinberg", "jarvisjudiceninke", "stucki", "atkinson", "burkes", "sierra",
+        "tworowsierra", "sierraLite","order","riemersma","quantize"]
+  color_ch = [2,10]
+  map_size = [2,4,8,16]
+  history = [10, 15]
+  ratio = [0.1,0.9]
+  probability = 0.5
 }
+
 ```
 
 ### Parameters
 - `type_dither`* - Controls the dithering algorithm
-  - Default: ["floyd"]
-  - Options:
-    - "floyd": Floyd-Steinberg dithering
-      - Creates a diffused, natural-looking pattern
-      - Better for photographic images
-    - "bayer": Ordered dithering
-      - Creates a regular, grid-like pattern
-      - Better for graphics and text
+  - Default: ["quantize"]
 
-- `bits`* - Controls color depth reduction
+- `color_ch`* - Controls color depth reduction
   - Format: [min, max]
-  - Default: [1, 1]
-  - Range: 1-8
+  - Default: [2, 10]
+  - Range: 2-255
   - Example: [1,4] means:
-    - 1 bit = Black & White only (2 colors)
-    - 2 bits = 4 colors
-    - 3 bits = 8 colors
-    - 4 bits = 16 colors
+    - 2 ch = Black & White only (2 colors)
+    - 4 ch = 12 colors
+    - 8 ch = 24 colors
+    - 16 ch = 48 colors
   - Lower values create more obvious dithering
 
 - `probability`* - Chance of applying effect

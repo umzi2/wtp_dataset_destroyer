@@ -1,18 +1,18 @@
-```json
-{
-    "type": "blur",
-    "filter": ["box", "gauss", "median", "lens", "motion", "random"],
-    "kernel": [0, 1],
-    "target_kernel": {
-      "box": [0,2],
-      "gauss": [0,2],
-      "median": [0,1],
-      "lens": [1,2],
-      "random": [0,2]
-    },
-    "motion_size": [1,10],
-    "motion_angle": [-30,30],
-    "probability": 0.5
+```hcl
+degradation {
+  type = "blur"
+  filter = ["box", "gauss", "median","lens","motion","random"]
+  kernel = [0, 1]
+  target_kernel = {
+    box = [0,1]
+    gauss = [0,1]
+    median = [0,1]
+    lens =[1,2]
+    random = [0,1]
+  }
+  motion_size = [0,10]
+  motion_angle = [-30,30]
+  probability = 0.5
 }
 ```
 
