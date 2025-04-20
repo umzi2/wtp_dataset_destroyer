@@ -2,7 +2,12 @@
 A tool for creating paired image datasets with configurable degradation Degradations. Perfect for training image restoration and enhancement models.
 
 ## Documentation
-
+### Requirements install
+```
+pip install -r requirements.txt
+# or
+python3 -m pip install -r requirements.txt
+```
 ### Basic Setup
 - [Basic Information](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/basic_info.md)
 - [Common Parameters](https://github.com/umzi2/wtp_dataset_destroyer/blob/master/instructions/common.md)
