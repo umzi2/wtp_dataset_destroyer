@@ -3,7 +3,7 @@ A tool for creating paired image datasets with configurable degradation Degradat
 
 ## Documentation
 ### Requirements install
-```
+```bash
 pip install -r requirements.txt
 # or
 python3 -m pip install -r requirements.txt
