@@ -2,6 +2,7 @@ import numpy as np
 from numpy import random
 from chainner_ext import resize
 from pepeline import fast_color_level
+from pepedpid import dpid_resize, cubic_resize
 from ..constants import INTERPOLATION_MAP
 from .utils import probability
 from ..utils.random import safe_uniform, safe_randint, safe_arange
@@ -74,16 +75,23 @@ class Resize:
         if real_size//self.lq_scale%2 !=0:
             return real_size-self.lq_scale
         return real_size
-
+    def __resize(self,x:np.ndarray, width: int, height: int,algorithm:str):
+        if algorithm in INTERPOLATION_MAP.keys():
+            x = resize(x,(width,height),INTERPOLATION_MAP[algorithm],self.gamma_correction)
+        elif algorithm == "mat_cubic":
+            x = cubic_resize(x,height,width)
+        else:
+            x = dpid_resize(x,height,width,float(algorithm.split("_")[-1]))
+        return x
     def __up_down(self, lq: np.ndarray, width: int, height: int) -> np.ndarray:
         up = safe_uniform(self.up_down_spread)
         algorithm_up = random.choice(self.up_down_alg_up)
         logging.debug(f"Resize - up_down up: {up:.4f} algorithm_up: {algorithm_up}")
-        lq = resize(
+        lq = self.__resize(
             lq,
-            (int(width * up), int(height * up)),
-            INTERPOLATION_MAP[algorithm_up],
-            gamma_correction=self.gamma_correction,
+            int(width * up),
+            int(height * up),
+            algorithm_up
         )
         return lq
 
@@ -93,11 +101,11 @@ class Resize:
         logging.debug(
             f"Resize - down_up down: {down:.4f} algorithm_down: {algorithm_down}"
         )
-        lq = resize(
+        lq = self.__resize(
             lq,
-            (int(width / down), int(height / down)),
-            INTERPOLATION_MAP[algorithm_down],
-            gamma_correction=self.gamma_correction,
+            int(width / down),
+            int(height / down),
+            algorithm_down,
         )
         return lq
 
@@ -108,11 +116,11 @@ class Resize:
         for down in list(
             reversed(np.arange(int(width // self.lq_scale), int(width), int(step)))
         )[:-1]:
-            lq = resize(
+            lq = self.__resize(
                 lq,
-                (int(down), int(down / height_k)),
-                INTERPOLATION_MAP[algorithm_lq],
-                gamma_correction=self.gamma_correction,
+                int(down),
+                int(down / height_k),
+                algorithm_lq,
             )
         return lq
 
@@ -148,22 +156,22 @@ class Resize:
                 logging.debug(f"Resize - down_down new_algorithm_lq: {algorithm_lq}")
                 lq = self.__down_down(lq, width, height, algorithm_lq)
 
-            lq = resize(
+            lq = self.__resize(
                 lq,
-                (int(width // self.lq_scale), int(height // self.lq_scale)),
-                INTERPOLATION_MAP[algorithm_lq],
-                gamma_correction=self.gamma_correction,
+                int(width // self.lq_scale),
+                int(height // self.lq_scale),
+                algorithm_lq
             )
-            hq = resize(
+            hq = self.__resize(
                 hq,
-                (int(width), int(height)),
-                INTERPOLATION_MAP[algorithm_hq],
-                gamma_correction=self.gamma_correction,
+                int(width),
+                int(height),
+                algorithm_hq,
             )
 
             if self.color_fix:
                 lq = fast_color_level(lq, 0, 254)
                 hq = fast_color_level(hq, 0, 254)
-            return lq.squeeze(), hq.squeeze()
+            return lq.squeeze().clip(0,1), hq.squeeze().clip(0,1)
         except Exception as e:
             logging.error("Resize error: %s", e)

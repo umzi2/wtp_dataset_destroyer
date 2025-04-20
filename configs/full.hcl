@@ -78,9 +78,9 @@ degradation {
 
 degradation {
   type = "resize"
-  alg_lq = ["box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
-    "lanczos", "gauss", "down_up", "down_down", "up_down"]
-  alg_hq = ["lagrange"]
+  alg_lq = ["nearest", "box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+    "lanczos","dpid_1","dpid_0.111","mat_cubic", "gauss", "down_up", "down_down", "up_down"]
+  alg_hq = ["dpid_0.5"]
   down_up = {
     down = [1, 2]
     alg_up = ["nearest", "box", "hermite", "linear", "lagrange", "cubic_catrom", "cubic_mitchell",
@@ -290,17 +290,18 @@ degradation {
   compress = [40, 100]
   probability = 0.5
 }
-laplace_filter = 0.02
-size = 1000
-shuffle_dataset = true
-num_workers = 16
-map_type = "thread"
-debug = false
-only_lq = false
-real_name = false
-out_clear = true
 tile = {
   size = 512
   no_wb = true
 }
+num_workers = 16
+map_type = "thread"
+laplace_filter = 0.02
+size = 1000
+shuffle_dataset = true
 gray = false
+gray_or_color = true
+debug = false
+only_lq = false
+real_name = false
+out_clear = true
