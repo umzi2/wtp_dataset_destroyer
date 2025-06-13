@@ -1,6 +1,6 @@
 import cv2
 from chainner_ext import ResizeFilter
-from pepeline import TypeNoise, CvtType, TypeDot
+from pepeline import TypeNoise, TypeDot
 from chainner_ext import DiffusionAlgorithm
 
 INTERPOLATION_MAP = {
@@ -37,23 +37,29 @@ DITHERING_MAP = {
 
 SUBSAMPLING_MAP = {
     "4:4:4": [1, 1, 1],
-    "4:2:2": [1, 0.5, 1],
-    "4:2:1": [1, 0.5, 0.5],
-    "4:1:1": [1, 0.25, 1],
+    "4:2:2": [1, 1, 0.5],
+    "4:1:1": [1, 1, 0.25],
     "4:2:0": [1, 0.5, 0.5],
-    "4:1:0": [1, 0.25, 0.5],
-    "3:1:1": [0.75, 0.25, 0.75],
+    "4:1:0": [1, 0.5, 0.25],
+    "4:4:0": [1, 0.5, 1],
+    "4:2:1": [1, 0.5, 0.5],
+    "4:1:2": [1, 1, 0.25],
+    "4:1:3": [1, 0.75, 0.25],
 }
+
 YUV_MAP = {
-    "2020": [CvtType.RGB2YCvCrBt2020, CvtType.YCvCr2RGBBt2020],
-    "601": [CvtType.RGB2YCbCr, CvtType.YCbCr2RGB],
-    "709": [CvtType.RGB2YCvCrBt709, CvtType.YCvCr2RGBBt709],
+    "709": "ITU-R BT.709",
+    "2020": "ITU-R BT.2020",
+    "601": "ITU-R BT.601",
+    "240": "SMPTE-240M",
 }
 JPEG_SUBSAMPLING = {
     "4:4:4": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_444,
     "4:4:0": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_440,
     "4:2:2": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_422,
     "4:2:0": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_420,
+    "4:1:1": cv2.IMWRITE_JPEG_SAMPLING_FACTOR_411,
+    "4:0:0": cv2.IMWRITE_JPEG_SAMPLING_FACTOR,
 }
 VIDEO_SUBSAMPLING = {"444": "yuv444p", "422": "yuv422p", "420": "yuv420p"}
 DOT_TYPE = {

@@ -1,14 +1,17 @@
+import random
 import numpy as np
+from pepeline.pepeline import fast_color_level
+
 from .utils import probability
 from ..constants import INTERPOLATION_MAP, SUBSAMPLING_MAP, YUV_MAP
 from numpy.random import choice
 from src.utils.registry import register_class
-from pepeline import cvt_color
 from chainner_ext import resize, ResizeFilter
 import cv2 as cv
 import logging
 
 from ..utils.random import safe_uniform
+import colour
 
 
 @register_class("subsampling")
@@ -46,7 +49,7 @@ class Subsampling:
     def __down_up(
         lq: np.ndarray,
         shape: [int, int],
-        scale: float,
+        scale: [float, float],
         down_alg: ResizeFilter,
         up_alg: ResizeFilter,
     ) -> np.ndarray:
@@ -63,22 +66,28 @@ class Subsampling:
         Returns:
             np.ndarray: Image after applying downscaling and upscaling.
         """
-        return resize(
+        return fast_color_level(
             resize(
-                lq, (int(shape[1] * scale), int(shape[0] * scale)), down_alg, False
+                resize(
+                    lq,
+                    (int(shape[1] * scale[1]), int(shape[0] * scale[0])),
+                    down_alg,
+                    False,
+                ).squeeze(),
+                (shape[1], shape[0]),
+                up_alg,
+                False,
             ).squeeze(),
-            (shape[1], shape[0]),
-            up_alg,
-            False,
-        ).squeeze()
+            1,
+            254,
+        )
 
-    def __sample(self, lq: np.ndarray, format_sampling: str) -> np.ndarray:
+    def __sample(self, lq: np.ndarray) -> np.ndarray:
         """
         Applies subsampling to the image according to the specified format.
 
         Args:
             lq (np.ndarray): Low-quality input image.
-            format_sampling (str): Subsampling format.
 
         Returns:
             np.ndarray: Image after subsampling.
@@ -86,16 +95,14 @@ class Subsampling:
         shape_lq = lq.shape
         down_alg = INTERPOLATION_MAP[choice(self.down_alg)]
         up_alg = INTERPOLATION_MAP[choice(self.up_alg)]
-        scale_list = SUBSAMPLING_MAP[format_sampling]
+        scale_list = SUBSAMPLING_MAP[random.choice(self.format_list)]
         logging.debug(
-            f"Subsampling: format - {format_sampling} down_alg - {down_alg} up_alg - {up_alg}"
+            f"Subsampling: format - {scale_list} down_alg - {down_alg} up_alg - {up_alg}"
         )
-        for index in range(3):
-            scale = scale_list[index]
-            if scale != 1:
-                lq[..., index] = self.__down_up(
-                    lq[..., index], shape_lq, scale, down_alg, up_alg
-                )
+        if scale_list != [1, 1, 1]:
+            lq[..., 1:3] = self.__down_up(
+                lq[..., 1:3], shape_lq, scale_list[1:3], down_alg, up_alg
+            )
         return lq
 
     def run(self, lq: np.ndarray, hq: np.ndarray) -> (np.ndarray, np.ndarray):
@@ -112,12 +119,12 @@ class Subsampling:
         try:
             if lq.ndim == 2 or lq.shape[2] == 1 or probability(self.probability):
                 return lq, hq
-            format_type = choice(self.format_list)
-            yuv = YUV_MAP.get(choice(self.ycbcr_type), YUV_MAP["601"])
-            lq = cvt_color(lq, yuv[0])
+            yuv = YUV_MAP[random.choice(self.ycbcr_type)]
+            lq = colour.RGB_to_YCbCr(
+                lq, in_bits=8, K=colour.models.rgb.ycbcr.WEIGHTS_YCBCR[yuv]
+            ).astype(np.float32)  # cv2.cvtColor(lq,cv2.COLOR_RGB2YCrCb)
 
-            if format_type in SUBSAMPLING_MAP.keys() and format_type != "4:4:4":
-                lq = self.__sample(lq, format_type)
+            lq = self.__sample(lq)
             if self.blur_kernels:
                 sigma = safe_uniform(self.blur_kernels)
                 if sigma != 0.0:
@@ -136,7 +143,16 @@ class Subsampling:
                         sigmaY=sigma,
                         borderType=cv.BORDER_REFLECT,
                     )
-            lq = cvt_color(lq, yuv[1])
+            lq = (
+                colour.YCbCr_to_RGB(
+                    lq,
+                    in_bits=8,
+                    out_bits=8,
+                    K=colour.models.rgb.ycbcr.WEIGHTS_YCBCR[yuv],
+                )
+                .astype(np.float32)
+                .clip(0, 1)
+            )
             return lq, hq
         except Exception as e:
             logging.error(f"Subsampling Error: {e}")

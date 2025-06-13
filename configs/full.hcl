@@ -110,12 +110,12 @@ degradation {
   type = "subsampling"
   down = ["box", "nearest", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
     "lanczos", "gauss"]
-  up = ["box",  "linear", "nearest", "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
+  up = ["box", "nearest", "linear",  "lagrange", "cubic_catrom", "cubic_mitchell", "cubic_bspline",
     "lanczos", "gauss"]
-  sampling = ["4:4:4", "4:2:2", "4:2:1", "4:1:1", "4:2:0", "4:1:0", "3:1:1"]
-  yuv = ["601","709","2020"]
-  blur = [0.0,4]
-  probability = 0.5
+  sampling = ["4:4:4", "4:2:2", "4:1:1", "4:2:0", "4:1:0", "4:4:0", "4:2:1", "4:1:2", "4:1:3"]
+  yuv = ["601","709","2020","240"]
+  blur = [0.0,0]
+  probability = 1
 }
 
 degradation {
