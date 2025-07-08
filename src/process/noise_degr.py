@@ -1,5 +1,5 @@
 import numpy as np
-from colour import colour
+import colour
 
 from .custom_blur import motion_blur
 from .utils import probability, normalize_noise as normalize
