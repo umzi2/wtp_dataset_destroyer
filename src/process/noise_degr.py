@@ -1,9 +1,10 @@
 import numpy as np
+from colour import colour
 
 from .custom_blur import motion_blur
 from .utils import probability, normalize_noise as normalize
 from ..constants import NOISE_MAP
-from pepeline import noise_generate, cvt_color, CvtType
+from pepeline import noise_generate
 from chainner_ext import resize, ResizeFilter
 from ..utils.random import safe_uniform, safe_arange, safe_randint
 import cv2 as cv
@@ -284,13 +285,17 @@ class Noise:
             if lq.ndim == 3:
                 if not probability(self.y_noise):
                     y = True
-                    yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
+                    yuv_img = colour.RGB_to_YCbCr(
+                lq, in_bits=8, K=colour.models.rgb.ycbcr.WEIGHTS_YCBCR["ITU-R BT.2020"]
+            ).astype(np.float32)
                     lq = yuv_img[:, :, 0]
                     uv_array = yuv_img[:, :, 1:]
                     self.default_debug = "Noise - color_type: y"
                 elif not probability(self.uv_noise):
                     uv = True
-                    yuv_img = cvt_color(lq, CvtType.RGB2YCvCrBt2020)
+                    yuv_img = colour.RGB_to_YCbCr(
+                lq, in_bits=8, K=colour.models.rgb.ycbcr.WEIGHTS_YCBCR["ITU-R BT.2020"]
+            ).astype(np.float32)
                     lq = yuv_img[:, :, 1:]
                     y_array = yuv_img[:, :, 0]
                     self.default_debug = "Noise - color_type: uv"
@@ -301,10 +306,28 @@ class Noise:
             lq = NOISE_TYPE_MAP[self.noise_type](lq)
             if y:
                 lq = np.stack((lq, uv_array[:, :, 0], uv_array[:, :, 1]), axis=-1)
-                lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
+                lq = (
+                colour.YCbCr_to_RGB(
+                    lq,
+                    in_bits=8,
+                    out_bits=8,
+                    K=colour.models.rgb.ycbcr.WEIGHTS_YCBCR["ITU-R BT.2020"],
+                )
+                .astype(np.float32)
+                .clip(0, 1)
+            )
             elif uv:
                 lq = np.stack((y_array, lq[:, :, 0], lq[:, :, 1]), axis=-1)
-                lq = cvt_color(lq, CvtType.YCvCr2RGBBt2020)
+                lq = (
+                colour.YCbCr_to_RGB(
+                    lq,
+                    in_bits=8,
+                    out_bits=8,
+                    K=colour.models.rgb.ycbcr.WEIGHTS_YCBCR["ITU-R BT.2020"],
+                )
+                .astype(np.float32)
+                .clip(0, 1)
+            )
             else:
                 lq = lq.clip(0, 1)
 
