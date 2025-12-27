@@ -27,8 +27,7 @@ jobs:
 
       - name: Publish core
         run: |
-          uv publish dist/* -t ${{ secrets.PYPI_TOKEN }}
-        working-directory: pepedd-core
+          uv publish $(pwd)/pepedd-core/dist/ -t ${{ secrets.PYPI_TOKEN }}
 
 
   publish-nodes:
@@ -54,5 +53,4 @@ jobs:
 
       - name: Publish nodes
         run: |
-          uv publish dist/* -t ${{ secrets.PYPI_TOKEN }}
-        working-directory: pepedd-nodes
+          uv publish $(pwd)/pepedd-nodes/dist/ -t ${{ secrets.PYPI_TOKEN }}
