@@ -1,0 +1,7 @@
+numpy~=2.4.0
+pepeline~=1.2.2
+pydantic~=2.12.5
+tqdm~=4.67.1
+
+[nodes]
+pepedd-nodes>=0.1.0

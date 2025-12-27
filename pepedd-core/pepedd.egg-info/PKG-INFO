@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: pepedd
+Version: 0.1.0
+Summary: A library for creating paired datasets with different degradations.
+Author: Umzi
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: numpy~=2.4.0
+Requires-Dist: pepeline~=1.2.2
+Requires-Dist: pydantic~=2.12.5
+Requires-Dist: tqdm~=4.67.1
+Provides-Extra: nodes
+Requires-Dist: pepedd-nodes>=0.1.0; extra == "nodes"

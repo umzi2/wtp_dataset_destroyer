@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pepedd"
+version = "0.1.0"
+description = "A library for creating paired datasets with different degradations."
+authors = [{name = "Umzi"}]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy~=2.4.0",
+    "pepeline~=1.2.2",
+    "pydantic~=2.12.5",
+    "tqdm~=4.67.1",
+]
+[project.optional-dependencies]
+nodes = [
+    "pepedd-nodes>=0.1.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pepedd", "pepedd.core*"]

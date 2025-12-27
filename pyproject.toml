@@ -1,0 +1,14 @@
+[project]
+name = "pepedd-workspace"
+version = "0.1.0"
+dependencies = [
+    "pepedd",
+    "pepedd-nodes",
+]
+
+[tool.uv.workspace]
+members = ["pepedd-core", "pepedd-nodes"]
+
+[tool.uv.sources]
+pepedd = { workspace = true }
+pepedd-nodes = { workspace = true }
