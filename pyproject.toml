@@ -1,14 +1,18 @@
 [project]
-name = "pepedd-workspace"
+name = "pepedd"
 version = "0.1.0"
 dependencies = [
-    "pepedd",
-    "pepedd-nodes",
+    "numpy~=2.4.0",
+    "pepeline~=1.2.2",
+    "pydantic~=2.12.5",
+    "tqdm~=4.67.1",
+    "astropy~=7.2.0",
+    "chainner-ext~=0.3.10",
+    "colour-science~=0.4.7",
+    "opencv-python~=4.11.0.86",
+    "pepedpid~=0.1.1",
+    "scikit-image~=0.26.0",
+    "scipy~=1.16.3",
 ]
 
-[tool.uv.workspace]
-members = ["pepedd-core", "pepedd-nodes"]
 
-[tool.uv.sources]
-pepedd = { workspace = true }
-pepedd-nodes = { workspace = true }

@@ -1,8 +1,0 @@
-pepedd>=0.1.0
-astropy~=7.2.0
-chainner-ext~=0.3.10
-colour-science~=0.4.7
-opencv-python~=4.11.0.86
-pepedpid~=0.1.1
-scikit-image~=0.26.0
-scipy~=1.16.3
