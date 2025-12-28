@@ -22,9 +22,8 @@ jobs:
 
       - name: Build core
         run: |
-          cd pepedd-core
-          uv build
-
+          chmod +x build_core.sh
+          ./build_core.sh
       - name: Publish core
         run: |
           echo $(pwd)
@@ -49,8 +48,8 @@ jobs:
 
       - name: Build nodes
         run: |
-          cd pepedd-nodes
-          uv build
+          chmod +x build_nodes.sh
+          ./build_nodes.sh
 
       - name: Publish nodes
         run: |
